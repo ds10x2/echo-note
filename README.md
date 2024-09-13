@@ -15,3 +15,4 @@
 | 3주차 | 09/09 | [`기획회의`](https://lab.ssafy.com/s11-ai-speech-sub1/S11P21A210/-/blob/jominju/20240909.md?ref_type=heads) / [`기능명세서`](https://lab.ssafy.com/s11-ai-speech-sub1/S11P21A210/-/blob/jominju/20240909.pdf?ref_type=heads)      |
 |       | 09/10 | [`API 명세서`](https://lab.ssafy.com/s11-ai-speech-sub1/S11P21A210/-/blob/jominju/20240910.pdf?ref_type=heads) / [`와이어프레임`](https://lab.ssafy.com/s11-ai-speech-sub1/S11P21A210/-/blob/jominju/20240910.png?ref_type=heads) |
 |       | 09/12 | [`새로운기획-확정!`](https://lab.ssafy.com/s11-ai-speech-sub1/S11P21A210/-/blob/jominju/20240912.md?ref_type=heads)                                                                                                               |
+|       | 09/13 | [`New 기능 명세서`](https://lab.ssafy.com/s11-ai-speech-sub1/S11P21A210/-/blob/jominju/20240913.pdf?ref_type=heads)                                                                                                               |
