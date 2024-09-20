@@ -17,3 +17,4 @@
 ||09/12|[`새로운 기획 회의 + 중간 발표 준비`](https://lab.ssafy.com/s11-ai-speech-sub1/S11P21A210/-/blob/choiyeheon/0912.md?ref_type=heads)|
 ||09/13|[`기능 명세서`](https://lab.ssafy.com/s11-ai-speech-sub1/S11P21A210/-/blob/choiyeheon/0913.md?ref_type=heads)|
 |4주차|09/19|[`디자인 및 필기 데이터 처리 고민`](https://lab.ssafy.com/s11-ai-speech-sub1/S11P21A210/-/blob/choiyeheon/0919.md?ref_type=heads)|
+||09/20|[`CI/CD`](https://lab.ssafy.com/s11-ai-speech-sub1/S11P21A210/-/blob/choiyeheon/0920.md?ref_type=heads)|
