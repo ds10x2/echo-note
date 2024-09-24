@@ -3,6 +3,7 @@ import * as St from "./styles/PdfViewer.style";
 import * as pdfjsLib from "pdfjs-dist";
 import { useSwipe } from "@/hooks/useSwipe";
 import { usePinchZoom } from "@/hooks/usePinchZoom";
+import PdfEditor from "@components/PdfEditor";
 
 const PdfViewer = ({ url }) => {
   const canvasRef = useRef();
@@ -11,18 +12,25 @@ const PdfViewer = ({ url }) => {
 
   const [pdfRef, setPdfRef] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [scale, setScale] = useState(1); //초기 스케일 값
+  const [scale, setScale] = useState(1); // 초기 스케일 값
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 }); // 캔버스 크기 상태
   const renderTaskRef = useRef(null);
+  const sampleUrl =
+    "https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf";
 
-  //PDF 렌더링
+  // PDF 렌더링
   const renderPage = useCallback(
     (pageNum, pdf = pdfRef) => {
       if (pdf) {
-        pdf.getPage(pageNum !== null ? pageNum : 1).then(function (page) {
+        pdf.getPage(pageNum).then(function (page) {
           const viewport = page.getViewport({ scale });
           const canvas = canvasRef.current;
           canvas.height = viewport.height;
           canvas.width = viewport.width;
+
+          // PDF 캔버스의 크기를 상태에 저장
+          setCanvasSize({ width: viewport.width, height: viewport.height });
+
           const renderContext = {
             canvasContext: canvas.getContext("2d"),
             viewport: viewport,
@@ -53,11 +61,9 @@ const PdfViewer = ({ url }) => {
     renderPage(currentPage, pdfRef);
   }, [pdfRef, currentPage, scale]);
 
+  //URL 설정
   useEffect(() => {
-    const loadingTask = pdfjsLib.getDocument(
-      // url
-      "https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf" // 임시 링크
-    );
+    const loadingTask = pdfjsLib.getDocument(sampleUrl);
     loadingTask.promise.then(
       (loadedPdf) => {
         setPdfRef(loadedPdf);
@@ -71,7 +77,7 @@ const PdfViewer = ({ url }) => {
   // usePinchZoom 훅 사용
   const isPinching = usePinchZoom(containerRef, setScale);
 
-  //페이지 이동
+  // 페이지 이동
   const nextPage = () => {
     pdfRef && currentPage < pdfRef.numPages && setCurrentPage(currentPage + 1);
   };
@@ -80,15 +86,16 @@ const PdfViewer = ({ url }) => {
   };
 
   // useSwipe 훅 사용 - 스와이프 동작으로 페이지 이동
-  // onSwipeLeft-prevPage, onSwipeRight-nextPage 연결
   useSwipe(isPinching, containerRef, prevPage, nextPage);
 
   return (
     <St.PdfContainer ref={containerRef}>
       <St.PdfPage>
         <canvas ref={canvasRef}></canvas>
+        <PdfEditor canvasSize={canvasSize} />
       </St.PdfPage>
     </St.PdfContainer>
   );
 };
+
 export default PdfViewer;
