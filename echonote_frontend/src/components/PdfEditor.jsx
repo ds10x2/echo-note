@@ -15,8 +15,8 @@ const PdfEditor = ({ canvasSize, scale }) => {
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
     const containerRect = containerRef.current.getBoundingClientRect();
-    const x = (clientX - containerRect.left) / scale; // 스케일 조정
-    const y = (clientY - containerRect.top) / scale; // 스케일 조정
+    const x = (clientX - containerRect.left) / scale;
+    const y = (clientY - containerRect.top) / scale;
 
     setTextItems([
       ...textItems,
@@ -57,14 +57,12 @@ const PdfEditor = ({ canvasSize, scale }) => {
   const handleKeyDown = (e, id) => {
     if (e.key === "Enter") {
       if (e.ctrlKey) {
-        // Ctrl + Enter인 경우 텍스트에 줄바꿈 추가
         e.preventDefault();
         updateTextItem(
           id,
           textItems.find((item) => item.id === id).text + "\n"
         );
       } else {
-        // Enter만 누른 경우 입력 종료
         e.preventDefault();
         finishEditing(id);
       }
@@ -109,18 +107,18 @@ const PdfEditor = ({ canvasSize, scale }) => {
             let newY = clientY / scale - item.offsetY;
 
             // 박스가 PdfEditor 범위를 넘지 않도록 조정
-            const textBoxWidth = 100 / scale; // 텍스트 박스의 너비, 필요에 따라 정확한 너비로 변경하세요.
-            const textBoxHeight = item.fontSize * scale; // 텍스트 박스의 높이
+            const textBoxWidth = 100 / scale;
+            const textBoxHeight = item.fontSize * scale;
 
             // X 축 범위 확인
-            if (newX < 0) newX = 0; // 좌측 경계
+            if (newX < 0) newX = 0;
             else if (newX + textBoxWidth > containerWidth)
-              newX = containerWidth - textBoxWidth; // 우측 경계
+              newX = containerWidth - textBoxWidth;
 
             // Y 축 범위 확인
-            if (newY < 0) newY = 0; // 상단 경계
+            if (newY < 0) newY = 0;
             else if (newY + textBoxHeight > containerHeight)
-              newY = containerHeight - textBoxHeight; // 하단 경계
+              newY = containerHeight - textBoxHeight;
 
             return {
               ...item,
@@ -131,7 +129,7 @@ const PdfEditor = ({ canvasSize, scale }) => {
           return item;
         })
       );
-      hasDraggedRef.current = true; // 실제로 드래그 동작이 발생했음을 기록
+      hasDraggedRef.current = true;
     }
   };
 
@@ -148,9 +146,9 @@ const PdfEditor = ({ canvasSize, scale }) => {
     const container = containerRef.current;
     container.addEventListener("mousemove", handleMouseMove);
     container.addEventListener("mouseup", handleMouseUp);
-    container.addEventListener("touchmove", handleMouseMove); // 터치 이동 이벤트 추가
-    container.addEventListener("touchend", handleMouseUp); // 터치 종료 이벤트 추가
-    container.addEventListener("touchstart", addTextBox); // 터치 시작 이벤트 추가
+    container.addEventListener("touchmove", handleMouseMove);
+    container.addEventListener("touchend", handleMouseUp);
+    container.addEventListener("touchstart", addTextBox);
 
     return () => {
       container.removeEventListener("mousemove", handleMouseMove);
@@ -177,14 +175,14 @@ const PdfEditor = ({ canvasSize, scale }) => {
       {textItems.map((item) => (
         <St.TextBox
           key={item.id}
-          x={item.x * scale} // 스케일 조정된 좌표 사용
-          y={item.y * scale} // 스케일 조정된 좌표 사용
+          x={item.x * scale}
+          y={item.y * scale}
           isEditing={item.isEditing}
           isDragging={item.isDragging}
           onMouseDown={(e) => handleMouseDown(e, item.id)}
-          onTouchStart={(e) => handleMouseDown(e, item.id)} // 터치 시작 이벤트 추가
+          onTouchStart={(e) => handleMouseDown(e, item.id)}
           style={{
-            fontSize: `${item.fontSize * scale}px`, // 스케일에 따라 폰트 크기 조정
+            fontSize: `${item.fontSize * scale}px`,
           }}
         >
           {item.isEditing ? (
@@ -193,7 +191,7 @@ const PdfEditor = ({ canvasSize, scale }) => {
               autoFocus
               onChange={(e) => updateTextItem(item.id, e.target.value)}
               onBlur={() => finishEditing(item.id)}
-              onKeyDown={(e) => handleKeyDown(e, item.id)} // Enter와 Ctrl + Enter 처리
+              onKeyDown={(e) => handleKeyDown(e, item.id)}
               style={{ fontSize: `${item.fontSize * scale}px` }}
             />
           ) : (
