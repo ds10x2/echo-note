@@ -54,6 +54,23 @@ const PdfEditor = ({ canvasSize, scale }) => {
     );
   };
 
+  const handleKeyDown = (e, id) => {
+    if (e.key === "Enter") {
+      if (e.ctrlKey) {
+        // Ctrl + Enter인 경우 텍스트에 줄바꿈 추가
+        e.preventDefault();
+        updateTextItem(
+          id,
+          textItems.find((item) => item.id === id).text + "\n"
+        );
+      } else {
+        // Enter만 누른 경우 입력 종료
+        e.preventDefault();
+        finishEditing(id);
+      }
+    }
+  };
+
   const handleMouseDown = (e, id) => {
     e.stopPropagation();
     isDraggingRef.current = true;
@@ -176,7 +193,8 @@ const PdfEditor = ({ canvasSize, scale }) => {
               autoFocus
               onChange={(e) => updateTextItem(item.id, e.target.value)}
               onBlur={() => finishEditing(item.id)}
-              style={{ fontSize: `${item.fontSize * scale}px` }} // 스케일에 따라 폰트 크기 조정
+              onKeyDown={(e) => handleKeyDown(e, item.id)} // Enter와 Ctrl + Enter 처리
+              style={{ fontSize: `${item.fontSize * scale}px` }}
             />
           ) : (
             <div>{item.text}</div>
