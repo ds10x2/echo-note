@@ -195,7 +195,9 @@ const PdfEditor = ({ canvasSize, scale }) => {
               style={{ fontSize: `${item.fontSize * scale}px` }}
             />
           ) : (
-            <div>{item.text}</div>
+            <St.TextDetail fontSize={item.fontSize * scale}>
+              {item.text}
+            </St.TextDetail>
           )}
         </St.TextBox>
       ))}

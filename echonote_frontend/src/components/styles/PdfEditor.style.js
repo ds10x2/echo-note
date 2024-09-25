@@ -1,4 +1,5 @@
 import { styled } from "styled-components";
+import { theme } from "@/shared/styles/theme";
 
 export const PdfEditorContainer = styled.div`
   position: absolute;
@@ -42,4 +43,9 @@ export const TextArea = styled.textarea`
   padding: 2px;
   outline: none;
   user-select: none;
+`;
+
+export const TextDetail = styled.div`
+  white-space: pre-wrap;
+  font-size: ${({ fontSize }) => fontSize}px;
 `;
