@@ -6,10 +6,10 @@ const PdfEditor = ({ canvasSize }) => {
   const [textItems, setTextItems] = useState([]);
   const [isTextMode, setIsTextMode] = useState(false);
   const isDraggingRef = useRef(false); // 현재 드래그 상태
-  const hasDragged = useRef(false); // 드래그 발생 여부(드래그 종료 시 클릭이벤트 방지용)
+  const hasDraggedRef = useRef(false); // 드래그 발생 여부(드래그 종료 시 클릭이벤트 방지용)
 
   const addTextBox = (e) => {
-    if (!isTextMode || isDraggingRef.current || hasDragged.current) return;
+    if (!isTextMode || isDraggingRef.current || hasDraggedRef.current) return;
 
     const containerRect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - containerRect.left;
@@ -54,7 +54,7 @@ const PdfEditor = ({ canvasSize }) => {
   const handleMouseDown = (e, id) => {
     e.stopPropagation();
     isDraggingRef.current = true;
-    hasDragged.current = false;
+    hasDraggedRef.current = false;
 
     setTextItems((items) =>
       items.map((item) =>
@@ -84,7 +84,7 @@ const PdfEditor = ({ canvasSize }) => {
             : item
         )
       );
-      hasDragged.current = true; // 실제로 드래그 동작이 발생했음을 기록
+      hasDraggedRef.current = true; // 실제로 드래그 동작이 발생했음을 기록
     }
   };
 
