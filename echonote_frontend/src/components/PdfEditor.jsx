@@ -34,6 +34,23 @@ const PdfEditor = ({ canvasSize, scale }) => {
     ]);
   };
 
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
+
+    setTextItems((items) =>
+      items.map((item) =>
+        item.isDragging ? { ...item, isDragging: false } : item
+      )
+    );
+
+    if (hasDraggedRef.current) {
+      // 드래그가 발생한 경우 약간의 시간차 후에 hasDraggedRef를 false로 설정
+      setTimeout(() => {
+        hasDraggedRef.current = false;
+      }, 50); // 50ms 정도의 시간차를 두어 클릭 이벤트를 차단
+    }
+  };
+
   const updateTextItem = (id, newText) => {
     setTextItems((items) =>
       items.map((item) => (item.id === id ? { ...item, text: newText } : item))
@@ -131,15 +148,6 @@ const PdfEditor = ({ canvasSize, scale }) => {
       );
       hasDraggedRef.current = true;
     }
-  };
-
-  const handleMouseUp = () => {
-    isDraggingRef.current = false;
-    setTextItems((items) =>
-      items.map((item) =>
-        item.isDragging ? { ...item, isDragging: false } : item
-      )
-    );
   };
 
   useEffect(() => {
