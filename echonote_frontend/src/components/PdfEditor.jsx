@@ -91,8 +91,30 @@ const PdfEditor = ({ canvasSize, scale }) => {
     isDraggingRef.current = true;
     hasDraggedRef.current = false;
 
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+
+    setTextItems((items) =>
+      items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              isDragging: true,
+              offsetX: clientX / scale - item.x,
+              offsetY: clientY / scale - item.y,
+            }
+          : item
+      )
+    );
+  };
+
+  const handleTouchStart = (e, id) => {
+    e.stopPropagation();
+    isDraggingRef.current = true;
+    hasDraggedRef.current = false;
+
+    const clientX = e.touches[0].clientX;
+    const clientY = e.touches[0].clientY;
 
     setTextItems((items) =>
       items.map((item) =>
@@ -156,14 +178,14 @@ const PdfEditor = ({ canvasSize, scale }) => {
     container.addEventListener("mouseup", handleMouseUp);
     container.addEventListener("touchmove", handleMouseMove);
     container.addEventListener("touchend", handleMouseUp);
-    container.addEventListener("touchstart", addTextBox);
+    container.addEventListener("mousedown", addTextBox);
 
     return () => {
       container.removeEventListener("mousemove", handleMouseMove);
       container.removeEventListener("mouseup", handleMouseUp);
       container.removeEventListener("touchmove", handleMouseMove);
       container.removeEventListener("touchend", handleMouseUp);
-      container.removeEventListener("touchstart", addTextBox);
+      container.removeEventListener("mousedown", addTextBox);
     };
   }, []);
 
@@ -188,7 +210,7 @@ const PdfEditor = ({ canvasSize, scale }) => {
           isEditing={item.isEditing}
           isDragging={item.isDragging}
           onMouseDown={(e) => handleMouseDown(e, item.id)}
-          onTouchStart={(e) => handleMouseDown(e, item.id)}
+          onTouchStart={(e) => handleTouchStart(e, item.id)}
           style={{
             fontSize: `${item.fontSize * scale}px`,
           }}
