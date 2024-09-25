@@ -12,8 +12,8 @@ const PdfViewer = ({ url }) => {
 
   const [pdfRef, setPdfRef] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [scale, setScale] = useState(1); // 초기 스케일 값
-  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 }); // 캔버스 크기 상태
+  const [scale, setScale] = useState(0.8); // 초기 스케일 값
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
   const sampleUrl =
     "https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf";
@@ -22,7 +22,7 @@ const PdfViewer = ({ url }) => {
   const renderPage = useCallback(
     (pageNum, pdf = pdfRef) => {
       if (pdf) {
-        pdf.getPage(pageNum).then(function (page) {
+        pdf.getPage(pageNum).then((page) => {
           const viewport = page.getViewport({ scale });
           const canvas = canvasRef.current;
           canvas.height = viewport.height;
@@ -92,7 +92,7 @@ const PdfViewer = ({ url }) => {
     <St.PdfContainer ref={containerRef}>
       <St.PdfPage>
         <canvas ref={canvasRef}></canvas>
-        <PdfEditor canvasSize={canvasSize} />
+        <PdfEditor canvasSize={canvasSize} scale={scale} />
       </St.PdfPage>
     </St.PdfContainer>
   );

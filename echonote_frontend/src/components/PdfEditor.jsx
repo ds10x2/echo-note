@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as St from "./styles/PdfEditor.style";
 
-const PdfEditor = ({ canvasSize }) => {
+const PdfEditor = ({ canvasSize, scale }) => {
   const containerRef = useRef();
   const [textItems, setTextItems] = useState([]);
   const [isTextMode, setIsTextMode] = useState(false);
@@ -12,8 +12,8 @@ const PdfEditor = ({ canvasSize }) => {
     if (!isTextMode || isDraggingRef.current || hasDraggedRef.current) return;
 
     const containerRect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - containerRect.left;
-    const y = e.clientY - containerRect.top;
+    const x = (e.clientX - containerRect.left) / scale; // 스케일 조정
+    const y = (e.clientY - containerRect.top) / scale; // 스케일 조정
 
     setTextItems([
       ...textItems,
@@ -26,6 +26,7 @@ const PdfEditor = ({ canvasSize }) => {
         isDragging: false,
         offsetX: 0,
         offsetY: 0,
+        fontSize: 16, // 기본 폰트 크기
       },
     ]);
   };
@@ -62,8 +63,8 @@ const PdfEditor = ({ canvasSize }) => {
           ? {
               ...item,
               isDragging: true,
-              offsetX: e.clientX - item.x,
-              offsetY: e.clientY - item.y,
+              offsetX: e.clientX / scale - item.x,
+              offsetY: e.clientY / scale - item.y,
             }
           : item
       )
@@ -78,8 +79,8 @@ const PdfEditor = ({ canvasSize }) => {
           item.isDragging
             ? {
                 ...item,
-                x: e.clientX - item.offsetX,
-                y: e.clientY - item.offsetY,
+                x: e.clientX / scale - item.offsetX,
+                y: e.clientY / scale - item.offsetY,
               }
             : item
         )
@@ -124,11 +125,14 @@ const PdfEditor = ({ canvasSize }) => {
       {textItems.map((item) => (
         <St.TextBox
           key={item.id}
-          x={item.x}
-          y={item.y}
+          x={item.x * scale} // 스케일 조정된 좌표 사용
+          y={item.y * scale} // 스케일 조정된 좌표 사용
           isEditing={item.isEditing}
           isDragging={item.isDragging}
           onMouseDown={(e) => handleMouseDown(e, item.id)}
+          style={{
+            fontSize: `${item.fontSize * scale}px`, // 스케일에 따라 폰트 크기 조정
+          }}
         >
           {item.isEditing ? (
             <St.TextArea
@@ -136,6 +140,7 @@ const PdfEditor = ({ canvasSize }) => {
               autoFocus
               onChange={(e) => updateTextItem(item.id, e.target.value)}
               onBlur={() => finishEditing(item.id)}
+              style={{ fontSize: `${item.fontSize * scale}px` }} // 스케일에 따라 폰트 크기 조정
             />
           ) : (
             <div>{item.text}</div>
