@@ -11,6 +11,6 @@ export const PdfPage = styled.div`
 export const PdfContainer = styled.div`
   display: flex;
   overflow: auto;
-  max-height: 100%;
-  background-color: ${theme.colors.articleDivider};
+  height: 100vh;
+  width: 100vw;
 `;
