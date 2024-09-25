@@ -1,4 +1,3 @@
-// styles/PdfEditor.style.js
 import { styled } from "styled-components";
 
 export const PdfEditorContainer = styled.div`
@@ -42,4 +41,5 @@ export const TextArea = styled.textarea`
   resize: none;
   padding: 2px;
   outline: none;
+  user-select: none;
 `;

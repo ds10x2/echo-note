@@ -5,11 +5,11 @@ const PdfEditor = ({ canvasSize }) => {
   const containerRef = useRef();
   const [textItems, setTextItems] = useState([]);
   const [isTextMode, setIsTextMode] = useState(false);
-  const isDraggingRef = useRef(false); // 드래그 여부만 사용
+  const isDraggingRef = useRef(false); // 현재 드래그 상태
+  const hasDragged = useRef(false); // 드래그 발생 여부(드래그 종료 시 클릭이벤트 방지용)
 
-  // 텍스트 모드가 활성화된 경우 텍스트 박스 추가
   const addTextBox = (e) => {
-    if (!isTextMode || isDraggingRef.current) return; // 드래그 중이면 텍스트 박스 추가 방지
+    if (!isTextMode || isDraggingRef.current || hasDragged.current) return;
 
     const containerRect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - containerRect.left;
@@ -30,22 +30,20 @@ const PdfEditor = ({ canvasSize }) => {
     ]);
   };
 
-  // 텍스트 박스 내용 업데이트
   const updateTextItem = (id, newText) => {
     setTextItems((items) =>
       items.map((item) => (item.id === id ? { ...item, text: newText } : item))
     );
   };
 
-  // 텍스트 입력 완료 시 편집 모드 종료 또는 텍스트 박스 제거
   const finishEditing = (id) => {
     setTextItems((items) =>
       items.filter((item) => {
         if (item.id === id) {
           if (item.text.trim() === "") {
-            return false; // 텍스트가 비어 있으면 제거
+            return false;
           }
-          item.isEditing = false; // 편집 모드 종료
+          item.isEditing = false;
         }
         return true;
       })
@@ -55,7 +53,8 @@ const PdfEditor = ({ canvasSize }) => {
   // 드래그 시작
   const handleMouseDown = (e, id) => {
     e.stopPropagation();
-    isDraggingRef.current = true; // 드래그 시작 시 true로 설정
+    isDraggingRef.current = true;
+    hasDragged.current = false;
 
     setTextItems((items) =>
       items.map((item) =>
@@ -85,12 +84,13 @@ const PdfEditor = ({ canvasSize }) => {
             : item
         )
       );
+      hasDragged.current = true; // 실제로 드래그 동작이 발생했음을 기록
     }
   };
 
   // 드래그 종료
   const handleMouseUp = () => {
-    isDraggingRef.current = false; // 드래그 종료 시 false로 설정
+    isDraggingRef.current = false;
     setTextItems((items) =>
       items.map((item) =>
         item.isDragging ? { ...item, isDragging: false } : item
@@ -114,7 +114,6 @@ const PdfEditor = ({ canvasSize }) => {
       onClick={addTextBox}
       width={canvasSize.width}
       height={canvasSize.height}
-      isDragging={isDraggingRef.current}
     >
       <button
         onClick={() => setIsTextMode(!isTextMode)}
