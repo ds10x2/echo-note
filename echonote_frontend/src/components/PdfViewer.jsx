@@ -23,7 +23,7 @@ const PdfViewer = ({ url }) => {
     (pageNum, pdf = pdfRef) => {
       if (pdf) {
         pdf.getPage(pageNum).then((page) => {
-          const viewport = page.getViewport({ scale });
+          const viewport = page.getViewport({ scale: 1 }); // 항상 1로 설정하여 고정
           const canvas = canvasRef.current;
           canvas.height = viewport.height;
           canvas.width = viewport.width;
@@ -54,12 +54,12 @@ const PdfViewer = ({ url }) => {
         });
       }
     },
-    [pdfRef, scale]
+    [pdfRef]
   );
 
   useEffect(() => {
     renderPage(currentPage, pdfRef);
-  }, [pdfRef, currentPage, scale]);
+  }, [pdfRef, currentPage]);
 
   //URL 설정
   useEffect(() => {
@@ -90,9 +90,11 @@ const PdfViewer = ({ url }) => {
 
   return (
     <St.PdfContainer ref={containerRef}>
-      <St.PdfPage>
+      <St.PdfPage
+        style={{ transform: `scale(${scale})`, transformOrigin: "0 0" }}
+      >
         <canvas ref={canvasRef}></canvas>
-        <PdfEditor canvasSize={canvasSize} scale={scale} />
+        <PdfEditor canvasSize={canvasSize} />
       </St.PdfPage>
     </St.PdfContainer>
   );
