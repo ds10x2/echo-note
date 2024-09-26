@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/note")
-@Tag(name = "voice", description = "voice api")
+@Tag(name = "note", description = "note api")
 public class NoteController {
 
 	private final NoteServiceImpl noteService;
