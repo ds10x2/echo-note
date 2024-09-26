@@ -1,4 +1,4 @@
-package com.echonote.domain.Voice.Service;
+package com.echonote.domain.Voice.service;
 
 import org.springframework.stereotype.Service;
 
