@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Document(collation = "memo")
+@Document(collection = "memo")
 public class Memo {
 
     @Id

@@ -28,7 +28,7 @@ public class MemoController {
 	@GetMapping
 	@Operation(summary = "MongoDB에 메모 불러옴", description = "Id와 매핑 된 Memo 불러오기")
 	public ResponseEntity<Memo> getMemo(@RequestParam long id) {
-		//        Memo list = memoService.findById(id);
+		// Memo list = memoService.findById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -43,7 +43,7 @@ public class MemoController {
 	@PutMapping
 	@Operation(summary = "메모 수정 및 삭제", description = "PDF와 매핑 된 모든 DB는 위와 같은 형식으로")
 	public ResponseEntity<Memo> updateMemo(@RequestBody Memo memo) {
-		memoService.saveMemo(memo);
+		memoService.updateMemo(memo);
 		System.out.println(memo.toString());
 
 		return new ResponseEntity<>(HttpStatus.OK);

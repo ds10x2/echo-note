@@ -7,7 +7,7 @@ public interface MemoService {
     void insertMemo(Memo list);
 
     // 메모 업데이트
-    void saveMemo(Memo list);
+    void updateMemo(Memo list);
 
     // 메모 삭제하기
     void deleteMemo(long id);
