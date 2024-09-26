@@ -32,6 +32,9 @@ public class VoiceServiceImpl implements VoiceService {
 			amazonS3.generatePresignedUrl(bucketName, filePath, calendar.getTime(), httpMethod).toString());
 
 		return res;
-
 	}
+
+	// STT Service
+
+
 }

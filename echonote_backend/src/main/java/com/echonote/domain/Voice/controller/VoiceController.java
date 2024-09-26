@@ -39,8 +39,7 @@ public class VoiceController {
 	@PostMapping("/stt")
 	public ResponseEntity<S3SaveResponse> saveToMongo(@RequestBody String result) {
 		System.out.println(result);
-
-
+		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
