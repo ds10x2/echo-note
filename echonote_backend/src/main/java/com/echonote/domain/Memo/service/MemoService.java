@@ -2,6 +2,8 @@ package com.echonote.domain.Memo.service;
 
 import com.echonote.domain.Memo.entity.Memo;
 
+import java.util.List;
+
 public interface MemoService {
     // MongoDB에 메모 추가
     void insertMemo(Memo list);
@@ -10,7 +12,7 @@ public interface MemoService {
     void updateMemo(Memo list);
 
     // 메모 삭제하기
-    void deleteMemo(long id);
+    void deleteMemo(long id, List<Long> memoId);
 
     // 특정 ID로 데이터를 가져오기
     Memo findById(long id);
