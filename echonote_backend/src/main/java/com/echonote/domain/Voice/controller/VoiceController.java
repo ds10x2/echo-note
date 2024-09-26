@@ -33,16 +33,16 @@ public class VoiceController {
 		S3SaveResponse response = voiceService.generatePreSignUrl(UUID.randomUUID() + ".wav", bucketName,
 			HttpMethod.PUT);
 
-
-
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-//	@PostMapping("/stt")
-//	public ResponseEntity<S3SaveResponse> saveToMongo(@RequestBody String result) {
-//		System.out.println(result);
-//		return new ResponseEntity<>(HttpStatus.OK);
-//	}
+	@PostMapping("/stt")
+	public ResponseEntity<S3SaveResponse> saveToMongo(@RequestBody String result) {
+		System.out.println(result);
+		
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 
 
 }
