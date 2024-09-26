@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import PropTypes from "prop-types"; // prop-types 가져오기
+import useSidebarStore from "@stores/sideBarStore";
 import {
   SidebarContainer,
   ImageContainer,
@@ -9,7 +9,9 @@ import {
   PageNumber,
 } from "@components/styles/PdfBar.style";
 
-const PdfBar = ({ isOpened }) => {
+const PdfBar = () => {
+  const { isPdfBarOpened } = useSidebarStore();
+
   const [images, setImages] = useState([
     { id: 1, name: "page 1", src: "https://via.placeholder.com/100x150" },
     { id: 2, name: "page 2", src: "https://via.placeholder.com/100x150" },
@@ -33,7 +35,7 @@ const PdfBar = ({ isOpened }) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <SidebarContainer isOpened={isOpened}>
+      <SidebarContainer isOpened={isPdfBarOpened}>
         <ImageContainer>
           {images.map((image, index) => (
             <DraggableItem
@@ -99,11 +101,6 @@ const DraggableItem = ({ id, src, index, moveImage, name }) => {
       <PageNumber>{name}</PageNumber>
     </div>
   );
-};
-
-// prop-types를 사용하여 prop 유효성 검사 추가
-PdfBar.propTypes = {
-  isOpened: PropTypes.bool.isRequired,
 };
 
 export default PdfBar;
