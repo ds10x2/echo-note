@@ -1,18 +1,18 @@
 import styled from "styled-components";
 import { shouldNotForwardPropsWithKeys } from "@shared/utils/shouldForwardProp";
 
-// STTBar 컨테이너
 export const STTBarContainer = styled.div.withConfig({
   shouldForwardProp: shouldNotForwardPropsWithKeys(["isOpened"]),
 })`
   position: absolute;
-  right: ${(props) => (props.isOpened ? "0" : "-300px")};
+  right: 0;
   top: 0;
   height: 100%;
-  width: 300px;
+  width: ${(props) => (props.isOpened ? "300px" : "0")}; // 너비를 줄이면서 닫기
   background-color: white;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  transition: right 0.3s ease;
+  overflow: hidden; // 부모 너비가 줄어들 때 내부 콘텐츠가 잘리도록
+  transition: width 0.3s ease; // 부드럽게 너비가 변화
 `;
 
 // 헤더 스타일
@@ -76,8 +76,12 @@ export const Divider = styled.div`
   background-color: #ccc;
 `;
 
-export const STTBarContent = styled.div`
-  flex-grow: 1;
-  overflow-y: auto;
+export const STTBarContent = styled.div.withConfig({
+  shouldForwardProp: shouldNotForwardPropsWithKeys(["isOpened"]),
+})`
+  opacity: ${(props) => (props.isOpened ? "1" : "0")};
+  transition: opacity 0.3s ease;
+  height: 100%;
   padding: 20px;
+  visibility: ${(props) => (props.isOpened ? "visible" : "hidden")};
 `;

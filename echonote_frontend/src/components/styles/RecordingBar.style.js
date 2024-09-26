@@ -7,66 +7,37 @@ export const RecordingBarContainer = styled.div`
   width: 100%;
   max-width: 500px;
   padding: 10px;
-  background-color: #f5f5f5;
+  background-color: white;
   border-radius: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 3px rgba(65, 65, 65, 0.1);
   margin: 0 auto;
-  position: absolute; /* absolute로 설정 */
-  top: 20px; /* MainContent 위쪽에 위치시키기 위한 값 */
+  position: absolute;
+  top: 20px;
   left: 50%;
-  transform: translateX(-50%); /* 가로로 중앙에 배치 */
-  z-index: 10; /* MainContent보다 위에 위치하도록 z-index 설정 */
+  transform: translateX(-50%);
+  z-index: 10;
 `;
 
 export const PlayPauseButton = styled.button`
-  background-color: #007bff;
   border: none;
-  border-radius: 50%;
-  color: white;
-  width: 30px;
-  height: 30px;
+  background-color: transparent;
+  color: ${(props) => props.theme.colors.recordButton};
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 27px;
 `;
 
-export const Waveform = styled.div`
-  flex-grow: 1;
-  margin: 0 10px;
-  height: 14px;
-  background-color: #e0e0e0;
-  border-radius: 10px;
-  position: relative;
-
-  .wave {
-    position: absolute;
-    height: 100%;
-    width: 50%;
-    background-color: #007bff;
-    border-radius: 10px;
-    animation: wave-animation 1s infinite ease-in-out;
-  }
-
-  @keyframes wave-animation {
-    0% {
-      width: 0;
-    }
-    50% {
-      width: 50%;
-    }
-    100% {
-      width: 0;
-    }
-  }
-`;
-
-export const Timer = styled.span`
-  font-size: 14px;
-  color: #007bff;
-  min-width: 50px;
-  text-align: center;
+export const StopReplayButton = styled.button`
+  border: none;
+  background-color: transparent;
+  color: ${(props) => props.theme.colors.recordButton};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 29px;
 `;
 
 export const IconButton = styled.button`
