@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import * as St from "./styles/PdfEditor.style";
 import TextEditor from "@components/TextEditor";
 import RectangleEditor from "@components/RectangleEditor";
-import { useTextEdit } from "@/hooks/useTextEdit";
+import { TextEdit } from "@/shared/utils/TextEdit";
 import { ButtonContainer } from "./styles/PdfViewer.style";
 
 //편집용
@@ -12,7 +12,7 @@ const PdfEditor = ({ containerRef }) => {
   const [isRectangleMode, setIsRectangleMode] = useState(false);
 
   const { addTextItem, updateTextItem, finishEditing, handleKeyDown } =
-    useTextEdit(textItems, setTextItems, containerRef);
+    TextEdit(textItems, setTextItems, containerRef);
 
   const edit = (e) => {
     //모드에 따라 처리

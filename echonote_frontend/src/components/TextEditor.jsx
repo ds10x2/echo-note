@@ -1,6 +1,6 @@
 import React from "react";
 import * as St from "./styles/TextEditor.style";
-import { useTextDragging } from "@/hooks/useTextDragging";
+import { TextDragging } from "@/shared/utils/TextDragging";
 
 const TextEditor = ({
   textItems,
@@ -9,7 +9,7 @@ const TextEditor = ({
   finishEditing,
   handleKeyDown,
 }) => {
-  const { handleMouseDown, handleTouchStart } = useTextDragging(setTextItems);
+  const { handleMouseDown, handleTouchStart } = TextDragging(setTextItems);
 
   return (
     <>

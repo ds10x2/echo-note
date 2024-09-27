@@ -1,6 +1,4 @@
-import { useState } from "react";
-
-export const useTextEdit = (textItems, setTextItems, containerRef) => {
+export const TextEdit = (textItems, setTextItems, containerRef) => {
   const addTextItem = (e) => {
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -64,11 +62,9 @@ export const useTextEdit = (textItems, setTextItems, containerRef) => {
   };
 
   return {
-    textItems,
     addTextItem,
     updateTextItem,
     finishEditing,
-    setTextItems, // 외부에서 직접 설정할 수 있도록 함
     handleKeyDown,
   };
 };

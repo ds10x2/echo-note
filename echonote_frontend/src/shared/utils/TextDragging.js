@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-export const useTextDragging = (setTextItems) => {
+export const TextDragging = (setTextItems) => {
   const isDraggingRef = useRef(false);
   const hasDraggedRef = useRef(false);
 
@@ -56,8 +56,6 @@ export const useTextDragging = (setTextItems) => {
       const containerRect = containerRef.current.getBoundingClientRect();
       const containerWidth = containerRect.width;
       const containerHeight = containerRect.height;
-
-      console.log(1);
 
       setTextItems((items) =>
         items.map((item) => {
