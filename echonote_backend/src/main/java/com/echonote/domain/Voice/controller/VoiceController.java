@@ -9,9 +9,17 @@ import com.echonote.domain.Voice.service.VoiceServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.amazonaws.HttpMethod;
+import com.echonote.domain.Voice.dto.PresignedUrlResponse;
+import com.echonote.domain.Voice.dto.VoiceProcessRequest;
+import com.echonote.domain.Voice.service.VoiceServiceImpl;
+import com.echonote.domain.note.dto.NoteCreateResponse;
 import com.echonote.domain.Voice.dto.S3SaveResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,13 +38,26 @@ public class VoiceController {
 
 	// 확장자명에 따라 presigned url 반환
 	@GetMapping
-	@Operation(summary = "presigned url 반환", description = "클라이언트에서 녹음한 wav 파일 업로드 위한 S3 presigned url 반환")
-	public ResponseEntity<S3SaveResponse> generatePresignedUrl() {
+	@Operation(summary = "녹음본 Presigned url 요청", description = "녹음본 S3 업로드를 위한 presigned url 요청")
+	public ResponseEntity<PresignedUrlResponse> generatePresignedUrl() {
 
-		S3SaveResponse response = voiceService.generatePreSignUrl(UUID.randomUUID() + ".wav", bucketName,
+		PresignedUrlResponse response = voiceService.generatePreSignUrl(UUID.randomUUID() + ".wav", bucketName,
 			HttpMethod.PUT);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+
+	@PostMapping
+	@Operation(summary = "음성 저장 및 분석", description = "녹음본의 S3 URL과 STT 처리 결과를 저장")
+	public ResponseEntity<NoteCreateResponse> processVoice(@RequestBody VoiceProcessRequest voiceCreateRequest) {
+
+		Long userId = 1L;
+
+		voiceService.sendVoice(userId, voiceCreateRequest);
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
 	}
 
 	@GetMapping("/stt")
@@ -71,7 +92,6 @@ public class VoiceController {
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
 
 
 }
