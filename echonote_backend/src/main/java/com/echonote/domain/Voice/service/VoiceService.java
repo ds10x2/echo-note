@@ -8,17 +8,17 @@ import com.echonote.domain.Voice.entity.STT;
 import java.util.List;
 
 public interface VoiceService {
-    PresignedUrlResponse generatePreSignUrl(String filePath,
-                                      String bucketName,
-                                      HttpMethod httpMethod);
+	PresignedUrlResponse generatePreSignUrl(String filePath,
+		String bucketName,
+		HttpMethod httpMethod);
 
-    public void sendVoice(Long userId, VoiceProcessRequest voiceProcessRequest);
+	void insertSTT(STT stt);
 
-    void insertSTT(STT stt);
+	STT getSTT(long id);
 
-    STT getSTT(long id);
+	void updateSTT(STT stt);
 
-    void updateSTT(STT stt);
+	void deleteSTT(long id, List<Long> sttId);
 
-    void deleteSTT(long id, List<Long> sttId);
+	void sendVoice(Long userId, VoiceProcessRequest voiceCreateRequest);
 }
