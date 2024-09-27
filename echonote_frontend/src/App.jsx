@@ -27,26 +27,19 @@ class App extends Component {
   };
 
   render() {
-    const { isPdfBarOpened, isSTTBarOpened } = this.state;
-
     return (
       <div style={rootStyle}>
         <div style={appStyle}>
           <ThemeProvider theme={theme}>
             <GlobalStyles />
-            <ToolBar
-              togglePdfBar={this.togglePdfBar}
-              toggleSTTBar={this.toggleSTTBar}
-              isPdfBarOpened={isPdfBarOpened}
-              isSTTBarOpened={isSTTBarOpened}
-            />
+            <ToolBar />
             <Layout>
               <RecordingBar />
-              <PdfBar isOpened={isPdfBarOpened} />
+              <PdfBar />
               <MainContent>
                 <p>페이지 내용이 여기에 들어갑니다.</p>
               </MainContent>
-              <STTBar isOpened={isSTTBarOpened} />
+              <STTBar />
             </Layout>
           </ThemeProvider>
         </div>

@@ -1,44 +1,36 @@
 import { useState } from "react";
-import { FaPlay, FaPause, FaTrashAlt, FaPaperPlane } from "react-icons/fa";
+import { FaPlayCircle, FaPauseCircle, FaStopCircle } from "react-icons/fa";
+import { MdOutlineReplayCircleFilled } from "react-icons/md";
 import {
   RecordingBarContainer,
   PlayPauseButton,
-  Timer,
-  IconButton,
+  StopReplayButton,
 } from "@components/styles/RecordingBar.style";
 import AudioWave from "@components/AudioWave";
 
 const RecordingBar = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [time, setTime] = useState(0);
-  const audioUrl = "src/assets/test.mp3";
+  const [isRecording, setIsRecording] = useState(false);
+  const audioUrl = "src/assets/test.wav";
 
   const togglePlayPause = () => {
     setIsPlaying(!isPlaying);
   };
 
-  const handleDelete = () => {
-    console.log("Recording deleted");
-    setTime(0); // 녹음 삭제 시 타이머 초기화
-  };
-
   const handleSend = () => {
+    setIsRecording(!isRecording);
     console.log("Recording sent");
   };
 
   return (
     <RecordingBarContainer>
       <PlayPauseButton onClick={togglePlayPause}>
-        {isPlaying ? <FaPause /> : <FaPlay />}
+        {isPlaying ? <FaPauseCircle /> : <FaPlayCircle />}
       </PlayPauseButton>
       <AudioWave audioUrl={audioUrl} isPlaying={isPlaying} />
-      <Timer>{new Date(time * 1000).toISOString().substr(14, 5)}</Timer>
-      <IconButton onClick={handleDelete}>
-        <FaTrashAlt />
-      </IconButton>
-      <IconButton onClick={handleSend}>
-        <FaPaperPlane />
-      </IconButton>
+      <StopReplayButton onClick={handleSend}>
+        {isRecording ? <FaStopCircle /> : <MdOutlineReplayCircleFilled />}
+      </StopReplayButton>
     </RecordingBarContainer>
   );
 };

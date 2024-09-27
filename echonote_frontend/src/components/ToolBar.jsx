@@ -3,6 +3,7 @@ import { RiSpeakLine } from "react-icons/ri";
 import { FaPen, FaTextHeight, FaImage, FaShapes, FaStar } from "react-icons/fa";
 import { BiWindowAlt, BiChevronsDown, BiChevronsUp } from "react-icons/bi";
 import { IoMicSharp } from "react-icons/io5";
+import useSidebarStore from "@stores/sideBarStore";
 import PropTypes from "prop-types";
 import {
   Divider,
@@ -19,12 +20,9 @@ import {
   STTIcon,
 } from "@components/styles/ToolBar.style";
 
-const ToolBar = ({
-  togglePdfBar,
-  toggleSTTBar,
-  isPdfBarOpened,
-  isSTTBarOpened,
-}) => {
+const ToolBar = () => {
+  const { isPdfBarOpened, isSTTBarOpened, togglePdfBar, toggleSTTBar } =
+    useSidebarStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleCollapse = () => {
@@ -79,14 +77,6 @@ const ToolBar = ({
       </ToolBarContent>
     </ToolBarContainer>
   );
-};
-
-// prop-types를 사용하여 props의 유효성 검사 추가
-ToolBar.propTypes = {
-  togglePdfBar: PropTypes.func.isRequired,
-  toggleSTTBar: PropTypes.func.isRequired,
-  isPdfBarOpened: PropTypes.bool.isRequired,
-  isSTTBarOpened: PropTypes.bool.isRequired,
 };
 
 export default ToolBar;
