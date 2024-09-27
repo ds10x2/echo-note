@@ -73,15 +73,25 @@ const AudioWave = () => {
   };
 
   const handleStartStopRecording = async () => {
-    if (isRecording) {
-      record?.stopRecording();
-    } else {
+    try {
+      // 마이크 접근 권한 요청
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // 장치 탐색
       const devices = await RecordPlugin.getAvailableAudioDevices();
-      record?.startRecording({ deviceId: devices[0]?.deviceId });
-      setIsRecording(true);
+      const deviceId = devices[0]?.deviceId;
+
+      if (isRecording) {
+        record?.stopRecording();
+        setIsRecording(false);
+      } else {
+        record?.startRecording({ deviceId });
+        setIsRecording(true);
+      }
+    } catch (error) {
+      console.error("Error accessing microphone or starting recording", error);
     }
   };
-
   const handleSpeedChange = (speed) => {
     setPlaybackRate(speed);
     if (wavesurfer) {
