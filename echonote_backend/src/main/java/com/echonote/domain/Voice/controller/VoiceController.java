@@ -40,14 +40,11 @@ public class VoiceController {
 	@GetMapping("/stt")
 	public ResponseEntity<STT> saveSTT(@RequestParam long id) {
 		STT stt = voiceService.getSTT(id);
-
 		return new ResponseEntity<>(stt, HttpStatus.OK);
 	}
 
 	@PostMapping("/stt")
 	public ResponseEntity<STT> saveSTT(@RequestBody STT result) {
-		System.out.println(result.toString());
-
 		voiceService.insertSTT(result);
 
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -55,7 +52,6 @@ public class VoiceController {
 
 	@PutMapping("/stt")
 	public ResponseEntity<STT> updateSTT(@RequestBody STT result){
-		System.out.println(result);
 
 		voiceService.updateSTT(result);
 
@@ -65,7 +61,6 @@ public class VoiceController {
 	@DeleteMapping("/stt")
 	public ResponseEntity<STT> deleteSTT(@RequestBody STT result){
 		System.out.println(result);
-
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

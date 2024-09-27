@@ -8,6 +8,7 @@ import com.echonote.domain.Memo.entity.Memo;
 import com.echonote.domain.Voice.dao.STTRepository;
 import com.echonote.domain.Voice.dto.STTRequest;
 import com.echonote.domain.Voice.entity.STT;
+import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +54,26 @@ public class VoiceServiceImpl implements VoiceService {
 	private final MongoTemplate mongoTemplate;
 
 	public void insertSTT(STT stt){
-		sttRepository.insert(stt);
+		try {
+			STT insert = sttRepository.insert(stt);
+			log.info("Inserted STT with ID: " + insert.getId());
+		} catch (DuplicateKeyException e) {
+			log.error("STT with this ID already exists.");
+		} catch (Exception e) {
+			log.error("An error occurred while inserting STT: " + e.getMessage());
+		}
+
 	}
 	public STT getSTT(long id){
 		Optional<STT> stt = sttRepository.findById(id);
 
-		return (stt.get() != null ? stt.get() : null);
+		if (stt != null) {
+			log.info("Found STT: " + stt);
+		} else {
+			log.warn("STT not found with ID: " + id);
+		}
+
+		return stt.orElse(null);
 	}
 
 	public void updateSTT(STT stt){
