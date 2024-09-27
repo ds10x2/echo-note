@@ -1,21 +1,24 @@
 package com.echonote.domain.Voice.service;
 
-import com.amazonaws.HttpMethod;
-import com.echonote.domain.Voice.dto.S3SaveResponse;
-import com.echonote.domain.Voice.entity.STT;
-
 import java.util.List;
 
+import com.amazonaws.HttpMethod;
+import com.echonote.domain.Voice.dto.PresignedUrlResponse;
+import com.echonote.domain.Voice.dto.VoiceProcessRequest;
+import com.echonote.domain.Voice.entity.STT;
+
 public interface VoiceService {
-    S3SaveResponse generatePreSignUrl(String filePath,
-                                      String bucketName,
-                                      HttpMethod httpMethod);
+	PresignedUrlResponse generatePreSignUrl(String filePath,
+		String bucketName,
+		HttpMethod httpMethod);
 
-    void insertSTT(STT stt);
+	void insertSTT(STT stt);
 
-    STT getSTT(long id);
+	STT getSTT(long id);
 
-    void updateSTT(STT stt);
+	void updateSTT(STT stt);
 
-    void deleteSTT(long id, List<Long> sttId);
+	void deleteSTT(long id, List<Long> sttId);
+
+	void sendVoice(Long userId, VoiceProcessRequest voiceCreateRequest);
 }
