@@ -3,10 +3,7 @@ package com.echonote.domain.Voice.entity;
 import com.echonote.domain.Voice.dto.STTRequest;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -14,7 +11,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@ToString
 @Document(collection = "STT")
 public class STT {
     private long id;

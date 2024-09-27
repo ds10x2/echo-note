@@ -2,8 +2,20 @@ package com.echonote.domain.Voice.service;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 
+import com.echonote.domain.Memo.entity.Memo;
+import com.echonote.domain.Voice.dao.STTRepository;
+import com.echonote.domain.Voice.dto.STTRequest;
+import com.echonote.domain.Voice.entity.STT;
+import com.mongodb.client.result.UpdateResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.HttpMethod;
@@ -14,10 +26,13 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VoiceServiceImpl implements VoiceService {
 
 	@Autowired
 	private AmazonS3 amazonS3;
+
+	private final STTRepository sttRepository;
 
 	public S3SaveResponse generatePreSignUrl(String filePath,
 		String bucketName,
@@ -35,6 +50,39 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 	// STT Service
+	private final MongoTemplate mongoTemplate;
+
+	public void insertSTT(STT stt){
+		sttRepository.insert(stt);
+	}
+	public STT getSTT(long id){
+		Optional<STT> stt = sttRepository.findById(id);
+
+		return (stt.get() != null ? stt.get() : null);
+	}
+
+	public void updateSTT(STT stt){
+		long id = stt.getId();
+
+		for(STTRequest sttInfo : stt.getResult()) {
+
+			Query query = new Query(Criteria.where("id").is(id).and("segment.id").is(sttInfo));
+			Update update = new Update().set("stt.$.segment", sttInfo.getText());
+
+			try {
+				UpdateResult result = mongoTemplate.updateFirst(query, update, STT.class);
+
+				if (result.getMatchedCount() > 0) {
+					log.info(id + "번 Note " + sttInfo.getId()+ "번 STT 업데이트");
+				} else {
+					log.warn(id + "번 Note " + sttInfo.getId()+ "번 STT 업데이트 실패");
+				}
+			} catch (DataIntegrityViolationException e) {
+				log.error("stt 데이터 업데이트 실패: "+e);
+			}
+		}
+	}
+
 
 
 }
