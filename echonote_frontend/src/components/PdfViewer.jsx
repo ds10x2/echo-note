@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import * as St from "./styles/PdfViewer.style";
 import * as pdfjsLib from "pdfjs-dist";
-import { useSwipe } from "@/hooks/useSwipe";
-import { usePinchZoom } from "@/hooks/usePinchZoom";
 import PdfEditor from "@components/PdfEditor";
+import { useTextDragging } from "@/hooks/useTextDragging";
+import { useTextEdit } from "@/hooks/useTextEdit";
 
 const PdfViewer = ({ url }) => {
   const canvasRef = useRef();
@@ -12,23 +12,32 @@ const PdfViewer = ({ url }) => {
 
   const [pdfRef, setPdfRef] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [scale, setScale] = useState(0.8); // 초기 스케일 값
+  const [scale, setScale] = useState(0.8);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
+
+  const {
+    textItems,
+    addTextItem,
+    updateTextItem,
+    finishEditing,
+    setTextItems,
+  } = useTextEdit();
+  const { handleMouseDown, handleTouchStart, handleMouseMove, handleMouseUp } =
+    useTextDragging(textItems, setTextItems); // useDragging 적용
+
   const sampleUrl =
     "https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf";
 
-  // PDF 렌더링
   const renderPage = useCallback(
     (pageNum, pdf = pdfRef) => {
       if (pdf) {
         pdf.getPage(pageNum).then((page) => {
-          const viewport = page.getViewport({ scale: 1 }); // 항상 1로 설정하여 고정
+          const viewport = page.getViewport({ scale: 1 });
           const canvas = canvasRef.current;
           canvas.height = viewport.height;
           canvas.width = viewport.width;
 
-          // PDF 캔버스의 크기를 상태에 저장
           setCanvasSize({ width: viewport.width, height: viewport.height });
 
           const renderContext = {
@@ -61,7 +70,6 @@ const PdfViewer = ({ url }) => {
     renderPage(currentPage, pdfRef);
   }, [pdfRef, currentPage]);
 
-  //URL 설정
   useEffect(() => {
     const loadingTask = pdfjsLib.getDocument(sampleUrl);
     loadingTask.promise.then(
@@ -74,27 +82,23 @@ const PdfViewer = ({ url }) => {
     );
   }, [url]);
 
-  // usePinchZoom 훅 사용
-  const isPinching = usePinchZoom(containerRef, setScale);
-
-  // 페이지 이동
-  const nextPage = () => {
+  const nextPage = () =>
     pdfRef && currentPage < pdfRef.numPages && setCurrentPage(currentPage + 1);
-  };
-  const prevPage = () => {
-    currentPage > 1 && setCurrentPage(currentPage - 1);
-  };
-
-  // useSwipe 훅 사용 - 스와이프 동작으로 페이지 이동
-  useSwipe(isPinching, containerRef, prevPage, nextPage);
+  const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
+  const zoomIn = () => setScale((prevScale) => Math.min(10, prevScale + 0.2));
+  const zoomOut = () => setScale((prevScale) => Math.max(0.5, prevScale - 0.2));
 
   return (
     <St.PdfContainer ref={containerRef}>
-      <St.PdfPage
-        style={{ transform: `scale(${scale})`, transformOrigin: "0 0" }}
-      >
+      <St.ButtonContainer>
+        <button onClick={zoomIn}>확대</button>
+        <button onClick={zoomOut}>축소</button>
+        <button onClick={prevPage}>이전 페이지</button>
+        <button onClick={nextPage}>다음 페이지</button>
+      </St.ButtonContainer>
+      <St.PdfPage scale={scale}>
         <canvas ref={canvasRef}></canvas>
-        <PdfEditor canvasSize={canvasSize} />
+        <PdfEditor containerRef={containerRef} />
       </St.PdfPage>
     </St.PdfContainer>
   );
