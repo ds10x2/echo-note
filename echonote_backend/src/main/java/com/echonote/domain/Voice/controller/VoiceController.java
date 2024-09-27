@@ -1,5 +1,6 @@
 package com.echonote.domain.Voice.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.echonote.domain.Voice.entity.STT;
@@ -38,12 +39,14 @@ public class VoiceController {
 	}
 
 	@GetMapping("/stt")
+	@Operation(summary = "note_id에 대응되는 stt 결과물 반환", description = "result가 processiong중이면 null값으로 들어옵니다.")
 	public ResponseEntity<STT> saveSTT(@RequestParam long id) {
 		STT stt = voiceService.getSTT(id);
 		return new ResponseEntity<>(stt, HttpStatus.OK);
 	}
 
 	@PostMapping("/stt")
+	@Operation(summary = "stt 저장", description = "stt를 저장하는 API. flask 서버와 연동된다.")
 	public ResponseEntity<STT> saveSTT(@RequestBody STT result) {
 		voiceService.insertSTT(result);
 
@@ -51,6 +54,7 @@ public class VoiceController {
 	}
 
 	@PutMapping("/stt")
+	@Operation(summary = "stt 업데이트", description = "note_id와 stt 정보를 보내주면 mongoDB에서 업데이트 할 수 있다.")
 	public ResponseEntity<STT> updateSTT(@RequestBody STT result){
 
 		voiceService.updateSTT(result);
@@ -59,8 +63,10 @@ public class VoiceController {
 	}
 
 	@DeleteMapping("/stt")
-	public ResponseEntity<STT> deleteSTT(@RequestBody STT result){
-		System.out.println(result);
+	@Operation(summary = "stt 삭제")
+	public ResponseEntity<STT> deleteSTT(@RequestHeader("X-Note-Id") long id,
+										 @RequestHeader("X-Target-STT-Ids") List<Long> sttIds){
+		voiceService.deleteSTT(id, sttIds);
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

@@ -2,6 +2,7 @@ package com.echonote.domain.Voice.service;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import com.echonote.domain.Memo.entity.Memo;
@@ -98,6 +99,26 @@ public class VoiceServiceImpl implements VoiceService {
 		}
 	}
 
+	public void deleteSTT(long id, List<Long> sttId){
+
+		for(long stt : sttId) {
+			Query query = new Query(Criteria.where("id").is(id).and("memo.id").is(stt));
+			Update update = new Update().pull("memo", new Query(Criteria.where("id").is(stt)));
+
+			// 삭제 실행
+			try {
+				UpdateResult result = mongoTemplate.updateFirst(query, update, Memo.class);
+
+				if (result.getMatchedCount() > 0) {
+					log.info(id + "번 Note " + stt+ "번 stt 삭제");
+				} else {
+					log.warn(id + "번 Note " + stt+ "번 stt 삭제 실패");
+				}
+			} catch (DataIntegrityViolationException e) {
+				log.error("stt 데이터 삭제 실패: "+e);
+			}
+		}
+	}
 
 
 }
