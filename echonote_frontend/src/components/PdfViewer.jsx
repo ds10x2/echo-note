@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import * as St from "./styles/PdfViewer.style";
 import * as pdfjsLib from "pdfjs-dist";
 import PdfEditor from "@components/PdfEditor";
-import { useTextDragging } from "@/hooks/useTextDragging";
-import { useTextEdit } from "@/hooks/useTextEdit";
 
 const PdfViewer = ({ url }) => {
   const canvasRef = useRef();
@@ -15,16 +13,6 @@ const PdfViewer = ({ url }) => {
   const [scale, setScale] = useState(0.8);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
-
-  const {
-    textItems,
-    addTextItem,
-    updateTextItem,
-    finishEditing,
-    setTextItems,
-  } = useTextEdit();
-  const { handleMouseDown, handleTouchStart, handleMouseMove, handleMouseUp } =
-    useTextDragging(textItems, setTextItems); // useDragging 적용
 
   const sampleUrl =
     "https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf";
