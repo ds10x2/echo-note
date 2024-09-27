@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.echonote.domain.Voice.entity.STT;
+import com.echonote.domain.Voice.service.VoiceService;
 import com.echonote.domain.Voice.service.VoiceServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/voice")
 @Tag(name = "voice", description = "voice api")
 public class VoiceController {
-	private final VoiceServiceImpl voiceService;
+	private final VoiceService voiceService;
 
 	@Value("${amazon.aws.bucket}")
 	private String bucketName;

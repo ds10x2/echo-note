@@ -36,9 +36,10 @@ public class VoiceServiceImpl implements VoiceService {
 
 	private final STTRepository sttRepository;
 
+	@Override
 	public S3SaveResponse generatePreSignUrl(String filePath,
-		String bucketName,
-		HttpMethod httpMethod) {
+											 String bucketName,
+											 HttpMethod httpMethod) {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
@@ -54,6 +55,7 @@ public class VoiceServiceImpl implements VoiceService {
 	// STT Service
 	private final MongoTemplate mongoTemplate;
 
+	@Override
 	public void insertSTT(STT stt){
 		try {
 			STT insert = sttRepository.insert(stt);
@@ -65,6 +67,7 @@ public class VoiceServiceImpl implements VoiceService {
 		}
 
 	}
+	@Override
 	public STT getSTT(long id){
 		Optional<STT> stt = sttRepository.findById(id);
 
@@ -77,6 +80,7 @@ public class VoiceServiceImpl implements VoiceService {
 		return stt.orElse(null);
 	}
 
+	@Override
 	public void updateSTT(STT stt){
 		long id = stt.getId();
 
@@ -99,6 +103,7 @@ public class VoiceServiceImpl implements VoiceService {
 		}
 	}
 
+	@Override
 	public void deleteSTT(long id, List<Long> sttId){
 
 		for(long stt : sttId) {
