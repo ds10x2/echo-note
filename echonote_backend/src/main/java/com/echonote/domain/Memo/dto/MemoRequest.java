@@ -1,12 +1,8 @@
 package com.echonote.domain.Memo.dto;
 
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.mongodb.lang.Nullable;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.Date;
 
 public class MemoRequest {
 
@@ -14,9 +10,17 @@ public class MemoRequest {
     @Builder
     public static class memoDto{
         private long id; // memo_id
-        private Date timestamp_start;
-        private Date timestamp_end;
+        private String memo;
 
+        @Nullable
+        private memoTimeStamp timeStamps;
+    }
+
+    @Getter
+    @Builder
+    public static class memoTimeStamp{
+        private String start;
+        private String end;
     }
 
 }

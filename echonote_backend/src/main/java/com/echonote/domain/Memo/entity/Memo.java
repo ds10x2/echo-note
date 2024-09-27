@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Document(collation = "memo")
+@Document(collection = "memo")
 public class Memo {
 
     @Id
@@ -27,7 +27,7 @@ public class Memo {
     private List<MemoRequest.memoDto> memo;
     // IntelliJ에서 TableDB 구조를 확인할 수 없어서 생긴 에러. 빌드됨
 
-    @CreatedBy
-    private Date create_at;
+//    @CreatedBy
+//    private Date create_at;
 
 }
