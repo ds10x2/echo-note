@@ -18,7 +18,10 @@ public class SwaggerConfig {
 	public OpenAPI openAPI() {
 		return new OpenAPI()
 			.components(new Components())
-			.info(apiInfo());
+			.info(apiInfo())
+			.servers(Arrays.asList(
+				new Server().url("https://j11a210.p.ssafy.io")
+			));
 	}
 
 	private Info apiInfo() {
