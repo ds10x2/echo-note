@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as St from "./styles/TextEditor.style";
 import textStore from "@stores/textStore";
 
@@ -14,11 +14,15 @@ const TextEditor = ({
     updateTextItem,
     finishEditing,
     setIsTextMode,
-    setIsDragging,
-    dragTextItem,
+    updateTextItemPosition,
     resetDraggingState,
-    getTextItemById,
   } = textStore();
+
+  const [curItems, setCurItems] = useState(currentPageItems);
+
+  useEffect(() => {
+    setCurItems(currentPageItems);
+  }, [currentPageItems]);
 
   const handleMouseDown = (e, id) => {
     e.stopPropagation();
@@ -28,17 +32,25 @@ const TextEditor = ({
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-    const item = currentPageItems.find((item) => item.id === id);
+    const item = curItems.find((item) => item.id === id);
     const offsetX = clientX / scale - item.x;
     const offsetY = clientY / scale - item.y;
 
     console.log("드래그 시작");
-    setIsDragging(id, true, offsetX, offsetY);
 
-    const selectedItem = getTextItemById(id);
-    console.log(
-      "선택된 아이템" + selectedItem.id + " " + selectedItem.isDragging
+    setCurItems((items) =>
+      items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              isDragging: true,
+              offsetX: offsetX,
+              offsetY: offsetY,
+            }
+          : item
+      )
     );
+
     document.body.style.userSelect = "none";
   };
 
@@ -48,39 +60,61 @@ const TextEditor = ({
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       console.log("드래그 중2");
 
-      currentPageItems.forEach((item) => {
-        console.log(item.id + " " + item.isDragging);
-        if (item.isDragging) {
-          console.log("드래그 중3");
-          let newX = clientX / scale - item.offsetX;
-          let newY = clientY / scale - item.offsetY;
+      setCurItems((items) =>
+        items.map((item) => {
+          if (item.isDragging) {
+            let newX = clientX / scale - item.offsetX;
+            let newY = clientY / scale - item.offsetY;
 
-          const containerRect = containerRef.current.getBoundingClientRect();
-          const containerWidth = containerRect.width / scale;
-          const containerHeight = containerRect.height / scale;
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const containerWidth = containerRect.width / scale;
+            const containerHeight = containerRect.height / scale;
 
-          const textBoxWidth = 100 / scale;
-          const textBoxHeight = item.fontSize * scale;
+            const textBoxWidth = 100 / scale;
+            const textBoxHeight = item.fontSize * scale;
 
-          if (newX < 0) newX = 0;
-          else if (newX + textBoxWidth > containerWidth)
-            newX = containerWidth - textBoxWidth;
+            if (newX < 0) newX = 0;
+            else if (newX + textBoxWidth > containerWidth)
+              newX = containerWidth - textBoxWidth;
 
-          if (newY < 0) newY = 0;
-          else if (newY + textBoxHeight > containerHeight)
-            newY = containerHeight - textBoxHeight;
+            if (newY < 0) newY = 0;
+            else if (newY + textBoxHeight > containerHeight)
+              newY = containerHeight - textBoxHeight;
 
-          dragTextItem(item.id, newX, newY);
-        }
-      });
+            return {
+              ...item,
+              x: newX,
+              y: newY,
+            };
+          }
+          return item;
+        })
+      );
+
       hasDraggedRef.current = true;
     }
   };
 
   const handleMouseUp = () => {
-    console.log("드래그 종료");
     if (isDraggingRef.current) {
       isDraggingRef.current = false;
+
+      setCurItems((items) =>
+        items.map((item) =>
+          item.isDragging ? { ...item, isDragging: false } : item
+        )
+      );
+
+      // curItems가 최신 상태로 업데이트될 때 zustand에 상태를 저장
+      const latestItems = curItems.map((item) => {
+        if (item.isDragging) {
+          updateTextItemPosition(item.id, item.x, item.y);
+        }
+        return { ...item, isDragging: false }; // 드래그 상태를 초기화
+      });
+
+      setCurItems(latestItems);
+
       resetDraggingState();
       if (hasDraggedRef.current) {
         setTimeout(() => {
@@ -111,10 +145,7 @@ const TextEditor = ({
     if (e.key === "Enter") {
       if (e.ctrlKey) {
         e.preventDefault();
-        updateTextItem(
-          id,
-          currentPageItems.find((item) => item.id === id).text + "\n"
-        );
+        updateTextItem(id, curItems.find((item) => item.id === id).text + "\n");
       } else {
         e.preventDefault();
         finishEditing(id);
@@ -139,7 +170,7 @@ const TextEditor = ({
       >
         {isTextMode ? "Text Mode On" : "Text Mode Off"}
       </button>
-      {currentPageItems.map((item) => (
+      {curItems.map((item) => (
         <St.TextBox
           key={item.id}
           x={item.x * scale}
