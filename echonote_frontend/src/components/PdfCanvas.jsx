@@ -3,7 +3,7 @@ import * as St from "./styles/PdfCanvas.style";
 import * as pdfjsLib from "pdfjs-dist";
 import PdfEditor from "@components/PdfEditor";
 
-const PdfCanvas = ({ getPages, url, page }) => {
+const PdfCanvas = ({ getPages, url, page, scale }) => {
   const canvasRef = useRef();
   const containerRef = useRef();
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs`;
@@ -80,7 +80,11 @@ const PdfCanvas = ({ getPages, url, page }) => {
   }, [url]);
 
   return (
-    <St.PdfCanvasContainer width={canvasSize.width} height={canvasSize.height}>
+    <St.PdfCanvasContainer
+      width={canvasSize.width}
+      height={canvasSize.height}
+      scale={scale}
+    >
       <canvas ref={canvasRef}></canvas>
       <PdfEditor scale={1} />
     </St.PdfCanvasContainer>
