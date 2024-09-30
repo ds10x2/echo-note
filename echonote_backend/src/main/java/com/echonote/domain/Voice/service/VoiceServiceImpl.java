@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,16 +14,19 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.echonote.domain.Memo.entity.Memo;
 import com.echonote.domain.Voice.dao.VoiceRepository;
 import com.echonote.domain.Voice.dto.PresignedUrlResponse;
 import com.echonote.domain.Voice.dto.STTRequest;
+import com.echonote.domain.Voice.dto.STTResponse;
+import com.echonote.domain.Voice.dto.VoiceAnalysisResponse;
 import com.echonote.domain.Voice.dto.VoiceProcessRequest;
 import com.echonote.domain.Voice.entity.STT;
 import com.echonote.domain.note.dao.NoteRepository;
@@ -51,7 +55,7 @@ public class VoiceServiceImpl implements VoiceService {
 	@Override
 	public PresignedUrlResponse generatePreSignUrl(String filePath,
 		String bucketName,
-		HttpMethod httpMethod) {
+		com.amazonaws.HttpMethod httpMethod) {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
@@ -70,17 +74,35 @@ public class VoiceServiceImpl implements VoiceService {
 		Note note = noteRepository.findById(voiceProcessRequest.getNoteId())
 			.orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
 
-		note.setRecord_path(voiceProcessRequest.getPresignedUrl());
+		note.setRecord_path(voiceProcessRequest.getObjectUrl());
 
 		noteRepository.save(note);
+		System.out.println("DB 저장 성공");
 
 		// 2. STT 분석 & 피치 분석 (비동기)
+		CompletableFuture<STTResponse> sttFuture = CompletableFuture.supplyAsync(() -> {
+			return sendSTTFlask(voiceProcessRequest);
+		});
+
+		// CompletableFuture<VoiceAnalysisResponse> pitchFuture = CompletableFuture.supplyAsync(() -> {
+		// 	return sendAnalysisFlask(voiceProcessRequest);
+		// });
 
 		// 3. 분석 결과 매칭 & 저장
+		// sttFuture.thenCombine(pitchFuture, (sttResult, pitchResult) -> {
+		// 	// 두 분석 결과를 매칭 및 저장
+		// 	voiceService.matchAndSaveAnalysisResults(note, sttResult, pitchResult);
+		//
+		// 	return null; // 반환값이 필요하지 않으면 null 반환
+		// }).exceptionally(ex -> {
+		// 	// 에러 처리 로직
+		// 	System.err.println("Error occurred during analysis: " + ex.getMessage());
+		// 	return null;
+		// });
 	}
 
-	public void sendSTTFlask(VoiceProcessRequest voiceProcessRequest) {
-		String flaskUrl = "http://70.12.130.111/";  // Flask 서버 URL
+	public STTResponse sendSTTFlask(VoiceProcessRequest voiceProcessRequest) {
+		String flaskUrl = "http://70.12.130.111:5000/stt";  // Flask 서버 URL
 
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
@@ -90,7 +112,33 @@ public class VoiceServiceImpl implements VoiceService {
 		HttpEntity<VoiceProcessRequest> entity = new HttpEntity<>(voiceProcessRequest, headers);
 
 		// Flask 서버로 POST 요청 보내기
-		// ResponseEntity<String> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity, String.class);
+		ResponseEntity<STTResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
+			STTResponse.class);
+
+		// 응답 처리 (필요에 따라)
+		if (response.getStatusCode().is2xxSuccessful()) {
+			System.out.println("성공적으로 Flask 서버에 전송되었습니다: " + response.getBody());
+		} else {
+			System.err.println("Flask 서버 요청 실패: " + response.getStatusCode());
+		}
+
+		return response.getBody();
+	}
+
+	// 음성 분석 모델에 보내기
+	public VoiceAnalysisResponse sendAnalysisFlask(VoiceProcessRequest voiceProcessRequest) {
+		String flaskUrl = "http://70.12.130.111:5000/";  // Flask 서버 URL
+
+		// HTTP 헤더 설정
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
+
+		// 요청에 데이터 추가
+		HttpEntity<VoiceProcessRequest> entity = new HttpEntity<>(voiceProcessRequest, headers);
+
+		// Flask 서버로 POST 요청 보내기
+		ResponseEntity<VoiceAnalysisResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
+			VoiceAnalysisResponse.class);
 
 		// 응답 처리 (필요에 따라)
 		// if (response.getStatusCode().is2xxSuccessful()) {
@@ -98,6 +146,8 @@ public class VoiceServiceImpl implements VoiceService {
 		// } else {
 		// 	System.err.println("Flask 서버 요청 실패: " + response.getStatusCode());
 		// }
+
+		return response.getBody();
 	}
 
 	// STT Service
@@ -106,7 +156,7 @@ public class VoiceServiceImpl implements VoiceService {
 	@Override
 	public void insertSTT(STT stt) {
 		try {
-			STT insert = voiceRepository.insert(stt);
+			STT insert = voiceRepository.save(stt);
 			log.info("Inserted STT with ID: " + insert.getId());
 		} catch (DuplicateKeyException e) {
 			log.error("STT with this ID already exists.");

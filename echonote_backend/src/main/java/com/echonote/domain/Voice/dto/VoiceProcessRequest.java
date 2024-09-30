@@ -7,6 +7,6 @@ public class VoiceProcessRequest {
 
 	private Long noteId;
 
-	private String presignedUrl;
+	private String ObjectUrl;
 
 }

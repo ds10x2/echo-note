@@ -2,7 +2,6 @@ package com.echonote.domain.Voice.service;
 
 import java.util.List;
 
-import com.amazonaws.HttpMethod;
 import com.echonote.domain.Voice.dto.PresignedUrlResponse;
 import com.echonote.domain.Voice.dto.VoiceProcessRequest;
 import com.echonote.domain.Voice.entity.STT;
@@ -10,7 +9,7 @@ import com.echonote.domain.Voice.entity.STT;
 public interface VoiceService {
 	PresignedUrlResponse generatePreSignUrl(String filePath,
 		String bucketName,
-		HttpMethod httpMethod);
+		com.amazonaws.HttpMethod httpMethod);
 
 	void insertSTT(STT stt);
 
