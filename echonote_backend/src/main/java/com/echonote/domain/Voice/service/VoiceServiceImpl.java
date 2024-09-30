@@ -23,9 +23,9 @@ import org.springframework.web.client.RestTemplate;
 import com.amazonaws.services.s3.AmazonS3;
 import com.echonote.domain.Memo.entity.Memo;
 import com.echonote.domain.Voice.dao.VoiceRepository;
-import com.echonote.domain.Voice.dto.PresignedUrlResponse;
 import com.echonote.domain.Voice.dto.STTRequest;
 import com.echonote.domain.Voice.dto.STTResponse;
+import com.echonote.domain.Voice.dto.UrlResponse;
 import com.echonote.domain.Voice.dto.VoiceAnalysisResponse;
 import com.echonote.domain.Voice.dto.VoiceProcessRequest;
 import com.echonote.domain.Voice.entity.STT;
@@ -53,7 +53,7 @@ public class VoiceServiceImpl implements VoiceService {
 	private final RestTemplate restTemplate;
 
 	@Override
-	public PresignedUrlResponse generatePreSignUrl(String filePath,
+	public UrlResponse generatePreSignUrl(String filePath,
 		String bucketName,
 		com.amazonaws.HttpMethod httpMethod) {
 
@@ -61,10 +61,10 @@ public class VoiceServiceImpl implements VoiceService {
 		calendar.setTime(new Date());
 		calendar.add(Calendar.MINUTE, 10); //validfy of 10 minutes
 
-		PresignedUrlResponse res = new PresignedUrlResponse();
+		UrlResponse res = new UrlResponse();
 		res.setPresignedUrl(
 			amazonS3.generatePresignedUrl(bucketName, filePath, calendar.getTime(), httpMethod).toString());
-
+		res.setObjectUrl("https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/" + filePath);
 		return res;
 	}
 
