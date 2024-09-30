@@ -22,7 +22,7 @@ public class SwaggerConfig {
 			.components(new Components())
 			.info(apiInfo())
 			.servers(Arrays.asList(
-				new Server().url("https://j11a210.p.ssafy.io")
+				new Server().url("https://j11a210.p.ssafy.io/api")
 			));
 	}
 
