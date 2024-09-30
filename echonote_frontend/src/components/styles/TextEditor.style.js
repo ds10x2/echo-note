@@ -1,4 +1,5 @@
 import { styled } from "styled-components";
+import { shouldNotForwardPropsWithKeys } from "@shared/utils/shouldForwardProp";
 
 export const TextContainer = styled.div`
   position: absolute;
@@ -6,18 +7,26 @@ export const TextContainer = styled.div`
   left: 0;
 `;
 
-export const TextBox = styled.div.attrs((props) => ({
-  style: {
-    left: `${props.x}px`,
-    top: `${props.y}px`,
-    cursor: props.isEditing ? "text" : "move",
-    backgroundColor: props.isEditing
-      ? "rgba(255, 255, 255, 0.8)"
-      : "transparent",
-  },
-}))`
+export const TextBox = styled.div
+  .withConfig({
+    shouldForwardProp: shouldNotForwardPropsWithKeys([
+      "isDragging",
+      "isEditing",
+      "minWidth",
+    ]),
+  })
+  .attrs((props) => ({
+    style: {
+      left: `${props.x}px`,
+      top: `${props.y}px`,
+      cursor: props.isEditing ? "text" : "move",
+      backgroundColor: props.isEditing
+        ? "rgba(255, 255, 255, 0.8)"
+        : "transparent",
+    },
+  }))`
   position: absolute;
-  padding: 2px;
+  padding: 4px;
   z-index: 1;
   border: ${({ isDragging }) =>
     isDragging ? "2px solid blue" : "1px solid transparent"};
@@ -29,6 +38,7 @@ export const TextBox = styled.div.attrs((props) => ({
       : "transparent"};
   transition: border 0.2s, background-color 0.2s;
   user-select: none;
+  min-width: ${({ minWidth }) => minWidth}px; 
 `;
 
 export const TextArea = styled.textarea`

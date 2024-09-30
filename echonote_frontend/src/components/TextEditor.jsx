@@ -110,6 +110,16 @@ const TextEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
     };
   }, []);
 
+  // 텍스트 길이에 따른 min-width 계산 함수
+  const calculateMinWidth = (text, fontSize) => {
+    const lines = text.split("\n");
+    const longestLine = lines.reduce(
+      (a, b) => (a.length > b.length ? a : b),
+      ""
+    );
+    return fontSize * longestLine.length;
+  };
+
   return (
     <St.TextContainer ref={containerRef}>
       <button
@@ -130,6 +140,7 @@ const TextEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
           style={{
             fontSize: `${item.fontSize * scale}px`,
           }}
+          minWidth={calculateMinWidth(item.text, item.fontSize * scale)}
         >
           {item.isEditing ? (
             <St.TextArea
