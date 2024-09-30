@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-const useTextStore = create((set, get) => ({
+const textStore = create((set, get) => ({
   textItems: [],
   isTextMode: false,
 
@@ -60,4 +60,4 @@ const useTextStore = create((set, get) => ({
   resetTextItems: () => set(() => ({ textItems: [] })),
 }));
 
-export default useTextStore;
+export default textStore;

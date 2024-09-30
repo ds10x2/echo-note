@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import * as St from "./styles/PdfEditor.style";
 import TextEditor from "@components/TextEditor";
-import useTextStore from "@stores/useTextStore";
+import textStore from "@stores/textStore";
 
 const PdfEditor = ({ scale }) => {
   const containerRef = useRef();
-  const { isTextMode, addTextItem } = useTextStore();
+  const { isTextMode, addTextItem } = textStore();
   const isDraggingRef = useRef(false);
   const hasDraggedRef = useRef(false);
 
