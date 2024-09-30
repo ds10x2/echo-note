@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.amazonaws.HttpMethod;
 import com.echonote.domain.Voice.dto.PresignedUrlResponse;
 import com.echonote.domain.Voice.dto.VoiceProcessRequest;
 import com.echonote.domain.Voice.entity.STT;
@@ -45,7 +44,7 @@ public class VoiceController {
 	public ResponseEntity<PresignedUrlResponse> generatePresignedUrl() {
 
 		PresignedUrlResponse response = voiceService.generatePreSignUrl(UUID.randomUUID() + ".wav", bucketName,
-			HttpMethod.PUT);
+			com.amazonaws.HttpMethod.PUT);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
