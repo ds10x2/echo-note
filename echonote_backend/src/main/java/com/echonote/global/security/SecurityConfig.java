@@ -1,6 +1,7 @@
 package com.echonote.global.security;
 
 import java.util.Collections;
+import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
