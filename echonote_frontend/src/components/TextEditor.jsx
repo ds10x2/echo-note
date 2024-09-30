@@ -92,21 +92,6 @@ const TextEditor = ({
     document.body.style.userSelect = "auto";
   };
 
-  const handleKeyDown = (e, id) => {
-    if (e.key === "Enter") {
-      if (e.ctrlKey) {
-        e.preventDefault();
-        updateTextItem(
-          id,
-          currentPageItems.find((item) => item.id === id).text + "\n"
-        );
-      } else {
-        e.preventDefault();
-        finishEditing(id);
-      }
-    }
-  };
-
   useEffect(() => {
     const container = containerRef.current;
     container.addEventListener("mousemove", handleMouseMove);
@@ -121,6 +106,21 @@ const TextEditor = ({
       container.removeEventListener("touchend", handleMouseUp);
     };
   }, []);
+
+  const handleKeyDown = (e, id) => {
+    if (e.key === "Enter") {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        updateTextItem(
+          id,
+          currentPageItems.find((item) => item.id === id).text + "\n"
+        );
+      } else {
+        e.preventDefault();
+        finishEditing(id);
+      }
+    }
+  };
 
   const calculateMinWidth = (text, fontSize) => {
     const lines = text.split("\n");
