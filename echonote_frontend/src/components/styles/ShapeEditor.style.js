@@ -2,9 +2,9 @@
 import styled from "styled-components";
 
 export const StyledSVG = styled.svg`
-  border: 1px solid #ccc;
-  width: 800px;
-  height: 600px;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
 `;
 
 export const StyledRectangle = styled.rect`

@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import PdfCanvas from "@components/PdfCanvas";
 import * as St from "@components/styles/PdfViewer.style";
+import shapeStore from "@/stores/shapeStore";
 
 const PdfViewer = ({}) => {
   const [pages, setPages] = useState(1);
   const [curPage, setCurPage] = useState(1);
   const [url, setUrl] = useState("");
   const [scale, setScale] = useState(1);
+
+  const { isRecMode, setIsRecMode } = shapeStore();
 
   //페이지 이동
   const nextPage = () => curPage < pages && setCurPage(curPage + 1);
@@ -26,6 +29,11 @@ const PdfViewer = ({}) => {
         <div>
           <button onClick={zoomIn}>확대</button>
           <button onClick={zoomOut}>축소</button>
+        </div>
+        <div>
+          <button onClick={() => setIsRecMode(!isRecMode)}>
+            {isRecMode ? "사각형모드on" : "사각형모드off"}
+          </button>
         </div>
       </St.ButtonContainer>
       <PdfCanvas getPages={setPages} page={curPage} url={url} scale={scale} />

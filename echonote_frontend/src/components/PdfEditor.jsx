@@ -1,7 +1,10 @@
-import React, { useEffect, useRef } from "react";
-import * as St from "./styles/PdfEditor.style";
+// PdfEditor.jsx
+import React, { useEffect, useRef, useState } from "react";
+import * as St from "@components/styles/PdfEditor.style";
 import TextEditor from "@components/TextEditor";
 import textStore from "@stores/textStore";
+import ShapeEditor from "@components/ShapeEditor";
+import shapeStore from "@/stores/shapeStore";
 
 const PdfEditor = ({ scale, currentPage }) => {
   const containerRef = useRef();
@@ -10,12 +13,15 @@ const PdfEditor = ({ scale, currentPage }) => {
   const isDraggingRef = useRef(false);
   const hasDraggedRef = useRef(false);
 
-  // 현재 페이지 설정
+  const { isShapeMode } = shapeStore();
+
+  //사각형
+  const [rectangles, setRectangles] = useState([]); // 그려진 사각형 목록
+
   useEffect(() => {
     setCurrentPage(currentPage);
   }, [currentPage]);
 
-  // 텍스트 박스 추가
   const handleAddTextBox = (e) => {
     if (isDraggingRef.current || hasDraggedRef.current) return;
 
@@ -46,29 +52,40 @@ const PdfEditor = ({ scale, currentPage }) => {
     }
   };
 
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
+  };
+
   useEffect(() => {
     const container = containerRef.current;
 
-    container.addEventListener("mousedown", handleClickEvent);
-    container.addEventListener("mouseup", () => {
-      isDraggingRef.current = false;
-    });
+    // isTextMode가 true일 때만 이벤트 리스너를 추가
+    if (isTextMode) {
+      container.addEventListener("mousedown", handleClickEvent);
+      container.addEventListener("mouseup", handleMouseUp);
+    }
 
     return () => {
       container.removeEventListener("mousedown", handleClickEvent);
-      container.removeEventListener("mouseup", () => {
-        isDraggingRef.current = false;
-      });
+      container.removeEventListener("mouseup", handleMouseUp);
     };
-  }, []);
+  }, [isTextMode]);
 
   return (
-    <St.PdfEditorContainer ref={containerRef} onClick={handleClickEvent}>
+    <St.PdfEditorContainer ref={containerRef}>
       <TextEditor
         scale={scale}
         hasDraggedRef={hasDraggedRef}
         isDraggingRef={isDraggingRef}
         currentPageItems={getCurrentPageItems()}
+      />
+      <ShapeEditor
+        scale={scale}
+        hasDraggedRef={hasDraggedRef}
+        isDraggingRef={isDraggingRef}
+        currentPageItems={getCurrentPageItems()}
+        rectangles={rectangles}
+        setRectangles={setRectangles}
       />
     </St.PdfEditorContainer>
   );
