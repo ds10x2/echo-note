@@ -42,14 +42,12 @@ const textStore = create((set, get) => ({
         item.id === id ? { ...item, isDragging, offsetX, offsetY } : item
       ),
     })),
-
   dragTextItem: (id, newX, newY) =>
     set((state) => ({
       textItems: state.textItems.map((item) =>
         item.id === id ? { ...item, x: newX, y: newY } : item
       ),
     })),
-
   resetDraggingState: () =>
     set((state) => ({
       textItems: state.textItems.map((item) =>
@@ -58,6 +56,8 @@ const textStore = create((set, get) => ({
     })),
 
   resetTextItems: () => set(() => ({ textItems: [] })),
+
+  getTextItemById: (id) => get().textItems.find((item) => item.id === id),
 }));
 
 export default textStore;
