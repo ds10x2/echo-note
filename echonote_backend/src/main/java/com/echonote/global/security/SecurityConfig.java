@@ -1,6 +1,7 @@
 package com.echonote.global.security;
 
 import java.util.Collections;
+import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,15 +29,15 @@ public class SecurityConfig {
 
 					CorsConfiguration configuration = new CorsConfiguration();
 
-					configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+					configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000", "https://j11a210.p.ssafy.io/api"));
 					configuration.setAllowedMethods(Collections.singletonList("*"));
 					configuration.setAllowCredentials(true);
 					configuration.setAllowedHeaders(Collections.singletonList("*"));
 					configuration.setMaxAge(3600L);
 
 					// 클라이언트가 응답에서 접근할 수 있는 헤더를 설정
-					configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
-					configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+					configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"));
+					configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
 
 					return configuration;
 				}
