@@ -105,17 +105,8 @@ const TextEditor = ({
         )
       );
 
-      // curItems가 최신 상태로 업데이트될 때 zustand에 상태를 저장
-      const latestItems = curItems.map((item) => {
-        if (item.isDragging) {
-          updateTextItemPosition(item.id, item.x, item.y);
-        }
-        return { ...item, isDragging: false }; // 드래그 상태를 초기화
-      });
-
-      setCurItems(latestItems);
-
       resetDraggingState();
+
       if (hasDraggedRef.current) {
         setTimeout(() => {
           hasDraggedRef.current = false;
