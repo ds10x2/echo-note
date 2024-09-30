@@ -3,11 +3,17 @@ import * as St from "./styles/PdfEditor.style";
 import TextEditor from "@components/TextEditor";
 import textStore from "@stores/textStore";
 
-const PdfEditor = ({ scale }) => {
+const PdfEditor = ({ scale, currentPage }) => {
   const containerRef = useRef();
-  const { isTextMode, addTextItem } = textStore();
+  const { isTextMode, addTextItem, getCurrentPageItems, setCurrentPage } =
+    textStore();
   const isDraggingRef = useRef(false);
   const hasDraggedRef = useRef(false);
+
+  // 현재 페이지 설정
+  useEffect(() => {
+    setCurrentPage(currentPage);
+  }, [currentPage]);
 
   // 텍스트 박스 추가
   const handleAddTextBox = (e) => {
@@ -20,6 +26,7 @@ const PdfEditor = ({ scale }) => {
     const x = (clientX - containerRect.left) / scale;
     const y = (clientY - containerRect.top) / scale;
 
+    console.log("텍스트 추가");
     addTextItem({
       id: Date.now(),
       x,
@@ -61,6 +68,7 @@ const PdfEditor = ({ scale }) => {
         scale={scale}
         hasDraggedRef={hasDraggedRef}
         isDraggingRef={isDraggingRef}
+        currentPageItems={getCurrentPageItems()}
       />
     </St.PdfEditorContainer>
   );

@@ -1,19 +1,24 @@
 import React, { useEffect, useRef } from "react";
 import * as St from "./styles/TextEditor.style";
-import useTextStore from "@stores/useTextStore";
+import textStore from "@stores/textStore";
 
-const TextEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
+const TextEditor = ({
+  scale,
+  hasDraggedRef,
+  isDraggingRef,
+  currentPageItems,
+}) => {
   const containerRef = useRef();
   const {
     isTextMode,
-    textItems,
     updateTextItem,
     finishEditing,
     setIsTextMode,
     setIsDragging,
     dragTextItem,
     resetDraggingState,
-  } = useTextStore();
+    getTextItemById,
+  } = textStore();
 
   const handleMouseDown = (e, id) => {
     e.stopPropagation();
@@ -23,13 +28,17 @@ const TextEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-    const item = textItems.find((item) => item.id === id);
+    const item = currentPageItems.find((item) => item.id === id);
     const offsetX = clientX / scale - item.x;
     const offsetY = clientY / scale - item.y;
 
+    console.log("드래그 시작");
     setIsDragging(id, true, offsetX, offsetY);
 
-    // Prevent text selection during drag
+    const selectedItem = getTextItemById(id);
+    console.log(
+      "선택된 아이템" + selectedItem.id + " " + selectedItem.isDragging
+    );
     document.body.style.userSelect = "none";
   };
 
@@ -37,9 +46,12 @@ const TextEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
     if (isDraggingRef.current) {
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      console.log("드래그 중2");
 
-      textItems.forEach((item) => {
+      currentPageItems.forEach((item) => {
+        console.log(item.id + " " + item.isDragging);
         if (item.isDragging) {
+          console.log("드래그 중3");
           let newX = clientX / scale - item.offsetX;
           let newY = clientY / scale - item.offsetY;
 
@@ -66,10 +78,10 @@ const TextEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
   };
 
   const handleMouseUp = () => {
+    console.log("드래그 종료");
     if (isDraggingRef.current) {
       isDraggingRef.current = false;
       resetDraggingState();
-
       if (hasDraggedRef.current) {
         setTimeout(() => {
           hasDraggedRef.current = false;
@@ -86,7 +98,7 @@ const TextEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
         e.preventDefault();
         updateTextItem(
           id,
-          textItems.find((item) => item.id === id).text + "\n"
+          currentPageItems.find((item) => item.id === id).text + "\n"
         );
       } else {
         e.preventDefault();
@@ -110,7 +122,6 @@ const TextEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
     };
   }, []);
 
-  // 텍스트 길이에 따른 min-width 계산 함수
   const calculateMinWidth = (text, fontSize) => {
     const lines = text.split("\n");
     const longestLine = lines.reduce(
@@ -128,7 +139,7 @@ const TextEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
       >
         {isTextMode ? "Text Mode On" : "Text Mode Off"}
       </button>
-      {textItems.map((item) => (
+      {currentPageItems.map((item) => (
         <St.TextBox
           key={item.id}
           x={item.x * scale}

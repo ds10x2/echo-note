@@ -86,7 +86,7 @@ const PdfCanvas = ({ getPages, url, page, scale }) => {
       scale={scale}
     >
       <canvas ref={canvasRef}></canvas>
-      <PdfEditor scale={1} />
+      <PdfEditor scale={1} currentPage={currentPage} />
     </St.PdfCanvasContainer>
   );
 };
