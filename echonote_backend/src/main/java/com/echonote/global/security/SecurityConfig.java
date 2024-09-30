@@ -36,8 +36,8 @@ public class SecurityConfig {
 					configuration.setMaxAge(3600L);
 
 					// 클라이언트가 응답에서 접근할 수 있는 헤더를 설정
-					configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
-					configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+					configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"));
+					configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
 
 					return configuration;
 				}
