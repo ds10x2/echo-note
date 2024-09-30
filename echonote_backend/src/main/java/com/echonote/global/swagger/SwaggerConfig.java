@@ -11,6 +11,8 @@ import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
+import java.util.Arrays;
 
 @Configuration
 public class SwaggerConfig {
@@ -18,7 +20,10 @@ public class SwaggerConfig {
 	public OpenAPI openAPI() {
 		return new OpenAPI()
 			.components(new Components())
-			.info(apiInfo());
+			.info(apiInfo())
+			.servers(Arrays.asList(
+				new Server().url("https://j11a210.p.ssafy.io")
+			));
 	}
 
 	private Info apiInfo() {
