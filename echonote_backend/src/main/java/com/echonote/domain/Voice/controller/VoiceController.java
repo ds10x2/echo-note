@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.echonote.domain.Voice.dto.PresignedUrlResponse;
+import com.echonote.domain.Voice.dto.UrlResponse;
 import com.echonote.domain.Voice.dto.VoiceProcessRequest;
 import com.echonote.domain.Voice.entity.STT;
 import com.echonote.domain.Voice.service.VoiceService;
@@ -38,10 +38,10 @@ public class VoiceController {
 
 	// 확장자명에 따라 presigned url 반환
 	@GetMapping
-	@Operation(summary = "녹음본 Presigned url 요청", description = "녹음본 S3 업로드를 위한 presigned url 요청")
-	public ResponseEntity<PresignedUrlResponse> generatePresignedUrl() {
+	@Operation(summary = "녹음본 Presigned url 요청", description = "녹음본 S3 업로드를 위한 presigned url과 객체 Url을 요청")
+	public ResponseEntity<UrlResponse> generatePresignedUrl() {
 
-		PresignedUrlResponse response = voiceService.generatePreSignUrl(UUID.randomUUID() + ".wav", bucketName,
+		UrlResponse response = voiceService.generatePreSignUrl(UUID.randomUUID() + ".wav", bucketName,
 			com.amazonaws.HttpMethod.PUT);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
