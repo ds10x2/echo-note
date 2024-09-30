@@ -68,6 +68,7 @@ public class VoiceServiceImpl implements VoiceService {
 		return res;
 	}
 
+	@Override
 	public void sendVoice(Long userId, VoiceProcessRequest voiceProcessRequest) {
 
 		// 1. DB에 S3 URL 저장

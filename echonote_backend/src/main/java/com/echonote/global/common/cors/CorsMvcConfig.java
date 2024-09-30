@@ -14,8 +14,9 @@ public class CorsMvcConfig implements WebMvcConfigurer {
 			.addMapping("/**")
 			.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE",
 				"OPTIONS") // 허용하려는 HTTP Method 설정 (OPTIONS는 Preflight 설정)
-			.allowedOrigins("http://localhost:3000/") // 허용하려는 클라이언트 측 주소
+			.allowedOriginPatterns("http://localhost:3000", "https://j11a210.p.ssafy.io/api") // 허용하려는 클라이언트 측 주소
 			.allowCredentials(true) // HttpOnly Cookie를 사용하기 위한 설정
+			.allowedHeaders("Content-Type", "Authorization", "X-Requested-With") // 허용할 헤더에 Content-Type 추가
 			.exposedHeaders("Set-Cookie")
 			.exposedHeaders("Access-Control-Allow-Methods")
 			.exposedHeaders("Access-Control-Allow-Headers")

@@ -3,9 +3,11 @@ package com.echonote.domain.Voice.controller;
 import java.util.List;
 import java.util.UUID;
 
+import com.amazonaws.HttpMethod;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,7 +54,6 @@ public class VoiceController {
 	public ResponseEntity<NoteCreateResponse> processVoice(@RequestBody VoiceProcessRequest voiceCreateRequest) {
 
 		Long userId = 1L;
-
 		voiceService.sendVoice(userId, voiceCreateRequest);
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
