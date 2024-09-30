@@ -1,51 +1,67 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import * as St from "./styles/PdfEditor.style";
 import TextEditor from "@components/TextEditor";
-import RectangleEditor from "@components/RectangleEditor";
-import { TextEdit } from "@/shared/utils/TextEdit";
-import { ButtonContainer } from "./styles/PdfViewer.style";
+import useTextStore from "@stores/useTextStore";
 
-//편집용
-const PdfEditor = ({ containerRef }) => {
-  const [textItems, setTextItems] = useState([]);
-  const [isTextMode, setIsTextMode] = useState(false);
-  const [isRectangleMode, setIsRectangleMode] = useState(false);
+const PdfEditor = ({ scale }) => {
+  const containerRef = useRef();
+  const { isTextMode, addTextItem } = useTextStore();
+  const isDraggingRef = useRef(false);
+  const hasDraggedRef = useRef(false);
 
-  const { addTextItem, updateTextItem, finishEditing, handleKeyDown } =
-    TextEdit(textItems, setTextItems, containerRef);
+  // 텍스트 박스 추가
+  const handleAddTextBox = (e) => {
+    if (isDraggingRef.current || hasDraggedRef.current) return;
 
-  const edit = (e) => {
-    //모드에 따라 처리
-    if (isTextMode) addTextItem(e);
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const x = (clientX - containerRect.left) / scale;
+    const y = (clientY - containerRect.top) / scale;
+
+    addTextItem({
+      id: Date.now(),
+      x,
+      y,
+      text: "",
+      isEditing: true,
+      isDragging: false,
+      offsetX: 0,
+      offsetY: 0,
+      fontSize: 16,
+    });
   };
 
-  const toggleTextMode = () => {
-    setIsTextMode((prev) => !prev);
-    setIsRectangleMode(false);
+  const handleClickEvent = (e) => {
+    if (isTextMode) {
+      handleAddTextBox(e);
+    }
   };
-  const toggleRectangleMode = () => {
-    setIsRectangleMode((prev) => !prev);
-    setIsTextMode(false);
-  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    container.addEventListener("mousedown", handleClickEvent);
+    container.addEventListener("mouseup", () => {
+      isDraggingRef.current = false;
+    });
+
+    return () => {
+      container.removeEventListener("mousedown", handleClickEvent);
+      container.removeEventListener("mouseup", () => {
+        isDraggingRef.current = false;
+      });
+    };
+  }, []);
 
   return (
-    <St.PdfEditorContainer onClick={edit}>
-      <ButtonContainer>
-        <button onClick={toggleTextMode}>
-          {isTextMode ? "텍스트 모드 해제" : "텍스트 모드 활성화"}
-        </button>
-        <button onClick={toggleRectangleMode}>
-          {isRectangleMode ? "사각형 모드 해제" : "사각형 모드 활성화"}
-        </button>
-      </ButtonContainer>
+    <St.PdfEditorContainer ref={containerRef} onClick={handleClickEvent}>
       <TextEditor
-        textItems={textItems}
-        setTextItems={setTextItems}
-        updateTextItem={updateTextItem}
-        finishEditing={finishEditing}
-        handleKeyDown={handleKeyDown}
+        scale={scale}
+        hasDraggedRef={hasDraggedRef}
+        isDraggingRef={isDraggingRef}
       />
-      <RectangleEditor />
     </St.PdfEditorContainer>
   );
 };

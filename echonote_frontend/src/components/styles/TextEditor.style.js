@@ -1,5 +1,11 @@
 import { styled } from "styled-components";
 
+export const TextContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
+
 export const TextBox = styled.div.attrs((props) => ({
   style: {
     left: `${props.x}px`,
