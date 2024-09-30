@@ -6,8 +6,6 @@ import com.echonote.domain.Voice.dto.UrlResponse;
 import com.echonote.domain.Voice.dto.VoiceProcessRequest;
 import com.echonote.domain.Voice.entity.STT;
 
-import java.util.List;
-
 public interface VoiceService {
 	UrlResponse generatePreSignUrl(String filePath,
 		String bucketName,
