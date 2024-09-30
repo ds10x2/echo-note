@@ -54,7 +54,6 @@ public class VoiceController {
 	public ResponseEntity<NoteCreateResponse> processVoice(@RequestBody VoiceProcessRequest voiceCreateRequest) {
 
 		Long userId = 1L;
-
 		voiceService.sendVoice(userId, voiceCreateRequest);
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
