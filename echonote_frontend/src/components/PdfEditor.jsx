@@ -16,8 +16,6 @@ const PdfEditor = ({ scale }) => {
   const isDraggingRef = useRef(false);
   const hasDraggedRef = useRef(false);
 
-  const { isShapeMode } = shapeStore();
-
   //사각형
   const [rectangles, setRectangles] = useState([]); // 그려진 사각형 목록
 

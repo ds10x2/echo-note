@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PdfCanvas from "@components/PdfCanvas";
 import * as St from "@components/styles/PdfViewer.style";
-import pageStore from "@/stores/pageStore"; // pageStore를 가져옵니다
+import pageStore from "@/stores/pageStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const PdfViewer = ({}) => {
@@ -9,7 +9,7 @@ const PdfViewer = ({}) => {
   const [scale, setScale] = useState(1);
 
   const { setShapeMode, mode } = drawingTypeStore();
-  const { currentPage, setCurrentPage } = pageStore(); // zustand에서 currentPage와 setCurrentPage를 가져옵니다
+  const { currentPage, setCurrentPage } = pageStore();
 
   //페이지 이동
   const nextPage = () => currentPage < pages && setCurrentPage(currentPage + 1);

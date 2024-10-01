@@ -6,11 +6,10 @@ import pageStore from "@/stores/pageStore"; // zustand 스토어 가져오기
 
 const PdfCanvas = ({ getPages, url, scale }) => {
   const canvasRef = useRef();
-  const containerRef = useRef();
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs`;
 
   const [pdfRef, setPdfRef] = useState(null);
-  const { currentPage, setCurrentPage } = pageStore(); // zustand에서 currentPage와 setCurrentPage 가져오기
+  const { currentPage } = pageStore();
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
 
