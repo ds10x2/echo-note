@@ -23,3 +23,11 @@ export const StyledRectangle = styled.rect`
 export const CurrentRectangle = styled(StyledRectangle)`
   opacity: 0.5;
 `;
+
+export const ShapeContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+`;

@@ -80,30 +80,32 @@ const ShapeEditor = ({
   };
 
   return (
-    <St.StyledSVG
-      onMouseDown={handleMouseDownRec}
-      onMouseMove={handleMouseMoveRec}
-      onMouseUp={handleMouseUpRec}
-      onMouseLeave={handleMouseUpRec}
-    >
-      {rectangles.map((rect, index) => (
-        <St.StyledRectangle
-          key={index}
-          x={rect.x}
-          y={rect.y}
-          width={Math.abs(rect.width)}
-          height={Math.abs(rect.height)}
-        />
-      ))}
-      {currentRect && (
-        <St.CurrentRectangle
-          x={currentRect.x}
-          y={currentRect.y}
-          width={Math.abs(currentRect.width)}
-          height={Math.abs(currentRect.height)}
-        />
-      )}
-    </St.StyledSVG>
+    <St.ShapeContainer>
+      <St.StyledSVG
+        onMouseDown={handleMouseDownRec}
+        onMouseMove={handleMouseMoveRec}
+        onMouseUp={handleMouseUpRec}
+        onMouseLeave={handleMouseUpRec}
+      >
+        {rectangles.map((rect, index) => (
+          <St.StyledRectangle
+            key={index}
+            x={rect.x}
+            y={rect.y}
+            width={Math.abs(rect.width)}
+            height={Math.abs(rect.height)}
+          />
+        ))}
+        {currentRect && (
+          <St.CurrentRectangle
+            x={currentRect.x}
+            y={currentRect.y}
+            width={Math.abs(currentRect.width)}
+            height={Math.abs(currentRect.height)}
+          />
+        )}
+      </St.StyledSVG>
+    </St.ShapeContainer>
   );
 };
 
