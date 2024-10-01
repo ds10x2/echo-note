@@ -22,58 +22,10 @@ const PdfEditor = ({ scale, currentPage }) => {
     setCurrentPage(currentPage);
   }, [currentPage]);
 
-  const handleAddTextBox = (e) => {
-    if (isDraggingRef.current || hasDraggedRef.current) return;
-
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const x = (clientX - containerRect.left) / scale;
-    const y = (clientY - containerRect.top) / scale;
-
-    console.log("텍스트 추가");
-    addTextItem({
-      id: Date.now(),
-      x,
-      y,
-      text: "",
-      isEditing: true,
-      isDragging: false,
-      offsetX: 0,
-      offsetY: 0,
-      fontSize: 16,
-    });
-  };
-
-  const handleClickEvent = (e) => {
-    if (isTextMode) {
-      handleAddTextBox(e);
-    }
-  };
-
-  const handleMouseUp = () => {
-    isDraggingRef.current = false;
-  };
-
-  useEffect(() => {
-    const container = containerRef.current;
-
-    // isTextMode가 true일 때만 이벤트 리스너를 추가
-    if (isTextMode) {
-      container.addEventListener("mousedown", handleClickEvent);
-      container.addEventListener("mouseup", handleMouseUp);
-    }
-
-    return () => {
-      container.removeEventListener("mousedown", handleClickEvent);
-      container.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isTextMode]);
-
   return (
     <St.PdfEditorContainer ref={containerRef}>
       <TextEditor
+        containerRef={containerRef}
         scale={scale}
         hasDraggedRef={hasDraggedRef}
         isDraggingRef={isDraggingRef}

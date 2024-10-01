@@ -1,24 +1,72 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as St from "./styles/TextEditor.style";
 import textStore from "@stores/textStore";
+import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const TextEditor = ({
+  containerRef,
   scale,
   hasDraggedRef,
   isDraggingRef,
   currentPageItems,
 }) => {
-  const containerRef = useRef();
   const {
-    isTextMode,
     updateTextItem,
     finishEditing,
-    setIsTextMode,
     updateTextItemPosition,
+    addTextItem,
     resetDraggingState,
   } = textStore();
 
+  const { setTextMode, mode } = drawingTypeStore();
+
   const [curItems, setCurItems] = useState(currentPageItems);
+  const [updatedItems, setUpdatedItems] = useState([]); // 갱신할 아이템을 저장할 상태
+
+  const handleAddTextBox = (e) => {
+    if (isDraggingRef.current || hasDraggedRef.current) return;
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const x = (clientX - containerRect.left) / scale;
+    const y = (clientY - containerRect.top) / scale;
+
+    console.log("텍스트 추가");
+    addTextItem({
+      id: Date.now(),
+      x,
+      y,
+      text: "",
+      isEditing: true,
+      isDragging: false,
+      offsetX: 0,
+      offsetY: 0,
+      fontSize: 16,
+    });
+  };
+
+  const handleClickEvent = (e) => {
+    if (mode.text) {
+      if (!e.target.closest(".text-box")) {
+        console.log("클릭");
+        handleAddTextBox(e);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (mode.text) {
+      container.addEventListener("mousedown", handleClickEvent);
+    }
+
+    return () => {
+      container.removeEventListener("mousedown", handleClickEvent);
+    };
+  }, [mode.text]);
 
   useEffect(() => {
     setCurItems(currentPageItems);
@@ -58,7 +106,7 @@ const TextEditor = ({
     if (isDraggingRef.current) {
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      console.log("드래그 중2");
+      console.log("드래그 중");
 
       setCurItems((items) =>
         items.map((item) => {
@@ -99,11 +147,18 @@ const TextEditor = ({
     if (isDraggingRef.current) {
       isDraggingRef.current = false;
 
-      setCurItems((items) =>
-        items.map((item) =>
-          item.isDragging ? { ...item, isDragging: false } : item
-        )
-      );
+      setCurItems((items) => {
+        return items.map((item) => {
+          if (item.isDragging) {
+            setUpdatedItems((prevItems) => [
+              ...prevItems,
+              { id: item.id, x: item.x, y: item.y },
+            ]); // 업데이트 할 아이템을 추가
+            return { ...item, isDragging: false };
+          }
+          return item;
+        });
+      });
 
       resetDraggingState();
 
@@ -116,6 +171,15 @@ const TextEditor = ({
 
     document.body.style.userSelect = "auto";
   };
+
+  useEffect(() => {
+    if (updatedItems.length > 0) {
+      updatedItems.forEach(({ id, x, y }) => {
+        updateTextItemPosition(id, x, y); // zustand에 상태 갱신
+      });
+      setUpdatedItems([]); // 갱신 후 초기화
+    }
+  }, [updatedItems]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -154,12 +218,12 @@ const TextEditor = ({
   };
 
   return (
-    <St.TextContainer ref={containerRef}>
+    <St.TextContainer>
       <button
-        onClick={() => setIsTextMode(!isTextMode)}
+        onClick={() => setTextMode()}
         style={{ position: "absolute", top: 10, left: 10, zIndex: 10 }}
       >
-        {isTextMode ? "Text Mode On" : "Text Mode Off"}
+        {mode.text ? "Text Mode On" : "Text Mode Off"}
       </button>
       {curItems.map((item) => (
         <St.TextBox
@@ -168,6 +232,7 @@ const TextEditor = ({
           y={item.y * scale}
           isEditing={item.isEditing}
           isDragging={item.isDragging}
+          className="text-box"
           onMouseDown={(e) => handleMouseDown(e, item.id)}
           onTouchStart={(e) => handleMouseDown(e, item.id)}
           style={{
