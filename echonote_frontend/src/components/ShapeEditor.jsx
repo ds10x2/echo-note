@@ -1,24 +1,30 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as St from "@/components/styles/ShapeEditor.style";
 import shapeStore from "@/stores/shapeStore";
+import drawingTypeStore from "@/stores/drawingTypeStore"; // drawingTypeStore 가져오기
 
-const ShapeEditor = ({
-  scale,
-  hasDraggedRef,
-  isDraggingRef,
-  currentPageItems,
-  rectangles,
-  setRectangles,
-}) => {
-  const [isDrawing, setIsDrawing] = useState(false); // 현재 드래그로 사각형을 그리고 있는지 여부
-  const [isDragging, setIsDragging] = useState(false); // 이미 생성된 사각형을 이동 중인지 여부
+const ShapeEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
+  const {
+    addRectangle,
+    updateRectangle,
+    getRectangles,
+    setRectangles,
+    currentPage,
+  } = shapeStore();
+  const { mode } = drawingTypeStore(); // drawingTypeStore의 mode 가져오기
+
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [draggingIndex, setDraggingIndex] = useState(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [currentRect, setCurrentRect] = useState(null); // 현재 그리고 있는 사각형의 정보
+  const [currentRect, setCurrentRect] = useState(null);
+
+  const rectangles = getRectangles(currentPage); // 현재 페이지의 사각형 가져오기
 
   const handleMouseDownRec = (e) => {
+    if (!mode.shape) return; // 모드가 shape가 아닐 때는 이벤트 무시
+
     e.stopPropagation();
-    console.log(1);
 
     const clickedIndex = rectangles.findIndex(
       (rect) =>
@@ -65,13 +71,13 @@ const ShapeEditor = ({
         }
         return rect;
       });
-      setRectangles(updatedRectangles);
+      setRectangles(currentPage, updatedRectangles);
     }
   };
 
   const handleMouseUpRec = () => {
     if (isDrawing && currentRect) {
-      setRectangles([...rectangles, currentRect]);
+      addRectangle(currentRect, currentPage); // 사각형 추가 시 현재 페이지 전달
       setCurrentRect(null);
     }
     setIsDrawing(false);
@@ -80,7 +86,7 @@ const ShapeEditor = ({
   };
 
   return (
-    <St.ShapeContainer>
+    <St.ShapeContainer modeShape={mode.shape}>
       <St.StyledSVG
         onMouseDown={handleMouseDownRec}
         onMouseMove={handleMouseMoveRec}

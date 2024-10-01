@@ -213,13 +213,7 @@ const TextEditor = ({
   };
 
   return (
-    <St.TextContainer ref={containerRef}>
-      <button
-        onClick={() => setTextMode()}
-        style={{ position: "absolute", top: 10, left: 10, zIndex: 10 }}
-      >
-        {mode.text ? "Text Mode On" : "Text Mode Off"}
-      </button>
+    <St.TextContainer ref={containerRef} mode={mode.text}>
       {curItems.map((item) => (
         <St.TextBox
           key={item.id}

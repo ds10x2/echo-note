@@ -30,7 +30,6 @@ const PdfEditor = ({ scale }) => {
         hasDraggedRef={hasDraggedRef}
         isDraggingRef={isDraggingRef}
         currentPageItems={getCurrentPageItems()}
-        style={{ zIndex: mode.text ? 2 : 1 }}
       />
       <ShapeEditor
         scale={scale}
@@ -39,7 +38,6 @@ const PdfEditor = ({ scale }) => {
         currentPageItems={getCurrentPageItems()}
         rectangles={rectangles}
         setRectangles={setRectangles}
-        style={{ zIndex: mode.shape ? 2 : 1 }}
       />
     </St.PdfEditorContainer>
   );

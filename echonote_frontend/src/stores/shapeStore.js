@@ -1,20 +1,44 @@
+// shapeStore.js
 import { create } from "zustand";
 
 const shapeStore = create((set, get) => ({
-  shapeItems: {}, // 페이지별로 관리
-  currentPage: 1, // 현재 페이지 상태 추가
-  isRecMode: false,
+  rectangles: {}, // 페이지별로 사각형을 관리하기 위해 객체로 변경
+  currentPage: 1,
 
-  resetTextItems: () => set(() => ({ shapeItems: {} })),
+  addRectangle: (rectangle, page) => {
+    set((state) => ({
+      rectangles: {
+        ...state.rectangles,
+        [page]: [...(state.rectangles[page] || []), rectangle],
+      },
+    }));
+  },
 
-  getCurrentPageItems: () => {
-    const currentPage = get().currentPage;
-    return get().shapeItems[currentPage] || [];
+  updateRectangle: (index, newRect, page) => {
+    set((state) => ({
+      rectangles: {
+        ...state.rectangles,
+        [page]: state.rectangles[page].map((rect, i) =>
+          i === index ? newRect : rect
+        ),
+      },
+    }));
+  },
+
+  setRectangles: (page, rects) => {
+    set((state) => ({
+      rectangles: {
+        ...state.rectangles,
+        [page]: rects,
+      },
+    }));
+  },
+
+  getRectangles: (page) => {
+    return get().rectangles[page] || [];
   },
 
   setCurrentPage: (page) => set(() => ({ currentPage: page })),
-
-  setIsRecMode: (isRecMode) => set(() => ({ isRecMode })),
 }));
 
 export default shapeStore;

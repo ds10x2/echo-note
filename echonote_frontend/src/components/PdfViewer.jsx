@@ -8,7 +8,7 @@ const PdfViewer = ({}) => {
   const [pages, setPages] = useState(1); //PDF 최대 페이지 수
   const [scale, setScale] = useState(1);
 
-  const { setShapeMode, mode } = drawingTypeStore();
+  const { setShapeMode, setTextMode, mode } = drawingTypeStore();
   const { currentPage, setCurrentPage } = pageStore();
 
   //페이지 이동
@@ -33,6 +33,9 @@ const PdfViewer = ({}) => {
         <div>
           <button onClick={() => setShapeMode()}>
             {mode.shape ? "사각형모드on" : "사각형모드off"}
+          </button>
+          <button onClick={() => setTextMode()}>
+            {mode.text ? "Text Mode On" : "Text Mode Off"}
           </button>
         </div>
       </St.ButtonContainer>

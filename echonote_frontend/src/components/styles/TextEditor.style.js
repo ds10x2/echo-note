@@ -1,12 +1,15 @@
 import { styled } from "styled-components";
 import { shouldNotForwardPropsWithKeys } from "@shared/utils/shouldForwardProp";
 
-export const TextContainer = styled.div`
+export const TextContainer = styled.div.withConfig({
+  shouldForwardProp: shouldNotForwardPropsWithKeys(["mode"]),
+})`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: ${({ mode }) => (mode ? 2 : 1)}; /* mode.shape에 따라 z-index 설정 */
 `;
 
 export const TextBox = styled.div
