@@ -105,7 +105,7 @@ const textStore = create((set, get) => ({
     return get().textItems[currentPage] || [];
   },
 
-  setCurrentPage: (page) => set(() => ({ currentPage: page })),
+  setCurrentPageForText: (page) => set(() => ({ currentPage: page })),
 }));
 
 export default textStore;

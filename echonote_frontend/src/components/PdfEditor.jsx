@@ -10,7 +10,7 @@ import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const PdfEditor = ({ scale }) => {
   const containerRef = useRef();
-  const { getCurrentPageItems } = textStore();
+  const { getCurrentPageItems, setCurrentPageForText } = textStore();
   const { currentPage, setCurrentPage } = pageStore();
   const { mode } = drawingTypeStore();
   const isDraggingRef = useRef(false);
@@ -21,6 +21,7 @@ const PdfEditor = ({ scale }) => {
 
   useEffect(() => {
     setCurrentPage(currentPage);
+    setCurrentPageForText(currentPage);
   }, [currentPage]);
 
   return (
