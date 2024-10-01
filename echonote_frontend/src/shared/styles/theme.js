@@ -14,5 +14,8 @@ export const theme = {
     recordInActive: "#94acd8",
     recordActive: "#5b86d6",
     recordButton: "#4036c9",
+    pdfShadowColor: "#00000021",
+    editButtonColor: "#FFFFFF",
+    editButtonBorderColor: "#cecece",
   },
 };

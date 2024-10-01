@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as St from "./styles/TextEditor.style";
+import * as Bt from "@/components/styles/EditButton.style";
 import textStore from "@stores/textStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const TextEditor = ({
-  scale,
   hasDraggedRef,
   isDraggingRef,
   currentPageItems,
+  scale,
+  parentContainerRef,
 }) => {
   const {
     updateTextItem,
@@ -20,8 +22,9 @@ const TextEditor = ({
   const { setTextMode, mode } = drawingTypeStore();
 
   const [curItems, setCurItems] = useState(currentPageItems);
-  const [updatedItems, setUpdatedItems] = useState([]); // 갱신할 아이템을 저장할 상태
+  const [updatedItems, setUpdatedItems] = useState([]);
   const containerRef = useRef();
+  const [selectedItemId, setSelectedItemId] = useState(null); // 선택된 텍스트박스 ID 상태
 
   const handleAddTextBox = (e) => {
     if (isDraggingRef.current || hasDraggedRef.current) return;
@@ -30,8 +33,11 @@ const TextEditor = ({
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
     const containerRect = containerRef.current.getBoundingClientRect();
-    const x = (clientX - containerRect.left) / scale;
-    const y = (clientY - containerRect.top) / scale;
+    const parentScrollLeft = parentContainerRef.current.scrollLeft;
+    const parentScrollTop = parentContainerRef.current.scrollTop;
+
+    const x = (clientX + parentScrollLeft - containerRect.left) / scale;
+    const y = (clientY + parentScrollTop - containerRect.top) / scale;
 
     addTextItem({
       id: Date.now(),
@@ -44,12 +50,16 @@ const TextEditor = ({
       offsetY: 0,
       fontSize: 16,
     });
+
+    setSelectedItemId(null); // 새로운 텍스트 박스 추가 시 기존 선택된 상태를 해제
   };
 
   const handleClickEvent = (e) => {
     if (mode.text) {
       if (!e.target.closest(".text-box")) {
         handleAddTextBox(e);
+      } else {
+        setSelectedItemId(null); // 다른 곳을 클릭하면 선택 해제
       }
     }
   };
@@ -74,13 +84,23 @@ const TextEditor = ({
     e.stopPropagation();
     isDraggingRef.current = true;
     hasDraggedRef.current = false;
+    setSelectedItemId(id); // 텍스트박스 클릭 시 해당 ID를 선택
 
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
+    const parentScrollLeft = parentContainerRef.current.scrollLeft;
+    const parentScrollTop = parentContainerRef.current.scrollTop;
+
     const item = curItems.find((item) => item.id === id);
-    const offsetX = clientX / scale - item.x;
-    const offsetY = clientY / scale - item.y;
+    const offsetX =
+      clientX +
+      parentScrollLeft -
+      (item.x * scale + containerRef.current.offsetLeft);
+    const offsetY =
+      clientY +
+      parentScrollTop -
+      (item.y * scale + containerRef.current.offsetTop);
 
     setCurItems((items) =>
       items.map((item) =>
@@ -106,15 +126,15 @@ const TextEditor = ({
       setCurItems((items) =>
         items.map((item) => {
           if (item.isDragging) {
-            let newX = clientX / scale - item.offsetX;
-            let newY = clientY / scale - item.offsetY;
+            let newX = clientX - item.offsetX;
+            let newY = clientY - item.offsetY;
 
             const containerRect = containerRef.current.getBoundingClientRect();
-            const containerWidth = containerRect.width / scale;
-            const containerHeight = containerRect.height / scale;
+            const containerWidth = containerRect.width;
+            const containerHeight = containerRect.height;
 
-            const textBoxWidth = 100 / scale;
-            const textBoxHeight = item.fontSize * scale;
+            const textBoxWidth = 100;
+            const textBoxHeight = item.fontSize;
 
             if (newX < 0) newX = 0;
             else if (newX + textBoxWidth > containerWidth)
@@ -148,7 +168,7 @@ const TextEditor = ({
             setUpdatedItems((prevItems) => [
               ...prevItems,
               { id: item.id, x: item.x, y: item.y },
-            ]); // 업데이트 할 아이템을 추가
+            ]);
             return { ...item, isDragging: false };
           }
           return item;
@@ -170,9 +190,9 @@ const TextEditor = ({
   useEffect(() => {
     if (updatedItems.length > 0) {
       updatedItems.forEach(({ id, x, y }) => {
-        updateTextItemPosition(id, x, y); // zustand에 상태 갱신
+        updateTextItemPosition(id, x, y);
       });
-      setUpdatedItems([]); // 갱신 후 초기화
+      setUpdatedItems([]);
     }
   }, [updatedItems]);
 
@@ -217,17 +237,17 @@ const TextEditor = ({
       {curItems.map((item) => (
         <St.TextBox
           key={item.id}
-          x={item.x * scale}
-          y={item.y * scale}
+          x={item.x}
+          y={item.y}
           isEditing={item.isEditing}
           isDragging={item.isDragging}
           className="text-box"
           onMouseDown={(e) => handleMouseDown(e, item.id)}
           onTouchStart={(e) => handleMouseDown(e, item.id)}
           style={{
-            fontSize: `${item.fontSize * scale}px`,
+            fontSize: `${item.fontSize}px`,
           }}
-          minWidth={calculateMinWidth(item.text, item.fontSize * scale)}
+          minWidth={calculateMinWidth(item.text, item.fontSize)}
         >
           {item.isEditing ? (
             <St.TextArea
@@ -236,12 +256,15 @@ const TextEditor = ({
               onChange={(e) => updateTextItem(item.id, e.target.value)}
               onBlur={() => finishEditing(item.id)}
               onKeyDown={(e) => handleKeyDown(e, item.id)}
-              style={{ fontSize: `${item.fontSize * scale}px` }}
+              style={{ fontSize: `${item.fontSize}px` }}
             />
           ) : (
-            <St.TextDetail fontSize={item.fontSize * scale}>
-              {item.text}
-            </St.TextDetail>
+            <St.TextDetail fontSize={item.fontSize}>{item.text}</St.TextDetail>
+          )}
+          {selectedItemId === item.id && (
+            <Bt.ButtonContainer>
+              <Bt.Button>삭제</Bt.Button>
+            </Bt.ButtonContainer>
           )}
         </St.TextBox>
       ))}
