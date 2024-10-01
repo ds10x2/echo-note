@@ -9,7 +9,6 @@ import pageStore from "@/stores/pageStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const PdfEditor = ({ scale }) => {
-  const containerRef = useRef();
   const { getCurrentPageItems, setCurrentPageForText } = textStore();
   const { currentPage, setCurrentPage } = pageStore();
   const { mode } = drawingTypeStore();
@@ -25,9 +24,8 @@ const PdfEditor = ({ scale }) => {
   }, [currentPage]);
 
   return (
-    <St.PdfEditorContainer ref={containerRef}>
+    <St.PdfEditorContainer>
       <TextEditor
-        containerRef={containerRef}
         scale={scale}
         hasDraggedRef={hasDraggedRef}
         isDraggingRef={isDraggingRef}

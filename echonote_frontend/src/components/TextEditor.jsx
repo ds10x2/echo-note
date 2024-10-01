@@ -4,7 +4,6 @@ import textStore from "@stores/textStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const TextEditor = ({
-  containerRef,
   scale,
   hasDraggedRef,
   isDraggingRef,
@@ -22,6 +21,7 @@ const TextEditor = ({
 
   const [curItems, setCurItems] = useState(currentPageItems);
   const [updatedItems, setUpdatedItems] = useState([]); // 갱신할 아이템을 저장할 상태
+  const containerRef = useRef();
 
   const handleAddTextBox = (e) => {
     if (isDraggingRef.current || hasDraggedRef.current) return;
@@ -213,7 +213,7 @@ const TextEditor = ({
   };
 
   return (
-    <St.TextContainer>
+    <St.TextContainer ref={containerRef}>
       <button
         onClick={() => setTextMode()}
         style={{ position: "absolute", top: 10, left: 10, zIndex: 10 }}
