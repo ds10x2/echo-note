@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import PdfCanvas from "@components/PdfCanvas";
 import * as St from "@components/styles/PdfViewer.style";
-import shapeStore from "@/stores/shapeStore";
 import pageStore from "@/stores/pageStore"; // pageStore를 가져옵니다
+import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const PdfViewer = ({}) => {
-  const [pages, setPages] = useState(1);
+  const [pages, setPages] = useState(1); //PDF 최대 페이지 수
   const [scale, setScale] = useState(1);
 
-  const { isRecMode, setIsRecMode } = shapeStore();
+  const { setShapeMode, mode } = drawingTypeStore();
   const { currentPage, setCurrentPage } = pageStore(); // zustand에서 currentPage와 setCurrentPage를 가져옵니다
 
   //페이지 이동
@@ -31,8 +31,8 @@ const PdfViewer = ({}) => {
           <button onClick={zoomOut}>축소</button>
         </div>
         <div>
-          <button onClick={() => setIsRecMode(!isRecMode)}>
-            {isRecMode ? "사각형모드on" : "사각형모드off"}
+          <button onClick={() => setShapeMode()}>
+            {mode.shape ? "사각형모드on" : "사각형모드off"}
           </button>
         </div>
       </St.ButtonContainer>

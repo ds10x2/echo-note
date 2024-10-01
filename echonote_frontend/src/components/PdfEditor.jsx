@@ -6,12 +6,13 @@ import textStore from "@stores/textStore";
 import ShapeEditor from "@components/ShapeEditor";
 import shapeStore from "@/stores/shapeStore";
 import pageStore from "@/stores/pageStore";
+import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const PdfEditor = ({ scale }) => {
   const containerRef = useRef();
-  const { isTextMode, addTextItem, getCurrentPageItems, setCurrentPage } =
-    textStore();
-  const { currentPage } = pageStore();
+  const { getCurrentPageItems } = textStore();
+  const { currentPage, setCurrentPage } = pageStore();
+  const { mode } = drawingTypeStore();
   const isDraggingRef = useRef(false);
   const hasDraggedRef = useRef(false);
 
@@ -32,6 +33,7 @@ const PdfEditor = ({ scale }) => {
         hasDraggedRef={hasDraggedRef}
         isDraggingRef={isDraggingRef}
         currentPageItems={getCurrentPageItems()}
+        style={{ zIndex: mode.text ? 2 : 1 }}
       />
       <ShapeEditor
         scale={scale}
@@ -40,6 +42,7 @@ const PdfEditor = ({ scale }) => {
         currentPageItems={getCurrentPageItems()}
         rectangles={rectangles}
         setRectangles={setRectangles}
+        style={{ zIndex: mode.shape ? 2 : 1 }}
       />
     </St.PdfEditorContainer>
   );
