@@ -33,7 +33,6 @@ const TextEditor = ({
     const x = (clientX - containerRect.left) / scale;
     const y = (clientY - containerRect.top) / scale;
 
-    console.log("텍스트 추가");
     addTextItem({
       id: Date.now(),
       x,
@@ -50,7 +49,6 @@ const TextEditor = ({
   const handleClickEvent = (e) => {
     if (mode.text) {
       if (!e.target.closest(".text-box")) {
-        console.log("클릭");
         handleAddTextBox(e);
       }
     }
@@ -84,8 +82,6 @@ const TextEditor = ({
     const offsetX = clientX / scale - item.x;
     const offsetY = clientY / scale - item.y;
 
-    console.log("드래그 시작");
-
     setCurItems((items) =>
       items.map((item) =>
         item.id === id
@@ -106,7 +102,6 @@ const TextEditor = ({
     if (isDraggingRef.current) {
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      console.log("드래그 중");
 
       setCurItems((items) =>
         items.map((item) => {
