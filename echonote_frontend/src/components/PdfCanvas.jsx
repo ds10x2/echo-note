@@ -2,14 +2,15 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import * as St from "./styles/PdfCanvas.style";
 import * as pdfjsLib from "pdfjs-dist";
 import PdfEditor from "@components/PdfEditor";
+import pageStore from "@/stores/pageStore"; // zustand 스토어 가져오기
 
-const PdfCanvas = ({ getPages, url, page, scale }) => {
+const PdfCanvas = ({ getPages, url, scale }) => {
   const canvasRef = useRef();
   const containerRef = useRef();
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs`;
 
   const [pdfRef, setPdfRef] = useState(null);
-  const [currentPage, setCurrentPage] = useState(page);
+  const { currentPage, setCurrentPage } = pageStore(); // zustand에서 currentPage와 setCurrentPage 가져오기
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
 
@@ -53,17 +54,12 @@ const PdfCanvas = ({ getPages, url, page, scale }) => {
     [pdfRef]
   );
 
-  useEffect(() => {
-    setCurrentPage(page);
-  }, [page]);
-
-  //페이지 렌더링
+  // currentPage가 바뀔 때마다 페이지를 렌더링
   useEffect(() => {
     renderPage(currentPage, pdfRef);
-  }, [currentPage]);
+  }, [currentPage, pdfRef]);
 
   useEffect(() => {
-    renderPage(currentPage, pdfRef);
     if (pdfRef) getPages(pdfRef.numPages);
   }, [pdfRef]);
 

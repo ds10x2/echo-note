@@ -5,11 +5,13 @@ import TextEditor from "@components/TextEditor";
 import textStore from "@stores/textStore";
 import ShapeEditor from "@components/ShapeEditor";
 import shapeStore from "@/stores/shapeStore";
+import pageStore from "@/stores/pageStore";
 
-const PdfEditor = ({ scale, currentPage }) => {
+const PdfEditor = ({ scale }) => {
   const containerRef = useRef();
   const { isTextMode, addTextItem, getCurrentPageItems, setCurrentPage } =
     textStore();
+  const { currentPage } = pageStore();
   const isDraggingRef = useRef(false);
   const hasDraggedRef = useRef(false);
 

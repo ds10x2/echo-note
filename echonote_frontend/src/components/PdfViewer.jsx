@@ -2,18 +2,18 @@ import { useEffect, useState } from "react";
 import PdfCanvas from "@components/PdfCanvas";
 import * as St from "@components/styles/PdfViewer.style";
 import shapeStore from "@/stores/shapeStore";
+import pageStore from "@/stores/pageStore"; // pageStore를 가져옵니다
 
 const PdfViewer = ({}) => {
   const [pages, setPages] = useState(1);
-  const [curPage, setCurPage] = useState(1);
-  const [url, setUrl] = useState("");
   const [scale, setScale] = useState(1);
 
   const { isRecMode, setIsRecMode } = shapeStore();
+  const { currentPage, setCurrentPage } = pageStore(); // zustand에서 currentPage와 setCurrentPage를 가져옵니다
 
   //페이지 이동
-  const nextPage = () => curPage < pages && setCurPage(curPage + 1);
-  const prevPage = () => curPage > 1 && setCurPage(curPage - 1);
+  const nextPage = () => currentPage < pages && setCurrentPage(currentPage + 1);
+  const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
 
   //줌인줌아웃
   const zoomIn = () => scale < 7 && setScale(scale + 0.5);
@@ -36,7 +36,7 @@ const PdfViewer = ({}) => {
           </button>
         </div>
       </St.ButtonContainer>
-      <PdfCanvas getPages={setPages} page={curPage} url={url} scale={scale} />
+      <PdfCanvas getPages={setPages} page={currentPage} scale={scale} />
     </St.PdfContainer>
   );
 };
