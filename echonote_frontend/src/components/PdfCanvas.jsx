@@ -4,7 +4,7 @@ import * as pdfjsLib from "pdfjs-dist";
 import PdfEditor from "@components/PdfEditor";
 import pageStore from "@/stores/pageStore"; // zustand 스토어 가져오기
 
-const PdfCanvas = ({ getPages, url, scale }) => {
+const PdfCanvas = ({ getPages, url, scale, containerRef }) => {
   const canvasRef = useRef();
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs`;
 
@@ -18,18 +18,35 @@ const PdfCanvas = ({ getPages, url, scale }) => {
 
   const renderPage = useCallback(
     (pageNum, pdf = pdfRef) => {
-      if (pdf) {
+      if (pdf && containerRef.current) {
+        // containerRef.current가 존재하는지 확인
         pdf.getPage(pageNum).then((page) => {
-          const viewport = page.getViewport({ scale: 1 });
-          const canvas = canvasRef.current;
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
+          const containerWidth = containerRef.current.clientWidth;
+          const containerHeight = containerRef.current.clientHeight;
 
-          setCanvasSize({ width: viewport.width, height: viewport.height });
+          const viewport = page.getViewport({ scale: 1 });
+          // 화면 비율에 맞게 PDF를 스케일링
+          const widthScale = (containerWidth / viewport.width) * 0.9;
+          const heightScale = (containerHeight / viewport.height) * 0.9;
+          const scaleFactor = Math.min(widthScale, heightScale); // 화면에 맞추기 위해 더 작은 스케일 사용
+
+          console.log(widthScale, " ", heightScale);
+          console.log(scaleFactor);
+
+          const scaledViewport = page.getViewport({ scale: scaleFactor });
+
+          const canvas = canvasRef.current;
+          canvas.height = scaledViewport.height;
+          canvas.width = scaledViewport.width;
+
+          setCanvasSize({
+            width: scaledViewport.width,
+            height: scaledViewport.height,
+          });
 
           const renderContext = {
             canvasContext: canvas.getContext("2d"),
-            viewport: viewport,
+            viewport: scaledViewport,
           };
 
           if (renderTaskRef.current) {
@@ -81,7 +98,11 @@ const PdfCanvas = ({ getPages, url, scale }) => {
       scale={scale}
     >
       <canvas ref={canvasRef}></canvas>
-      <PdfEditor scale={1} currentPage={currentPage} />
+      <PdfEditor
+        scale={scale}
+        currentPage={currentPage}
+        containerRef={containerRef}
+      />
     </St.PdfCanvasContainer>
   );
 };

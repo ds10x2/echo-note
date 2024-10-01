@@ -8,7 +8,7 @@ import shapeStore from "@/stores/shapeStore";
 import pageStore from "@/stores/pageStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 
-const PdfEditor = ({ scale }) => {
+const PdfEditor = ({ scale, containerRef }) => {
   const { getCurrentPageItems, setCurrentPageForText } = textStore();
   const { currentPage, setCurrentPage } = pageStore();
   const { mode } = drawingTypeStore();
@@ -30,15 +30,9 @@ const PdfEditor = ({ scale }) => {
         hasDraggedRef={hasDraggedRef}
         isDraggingRef={isDraggingRef}
         currentPageItems={getCurrentPageItems()}
+        parentContainerRef={containerRef}
       />
-      <ShapeEditor
-        scale={scale}
-        hasDraggedRef={hasDraggedRef}
-        isDraggingRef={isDraggingRef}
-        currentPageItems={getCurrentPageItems()}
-        rectangles={rectangles}
-        setRectangles={setRectangles}
-      />
+      <ShapeEditor currentPageItems={getCurrentPageItems()} />
     </St.PdfEditorContainer>
   );
 };
