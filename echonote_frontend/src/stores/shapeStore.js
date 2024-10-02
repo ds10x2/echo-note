@@ -1,44 +1,85 @@
-// shapeStore.js
 import { create } from "zustand";
 
 const shapeStore = create((set, get) => ({
-  rectangles: {}, // 페이지별로 사각형을 관리하기 위해 객체로 변경
+  rectangles: {},
+  circles: {},
   currentPage: 1,
 
-  addRectangle: (rectangle, page) => {
+  addRectangle: (rectangle) => {
+    const currentPage = get().currentPage;
     set((state) => ({
       rectangles: {
         ...state.rectangles,
-        [page]: [...(state.rectangles[page] || []), rectangle],
+        [currentPage]: [...(state.rectangles[currentPage] || []), rectangle],
       },
     }));
   },
 
-  updateRectangle: (index, newRect, page) => {
+  addCircle: (circle) => {
+    const currentPage = get().currentPage;
+    set((state) => ({
+      circles: {
+        ...state.circles,
+        [currentPage]: [...(state.circles[currentPage] || []), circle],
+      },
+    }));
+  },
+
+  updateRectangle: (index, newRect) => {
+    const currentPage = get().currentPage;
     set((state) => ({
       rectangles: {
         ...state.rectangles,
-        [page]: state.rectangles[page].map((rect, i) =>
+        [currentPage]: state.rectangles[currentPage].map((rect, i) =>
           i === index ? newRect : rect
         ),
       },
     }));
   },
 
-  setRectangles: (page, rects) => {
+  updateCircle: (index, newCircle) => {
+    const currentPage = get().currentPage;
     set((state) => ({
-      rectangles: {
-        ...state.rectangles,
-        [page]: rects,
+      circles: {
+        ...state.circles,
+        [currentPage]: state.circles[currentPage].map((circle, i) =>
+          i === index ? newCircle : circle
+        ),
       },
     }));
   },
 
-  getRectangles: (page) => {
-    return get().rectangles[page] || [];
+  setRectangles: (rects) => {
+    const currentPage = get().currentPage;
+    set((state) => ({
+      rectangles: {
+        ...state.rectangles,
+        [currentPage]: rects,
+      },
+    }));
   },
 
-  setCurrentPage: (page) => set(() => ({ currentPage: page })),
+  setCircles: (circles) => {
+    const currentPage = get().currentPage;
+    set((state) => ({
+      circles: {
+        ...state.circles,
+        [currentPage]: circles,
+      },
+    }));
+  },
+
+  getRectangles: () => {
+    const currentPage = get().currentPage;
+    return get().rectangles[currentPage] || [];
+  },
+
+  getCircles: () => {
+    const currentPage = get().currentPage;
+    return get().circles[currentPage] || [];
+  },
+
+  setCurrentPageForShape: (page) => set(() => ({ currentPage: page })),
 }));
 
 export default shapeStore;

@@ -10,6 +10,7 @@ import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const PdfEditor = ({ scale, containerRef }) => {
   const { getCurrentPageItems, setCurrentPageForText } = textStore();
+  const { getRectangles, getCircles, setCurrentPageForShape } = shapeStore();
   const { currentPage, setCurrentPage } = pageStore();
   const { mode } = drawingTypeStore();
   const isDraggingRef = useRef(false);
@@ -21,6 +22,7 @@ const PdfEditor = ({ scale, containerRef }) => {
   useEffect(() => {
     setCurrentPage(currentPage);
     setCurrentPageForText(currentPage);
+    setCurrentPageForShape(currentPage);
   }, [currentPage]);
 
   return (
@@ -32,7 +34,10 @@ const PdfEditor = ({ scale, containerRef }) => {
         currentPageItems={getCurrentPageItems()}
         parentContainerRef={containerRef}
       />
-      <ShapeEditor currentPageItems={getCurrentPageItems()} />
+      <ShapeEditor
+        currentPageRecs={getRectangles()}
+        currentPageCircles={getCircles()}
+      />
     </St.PdfEditorContainer>
   );
 };

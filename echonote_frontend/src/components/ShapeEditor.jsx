@@ -1,17 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as St from "@/components/styles/ShapeEditor.style";
 import shapeStore from "@/stores/shapeStore";
-import drawingTypeStore from "@/stores/drawingTypeStore"; // drawingTypeStore 가져오기
+import drawingTypeStore from "@/stores/drawingTypeStore";
 
-const ShapeEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
-  const {
-    addRectangle,
-    updateRectangle,
-    getRectangles,
-    setRectangles,
-    currentPage,
-  } = shapeStore();
-  const { mode } = drawingTypeStore(); // drawingTypeStore의 mode 가져오기
+const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
+  const { setRectangles } = shapeStore();
+  const { mode } = drawingTypeStore();
 
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -19,14 +13,18 @@ const ShapeEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [currentRect, setCurrentRect] = useState(null);
 
-  const rectangles = getRectangles(currentPage); // 현재 페이지의 사각형 가져오기
+  const [currentRects, setCurrentRects] = useState(currentPageRecs);
+
+  useEffect(() => {
+    setCurrentRects(currentPageRecs);
+  }, [currentPageRecs]);
 
   const handleMouseDownRec = (e) => {
-    if (!mode.shape) return; // 모드가 shape가 아닐 때는 이벤트 무시
+    if (!mode.shape) return;
 
     e.stopPropagation();
 
-    const clickedIndex = rectangles.findIndex(
+    const clickedIndex = currentRects.findIndex(
       (rect) =>
         e.nativeEvent.offsetX >= rect.x &&
         e.nativeEvent.offsetX <= rect.x + rect.width &&
@@ -38,8 +36,8 @@ const ShapeEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
       setIsDragging(true);
       setDraggingIndex(clickedIndex);
       setOffset({
-        x: e.nativeEvent.offsetX - rectangles[clickedIndex].x,
-        y: e.nativeEvent.offsetY - rectangles[clickedIndex].y,
+        x: e.nativeEvent.offsetX - currentRects[clickedIndex].x,
+        y: e.nativeEvent.offsetY - currentRects[clickedIndex].y,
       });
     } else {
       setIsDrawing(true);
@@ -61,7 +59,7 @@ const ShapeEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
     }
 
     if (isDragging && draggingIndex !== null) {
-      const updatedRectangles = rectangles.map((rect, index) => {
+      const updatedRectangles = currentRects.map((rect, index) => {
         if (index === draggingIndex) {
           return {
             ...rect,
@@ -71,18 +69,20 @@ const ShapeEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
         }
         return rect;
       });
-      setRectangles(currentPage, updatedRectangles);
+      setCurrentRects(updatedRectangles);
     }
   };
 
   const handleMouseUpRec = () => {
     if (isDrawing && currentRect) {
-      addRectangle(currentRect, currentPage); // 사각형 추가 시 현재 페이지 전달
+      setCurrentRects([...currentRects, currentRect]);
       setCurrentRect(null);
     }
     setIsDrawing(false);
     setIsDragging(false);
     setDraggingIndex(null);
+
+    setRectangles(currentRects);
   };
 
   return (
@@ -93,7 +93,7 @@ const ShapeEditor = ({ scale, hasDraggedRef, isDraggingRef }) => {
         onMouseUp={handleMouseUpRec}
         onMouseLeave={handleMouseUpRec}
       >
-        {rectangles.map((rect, index) => (
+        {currentRects.map((rect, index) => (
           <St.StyledRectangle
             key={index}
             x={rect.x}
