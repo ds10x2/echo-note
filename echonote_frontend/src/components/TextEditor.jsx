@@ -20,7 +20,7 @@ const TextEditor = ({
     deleteTextItem,
   } = textStore();
 
-  const { setTextMode, mode } = drawingTypeStore();
+  const { mode } = drawingTypeStore();
 
   const [curItems, setCurItems] = useState(currentPageItems);
   const [updatedItems, setUpdatedItems] = useState([]);
@@ -223,6 +223,7 @@ const TextEditor = ({
         updateTextItem(id, curItems.find((item) => item.id === id).text + "\n");
       } else {
         e.preventDefault();
+        updateTextItem(id, e.target.value);
         finishEditing(id);
       }
     }
@@ -254,6 +255,13 @@ const TextEditor = ({
       )
     );
   };
+  const updateCurTextItem = (id, newText) => {
+    setCurItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, text: newText } : item
+      )
+    );
+  };
 
   return (
     <St.TextContainer ref={containerRef} mode={mode.text}>
@@ -276,8 +284,11 @@ const TextEditor = ({
             <St.TextArea
               value={item.text}
               autoFocus
-              onChange={(e) => updateTextItem(item.id, e.target.value)}
-              onBlur={() => finishEditing(item.id)}
+              onChange={(e) => updateCurTextItem(item.id, e.target.value)}
+              onBlur={() => {
+                updateTextItem(item.id, item.text);
+                finishEditing(item.id);
+              }}
               onKeyDown={(e) => handleKeyDown(e, item.id)}
               style={{ fontSize: `${item.fontSize}px` }}
             />
