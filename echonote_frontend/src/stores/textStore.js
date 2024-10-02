@@ -93,6 +93,18 @@ const textStore = create((set, get) => ({
     }));
   },
 
+  deleteTextItem: (id) => {
+    const currentPage = get().currentPage;
+    set((state) => ({
+      textItems: {
+        ...state.textItems,
+        [currentPage]: state.textItems[currentPage].filter(
+          (item) => item.id !== id
+        ),
+      },
+    }));
+  },
+
   resetTextItems: () => set(() => ({ textItems: {} })),
 
   getTextItemById: (id) => {

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as St from "./styles/TextEditor.style";
-
 import EditButton from "@components/common/EditButton";
 import textStore from "@stores/textStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
@@ -18,6 +17,7 @@ const TextEditor = ({
     updateTextItemPosition,
     addTextItem,
     resetDraggingState,
+    deleteTextItem,
   } = textStore();
 
   const { setTextMode, mode } = drawingTypeStore();
@@ -52,15 +52,19 @@ const TextEditor = ({
       fontSize: 16,
     });
 
-    setSelectedItemId(null); // 새로운 텍스트 박스 추가 시 기존 선택된 상태를 해제
+    setSelectedItemId(null);
   };
 
   const handleClickEvent = (e) => {
     if (mode.text) {
+      if (e.target.closest(".edit-button-container")) {
+        return;
+      }
+
       if (!e.target.closest(".text-box")) {
         handleAddTextBox(e);
       } else {
-        setSelectedItemId(null); // 다른 곳을 클릭하면 선택 해제
+        setSelectedItemId(null);
       }
     }
   };
@@ -233,6 +237,24 @@ const TextEditor = ({
     return fontSize * longestLine.length;
   };
 
+  // 삭제 핸들러
+  const handleDelete = () => {
+    if (selectedItemId !== null) {
+      setCurItems(curItems.filter((item) => item.id !== selectedItemId));
+      deleteTextItem(selectedItemId);
+      setSelectedItemId(null);
+    }
+  };
+
+  // 수정 핸들러
+  const handleEdit = () => {
+    setCurItems((items) =>
+      items.map((item) =>
+        item.id === selectedItemId ? { ...item, isEditing: true } : item
+      )
+    );
+  };
+
   return (
     <St.TextContainer ref={containerRef} mode={mode.text}>
       {curItems.map((item) => (
@@ -263,8 +285,9 @@ const TextEditor = ({
             <St.TextDetail fontSize={item.fontSize}>{item.text}</St.TextDetail>
           )}
           {selectedItemId === item.id && (
-            <St.ButtonContainer>
-              <EditButton buttonText="삭제" />
+            <St.ButtonContainer className="edit-button-container">
+              <EditButton buttonText="삭제" onClick={handleDelete} />
+              <EditButton buttonText="수정" onClick={handleEdit} />
             </St.ButtonContainer>
           )}
         </St.TextBox>
