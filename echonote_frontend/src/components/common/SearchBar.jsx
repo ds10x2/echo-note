@@ -37,11 +37,6 @@ const SearchBar = ({ onSearch }) => {
     }
   };
 
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter" && searchTerm.trim() !== "" && searchTerm !== prevSearchTerm) {
-      handleSearch();
-    }
-  };
 
   useEffect(() => {
     if (isOpen) {
@@ -62,7 +57,6 @@ const SearchBar = ({ onSearch }) => {
                 placeholder="원하는 것을 검색해보세요"
                 value={searchTerm} // 상태에 따라 입력 필드의 값 설정
                 onChange={handleInputChange} // 입력 변경 시 상태 업데이트 및 상위 컴포넌트에 검색어 전달
-                onKeyDown={handleKeyDown} // 엔터 키 입력 처리
             />
         )}
         <SearchButton onClick={handleSearchClick}>
