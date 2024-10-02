@@ -60,3 +60,15 @@ export const TextDetail = styled.div`
   white-space: pre-wrap;
   font-size: ${({ fontSize }) => fontSize}px;
 `;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  gap: 5px;
+  position: absolute;
+  top: 100%; /* 텍스트박스 바로 아래에 버튼 배치 */
+  left: 50%;
+  transform: translateY(5px);
+  transform: translateX(-50%);
+  padding: 5px;
+  z-index: 3;
+`;

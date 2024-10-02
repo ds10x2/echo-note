@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as St from "./styles/TextEditor.style";
-import * as Bt from "@/components/styles/EditButton.style";
+
+import EditButton from "@components/common/EditButton";
 import textStore from "@stores/textStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 
@@ -262,9 +263,9 @@ const TextEditor = ({
             <St.TextDetail fontSize={item.fontSize}>{item.text}</St.TextDetail>
           )}
           {selectedItemId === item.id && (
-            <Bt.ButtonContainer>
-              <Bt.Button>삭제</Bt.Button>
-            </Bt.ButtonContainer>
+            <St.ButtonContainer>
+              <EditButton buttonText="삭제" />
+            </St.ButtonContainer>
           )}
         </St.TextBox>
       ))}
