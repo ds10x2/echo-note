@@ -1,7 +1,9 @@
+// ShapeEditor.jsx
 import React, { useEffect, useState } from "react";
 import * as St from "@/components/styles/ShapeEditor.style";
 import shapeStore from "@/stores/shapeStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
+import EditButton from "@components/common/EditButton";
 
 const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
   const { setRectangles, property } = shapeStore();
@@ -14,9 +16,11 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
   const [currentRect, setCurrentRect] = useState(null);
 
   const [currentRects, setCurrentRects] = useState(currentPageRecs);
+  const [selectedRectId, setSelectedRectId] = useState(null);
 
   useEffect(() => {
     setCurrentRects(currentPageRecs);
+    setSelectedRectId(null);
   }, [currentPageRecs]);
 
   const handleMouseDownRec = (e) => {
@@ -39,6 +43,7 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
         x: e.nativeEvent.offsetX - currentRects[clickedIndex].x,
         y: e.nativeEvent.offsetY - currentRects[clickedIndex].y,
       });
+      setSelectedRectId(clickedIndex);
     } else {
       setIsDrawing(true);
       const startX = e.nativeEvent.offsetX;
@@ -53,23 +58,16 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
         height: 0,
         property: property,
       });
+      setSelectedRectId(null);
     }
   };
 
   const handleMouseMoveRec = (e) => {
     if (isDrawing) {
-      const currentX = e.nativeEvent.offsetX;
-      const currentY = e.nativeEvent.offsetY;
-
-      const newX = Math.min(currentRect.startX, currentX);
-      const newY = Math.min(currentRect.startY, currentY);
-      const newWidth = Math.abs(currentX - currentRect.startX);
-      const newHeight = Math.abs(currentY - currentRect.startY);
-
+      const newWidth = e.nativeEvent.offsetX - currentRect.x;
+      const newHeight = e.nativeEvent.offsetY - currentRect.y;
       setCurrentRect({
         ...currentRect,
-        x: newX,
-        y: newY,
         width: newWidth,
         height: newHeight,
       });
@@ -87,6 +85,7 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
         return rect;
       });
       setCurrentRects(updatedRectangles);
+      setSelectedRectId(null);
     }
   };
 
@@ -102,6 +101,17 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
     setRectangles(currentRects);
   };
 
+  const handleDelete = () => {
+    if (selectedRectId !== null) {
+      const updatedRects = currentRects.filter(
+        (_, index) => index !== selectedRectId
+      );
+      setCurrentRects(updatedRects);
+      setRectangles(updatedRects);
+      setSelectedRectId(null);
+    }
+  };
+
   return (
     <St.ShapeContainer modeShape={mode.shape}>
       <St.StyledSVG
@@ -115,19 +125,21 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
             key={index}
             x={rect.x}
             y={rect.y}
-            width={rect.width}
-            height={rect.height}
+            width={Math.abs(rect.width)}
+            height={Math.abs(rect.height)}
             fill={rect.property.fill ? rect.property.fillColor : "none"}
             stroke={rect.property.stroke ? rect.property.strokeColor : "none"}
             strokeWidth={rect.property.stroke ? rect.property.strokeWidth : 0}
+            className="rectangle"
+            onClick={() => setSelectedRectId(index)} // 클릭 시 선택된 ID 설정
           />
         ))}
         {currentRect && (
           <St.CurrentRectangle
             x={currentRect.x}
             y={currentRect.y}
-            width={currentRect.width}
-            height={currentRect.height}
+            width={Math.abs(currentRect.width)}
+            height={Math.abs(currentRect.height)}
             fill={
               currentRect.property.fill
                 ? currentRect.property.fillColor
@@ -144,6 +156,21 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
           />
         )}
       </St.StyledSVG>
+      {selectedRectId !== null && (
+        <St.ButtonContainer
+          $top={
+            currentRects[selectedRectId].y +
+            currentRects[selectedRectId].height +
+            10 // 도형의 아래에 약간의 여백 추가
+          }
+          $left={
+            currentRects[selectedRectId].x +
+            currentRects[selectedRectId].width / 2
+          }
+        >
+          <EditButton buttonText="삭제" onClick={handleDelete} />
+        </St.ButtonContainer>
+      )}
     </St.ShapeContainer>
   );
 };

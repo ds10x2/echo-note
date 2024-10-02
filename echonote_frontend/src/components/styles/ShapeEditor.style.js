@@ -35,3 +35,16 @@ export const ShapeContainer = styled.div.withConfig({
   z-index: ${({ modeShape }) => (modeShape ? 2 : 1)};
   cursor: ${({ modeShape }) => (modeShape ? "crosshair" : "default")};
 `;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  gap: 5px;
+  position: absolute;
+  top: ${(props) => `${props.$top}px`};
+  left: ${(props) =>
+    `calc(${props.$left}px - 50px)`}; /* 버튼의 너비를 고려해 중앙에 위치 */
+  padding: 5px;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  z-index: 10;
+`;
