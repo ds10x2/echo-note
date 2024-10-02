@@ -49,13 +49,24 @@ export const TextBox = styled.div
 `;
 
 export const TextArea = styled.textarea`
-  font-size: 16px;
-  border: 1px solid #ddd;
+  font-size: ${({ fontSize }) => fontSize || 16}px;
+  border: 1px solid ${theme.colors.textSelectedStrokeColor};
   background-color: ${theme.colors.textEditBackground};
-  resize: none;
-  padding: 2px;
+  padding: 4px;
   outline: none;
+  resize: none;
   user-select: none;
+  border-radius: 4px;
+  line-height: 1.5;
+  width: ${({ minWidth }) => (minWidth ? `${minWidth}px` : "100%")};
+  min-width: ${({ minWidth }) => (minWidth ? `${minWidth}px` : "150px")};
+  transition: all 0.2s ease-in-out;
+
+  &:focus {
+    border-color: ${theme.colors.textFocusedStrokeColor};
+    box-shadow: 0 0 5px ${theme.colors.pdfShadowColor};
+    backdrop-filter: blur(5px);
+  }
 `;
 
 export const TextDetail = styled.div`

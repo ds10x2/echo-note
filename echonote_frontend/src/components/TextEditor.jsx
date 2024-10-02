@@ -220,10 +220,13 @@ const TextEditor = ({
     if (e.key === "Enter") {
       if (e.ctrlKey) {
         e.preventDefault();
-        updateTextItem(id, curItems.find((item) => item.id === id).text + "\n");
+        updateCurTextItem(
+          id,
+          curItems.find((item) => item.id === id).text + "\n"
+        );
       } else {
         e.preventDefault();
-        updateTextItem(id, e.target.value);
+        updateTextItem(id, curItems.find((item) => item.id === id).text);
         finishEditing(id);
       }
     }
