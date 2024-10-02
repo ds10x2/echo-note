@@ -3,11 +3,9 @@ package com.echonote.domain.Voice.controller;
 import java.util.List;
 import java.util.UUID;
 
-import com.amazonaws.HttpMethod;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.echonote.domain.Voice.dto.AnalysisResultRequest;
+import com.echonote.domain.Voice.dto.STTResultRequest;
 import com.echonote.domain.Voice.dto.UrlResponse;
-import com.echonote.domain.Voice.dto.VoiceProcessRequest;
+import com.echonote.domain.Voice.dto.VoiceSendRequest;
 import com.echonote.domain.Voice.entity.STT;
 import com.echonote.domain.Voice.service.VoiceService;
 import com.echonote.domain.note.dto.NoteCreateResponse;
@@ -50,14 +50,33 @@ public class VoiceController {
 	}
 
 	@PostMapping
-	@Operation(summary = "음성 저장 및 분석", description = "녹음본의 S3 URL과 STT 처리 결과를 저장")
-	public ResponseEntity<NoteCreateResponse> processVoice(@RequestBody VoiceProcessRequest voiceCreateRequest) {
+	@Operation(summary = "음성 저장 및 분석", description = "녹음본의 객체 URL을 DB에 저장하고 Flask 모델 API를 호출합니다.")
+	public ResponseEntity<NoteCreateResponse> processVoice(@RequestBody VoiceSendRequest voiceSendRequest) {
 
 		Long userId = 1L;
-		voiceService.sendVoice(userId, voiceCreateRequest);
+		String processId = UUID.randomUUID().toString();
+		voiceSendRequest.setProcessId(processId);
+		voiceService.sendVoice(userId, voiceSendRequest);
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
 
+	}
+
+	@PostMapping("/sttResult")
+	@Operation(summary = "STT 모델 결과 받기", description = "Flask STT 모델에서 처리된 결과를 받습니다.")
+	public ResponseEntity<String> receiveSTTResult(@RequestBody STTResultRequest sttResultRequest) {
+		System.out.println(sttResultRequest);
+		// voiceService.saveSTTResult(sttResultRequest);
+		// voiceService.checkAndProcessVoice(sttResultRequest.getProcessId());
+		return ResponseEntity.ok("STT 완료");
+	}
+
+	@PostMapping("/analysisResult")
+	@Operation(summary = "음성 분석 모델 결과 받기", description = "Flask 음성 분석 모델에서 처리된 결과를 받습니다.")
+	public ResponseEntity<String> receiveSTTResult(@RequestBody AnalysisResultRequest analysisResultRequest) {
+		voiceService.saveAnalysisResult(analysisResultRequest);
+		voiceService.checkAndProcessVoice(analysisResultRequest.getProcessId());
+		return ResponseEntity.ok("음성 분석 완료");
 	}
 
 	@GetMapping("/stt")

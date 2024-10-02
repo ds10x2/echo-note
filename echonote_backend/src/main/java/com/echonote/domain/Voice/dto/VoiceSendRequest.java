@@ -3,10 +3,12 @@ package com.echonote.domain.Voice.dto;
 import lombok.Data;
 
 @Data
-public class VoiceProcessRequest {
+public class VoiceSendRequest {
+
+	private String processId;
 
 	private Long noteId;
 
-	private String ObjectUrl;
+	private String objectUrl;
 
 }

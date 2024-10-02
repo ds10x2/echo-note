@@ -2,8 +2,10 @@ package com.echonote.domain.Voice.service;
 
 import java.util.List;
 
+import com.echonote.domain.Voice.dto.AnalysisResultRequest;
+import com.echonote.domain.Voice.dto.STTResultRequest;
 import com.echonote.domain.Voice.dto.UrlResponse;
-import com.echonote.domain.Voice.dto.VoiceProcessRequest;
+import com.echonote.domain.Voice.dto.VoiceSendRequest;
 import com.echonote.domain.Voice.entity.STT;
 
 public interface VoiceService {
@@ -19,5 +21,11 @@ public interface VoiceService {
 
 	void deleteSTT(long id, List<Long> sttId);
 
-	void sendVoice(Long userId, VoiceProcessRequest voiceCreateRequest);
+	void sendVoice(Long userId, VoiceSendRequest voiceSendRequest);
+
+	void saveSTTResult(STTResultRequest sttResultRequest);
+
+	void saveAnalysisResult(AnalysisResultRequest analysisResultRequest);
+
+	void checkAndProcessVoice(String processId);
 }

@@ -3,8 +3,9 @@ package com.echonote.domain.Voice.service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,11 +24,14 @@ import org.springframework.web.client.RestTemplate;
 import com.amazonaws.services.s3.AmazonS3;
 import com.echonote.domain.Memo.entity.Memo;
 import com.echonote.domain.Voice.dao.VoiceRepository;
+import com.echonote.domain.Voice.dto.AnalysisResultRequest;
 import com.echonote.domain.Voice.dto.STTRequest;
 import com.echonote.domain.Voice.dto.STTResponse;
+import com.echonote.domain.Voice.dto.STTResultRequest;
+import com.echonote.domain.Voice.dto.TwoFlaskResult;
 import com.echonote.domain.Voice.dto.UrlResponse;
 import com.echonote.domain.Voice.dto.VoiceAnalysisResponse;
-import com.echonote.domain.Voice.dto.VoiceProcessRequest;
+import com.echonote.domain.Voice.dto.VoiceSendRequest;
 import com.echonote.domain.Voice.entity.STT;
 import com.echonote.domain.note.dao.NoteRepository;
 import com.echonote.domain.note.entity.Note;
@@ -52,6 +56,8 @@ public class VoiceServiceImpl implements VoiceService {
 	@Autowired
 	private final RestTemplate restTemplate;
 
+	private final Map<String, TwoFlaskResult> resultStore = new ConcurrentHashMap<>();
+
 	@Override
 	public UrlResponse generatePreSignUrl(String filePath,
 		String bucketName,
@@ -69,48 +75,31 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 	@Override
-	public void sendVoice(Long userId, VoiceProcessRequest voiceProcessRequest) {
+	public void sendVoice(Long userId, VoiceSendRequest voiceSendRequest) {
 
 		// 1. DB에 S3 URL 저장
-		Note note = noteRepository.findById(voiceProcessRequest.getNoteId())
+		Note note = noteRepository.findById(voiceSendRequest.getNoteId())
 			.orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
 
-		note.setRecord_path(voiceProcessRequest.getObjectUrl());
+		note.setRecord_path(voiceSendRequest.getObjectUrl());
 
 		noteRepository.save(note);
 		System.out.println("DB 저장 성공");
 
-		// 2. STT 분석 & 피치 분석 (비동기)
-		CompletableFuture<STTResponse> sttFuture = CompletableFuture.supplyAsync(() -> {
-			return sendSTTFlask(voiceProcessRequest);
-		});
-
-		// CompletableFuture<VoiceAnalysisResponse> pitchFuture = CompletableFuture.supplyAsync(() -> {
-		// 	return sendAnalysisFlask(voiceProcessRequest);
-		// });
-
-		// 3. 분석 결과 매칭 & 저장
-		// sttFuture.thenCombine(pitchFuture, (sttResult, pitchResult) -> {
-		// 	// 두 분석 결과를 매칭 및 저장
-		// 	voiceService.matchAndSaveAnalysisResults(note, sttResult, pitchResult);
-		//
-		// 	return null; // 반환값이 필요하지 않으면 null 반환
-		// }).exceptionally(ex -> {
-		// 	// 에러 처리 로직
-		// 	System.err.println("Error occurred during analysis: " + ex.getMessage());
-		// 	return null;
-		// });
+		// 2. Flask 모델 요청
+		sendSTTFlask(voiceSendRequest);
+		sendAnalysisFlask(voiceSendRequest);
 	}
 
-	public STTResponse sendSTTFlask(VoiceProcessRequest voiceProcessRequest) {
-		String flaskUrl = "http://70.12.130.111:5000/stt";  // Flask 서버 URL
+	public STTResponse sendSTTFlask(VoiceSendRequest voiceSendRequest) {
+		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // Flask 서버 URL
 
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
 
 		// 요청에 데이터 추가
-		HttpEntity<VoiceProcessRequest> entity = new HttpEntity<>(voiceProcessRequest, headers);
+		HttpEntity<VoiceSendRequest> entity = new HttpEntity<>(voiceSendRequest, headers);
 
 		// Flask 서버로 POST 요청 보내기
 		ResponseEntity<STTResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
@@ -127,7 +116,7 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 	// 음성 분석 모델에 보내기
-	public VoiceAnalysisResponse sendAnalysisFlask(VoiceProcessRequest voiceProcessRequest) {
+	public void sendAnalysisFlask(VoiceSendRequest voiceSendRequest) {
 		String flaskUrl = "http://70.12.130.111:5000/";  // Flask 서버 URL
 
 		// HTTP 헤더 설정
@@ -135,11 +124,10 @@ public class VoiceServiceImpl implements VoiceService {
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
 
 		// 요청에 데이터 추가
-		HttpEntity<VoiceProcessRequest> entity = new HttpEntity<>(voiceProcessRequest, headers);
+		HttpEntity<VoiceSendRequest> entity = new HttpEntity<>(voiceSendRequest, headers);
 
 		// Flask 서버로 POST 요청 보내기
-		ResponseEntity<VoiceAnalysisResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
-			VoiceAnalysisResponse.class);
+		restTemplate.exchange(flaskUrl, HttpMethod.POST, entity, VoiceAnalysisResponse.class);
 
 		// 응답 처리 (필요에 따라)
 		// if (response.getStatusCode().is2xxSuccessful()) {
@@ -147,8 +135,41 @@ public class VoiceServiceImpl implements VoiceService {
 		// } else {
 		// 	System.err.println("Flask 서버 요청 실패: " + response.getStatusCode());
 		// }
+	}
 
-		return response.getBody();
+	@Override
+	public void saveSTTResult(STTResultRequest sttResultRequest) {
+		String processId = sttResultRequest.getProcessId();
+		TwoFlaskResult twoFlaskResult = resultStore.getOrDefault(processId, new TwoFlaskResult());
+		twoFlaskResult.setSttResultRequest(sttResultRequest);
+		resultStore.put(processId, twoFlaskResult);
+	}
+
+	@Override
+	public void saveAnalysisResult(AnalysisResultRequest analysisResultRequest) {
+		String processId = analysisResultRequest.getProcessId();
+		TwoFlaskResult twoFlaskResult = resultStore.getOrDefault(processId, new TwoFlaskResult());
+		twoFlaskResult.setAnalysisResultRequest(analysisResultRequest);
+		resultStore.put(processId, twoFlaskResult);
+	}
+
+	@Override
+	public void checkAndProcessVoice(String processId) {
+		TwoFlaskResult twoFlaskResult = resultStore.get(processId);
+
+		// 두 결과가 모두 도착하면 처리
+		if (twoFlaskResult != null && twoFlaskResult.getSttResultRequest() != null
+			&& twoFlaskResult.getAnalysisResultRequest() != null) {
+			// voiceRepository.save(matchResult(twoFlaskResult));
+			// 저장 완료 후 삭제
+			resultStore.remove(processId);
+		}
+	}
+
+	private STT matchResult(TwoFlaskResult twoFlaskResult) {
+		STT totalResult = new STT();
+
+		return totalResult;
 	}
 
 	// STT Service
