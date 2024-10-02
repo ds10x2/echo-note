@@ -3,6 +3,7 @@ import PdfCanvas from "@components/PdfCanvas";
 import * as St from "@components/styles/PdfViewer.style";
 import pageStore from "@/stores/pageStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
+import PropertyEditor from "@/components/TmpShapeProperty";
 
 const PdfViewer = ({}) => {
   const containerRef = useRef();
@@ -72,6 +73,7 @@ const PdfViewer = ({}) => {
             {mode.text ? "Text Mode On" : "Text Mode Off"}
           </button>
         </div>
+        <PropertyEditor />
       </St.ButtonContainer>
       <PdfCanvas
         getPages={setPages}
