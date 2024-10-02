@@ -29,7 +29,8 @@ const formatTime = (seconds) => {
     const secs = Math.floor(seconds % 60);
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
 };
-const STTComponent = ({ id }) => {
+
+const STTComponent = ({ id, searchTerm  }) => {
     const [sttData, setSttData] = useState([]);
 
     console.log(sttData)
@@ -45,15 +46,24 @@ const STTComponent = ({ id }) => {
         fetchData();
     }, [id]);
 
+    // 검색어를 포함한 부분 강조
+    const highlightText = (text) => {
+        if (!searchTerm) return text;
+        const parts = text.split(new RegExp(`(${searchTerm})`, 'gi'));
+        return parts.map((part, index) =>
+            part.toLowerCase() === searchTerm.toLowerCase() ? (
+                <span key={index} style={{ backgroundColor: 'yellow' }}>{part}</span>
+            ) : part
+        );
+    };
     return (
         <div className="sttContainer">
             {sttData && sttData.length > 0 ? (
                 <ul>
                     {sttData.map((segment, index) => (
-                        <li key={segment.id || `segment-${index}`}> {/* segment.id가 null인 경우 fallback */}
-                            {/* 타임스탬프 표시 */}
+                        <li key={segment.id}>
                             <a href="#">{formatTime(parseFloat(segment.start))} ~ {formatTime(parseFloat(segment.end))}</a>
-                            <p>{segment.text}</p>
+                            <p>{highlightText(segment.text)}</p> {/* 강조된 텍스트 표시 */}
                         </li>
                     ))}
                 </ul>
