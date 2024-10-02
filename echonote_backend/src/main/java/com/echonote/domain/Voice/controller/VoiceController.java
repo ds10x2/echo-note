@@ -8,15 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.echonote.domain.Voice.dto.UrlResponse;
 import com.echonote.domain.Voice.dto.VoiceProcessRequest;
@@ -64,6 +56,7 @@ public class VoiceController {
 	@Operation(summary = "note_id에 대응되는 stt 결과물 반환", description = "result가 processiong중이면 null값으로 들어옵니다.")
 	public ResponseEntity<STT> saveSTT(@RequestParam long id) {
 		STT stt = voiceService.getSTT(id);
+
 		return new ResponseEntity<>(stt, HttpStatus.OK);
 	}
 

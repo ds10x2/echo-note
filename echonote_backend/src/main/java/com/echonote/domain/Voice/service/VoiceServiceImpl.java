@@ -18,6 +18,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.client.RestTemplate;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -167,12 +168,13 @@ public class VoiceServiceImpl implements VoiceService {
 
 	}
 
+	@CrossOrigin(origins = "http://localhost:5173")
 	@Override
 	public STT getSTT(long id) {
 		Optional<STT> stt = voiceRepository.findById(id);
 
 		if (stt != null) {
-			log.info("Found STT: " + stt);
+			log.info("Found STT");
 		} else {
 			log.warn("STT not found with ID: " + id);
 		}
