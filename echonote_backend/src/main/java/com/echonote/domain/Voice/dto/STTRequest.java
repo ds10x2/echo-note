@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class STTRequest {
-    private long id;
+    private Long id;
     private String start;
     private String end;
     private String text;

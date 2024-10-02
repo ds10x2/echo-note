@@ -1,0 +1,59 @@
+#root {
+  width: 100vw;
+  height: 100vh;
+  background: black;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#App {
+  background: white;
+  position: relative;
+}
+
+.sttContainer{
+  margin: 0;
+  padding: 0;
+  height: 550px; /* 원하는 높이 설정 */
+  overflow-y: scroll; /* 세로 방향 스크롤 활성화 */
+  /*border: 1px solid #ccc; !* 필요에 따라 경계선 추가 *!*/
+  padding: 10px; /* 내부 여백 */
+}
+
+.sttContainer::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.sttContainer {
+  -ms-overflow-style: none; /* Internet Explorer and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.sttContainer > ul{
+  margin:0;
+  padding: 0;
+}
+
+.sttContainer > ul > li{
+  margin-bottom: 10px;
+  padding: 0;
+  list-style-type: none;
+}
+.sttContainer > ul > li > a{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  text-decoration: none;
+  color: cornflowerblue;
+}
+.sttContainer > ul > li > a:hover{
+  color: purple;
+}
+
+.sttContainer > ul > li > p{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
