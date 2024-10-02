@@ -37,7 +37,6 @@ const STTBar = () => {
         </STTBarSearchRow>
         <Divider />
         <STTBarContent isOpened={isSTTBarOpened}>
-          <p>이곳에 텍스트가 들어갑니다. STT 관련 내용을 추가할 수 있습니다.</p>
           <STTResult id={1}/>
         </STTBarContent>
       </STTBarContainer>
