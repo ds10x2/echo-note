@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as St from "@/components/styles/ShapeEditor.style";
 import shapeStore from "@/stores/shapeStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
@@ -44,10 +44,11 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
       const startX = e.nativeEvent.offsetX;
       const startY = e.nativeEvent.offsetY;
 
-      // 새로운 사각형에 기본 속성 추가
       setCurrentRect({
         x: startX,
         y: startY,
+        startX: startX,
+        startY: startY,
         width: 0,
         height: 0,
         property: property,
@@ -57,10 +58,18 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
 
   const handleMouseMoveRec = (e) => {
     if (isDrawing) {
-      const newWidth = e.nativeEvent.offsetX - currentRect.x;
-      const newHeight = e.nativeEvent.offsetY - currentRect.y;
+      const currentX = e.nativeEvent.offsetX;
+      const currentY = e.nativeEvent.offsetY;
+
+      const newX = Math.min(currentRect.startX, currentX);
+      const newY = Math.min(currentRect.startY, currentY);
+      const newWidth = Math.abs(currentX - currentRect.startX);
+      const newHeight = Math.abs(currentY - currentRect.startY);
+
       setCurrentRect({
         ...currentRect,
+        x: newX,
+        y: newY,
         width: newWidth,
         height: newHeight,
       });
@@ -106,8 +115,8 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
             key={index}
             x={rect.x}
             y={rect.y}
-            width={Math.abs(rect.width)}
-            height={Math.abs(rect.height)}
+            width={rect.width}
+            height={rect.height}
             fill={rect.property.fill ? rect.property.fillColor : "none"}
             stroke={rect.property.stroke ? rect.property.strokeColor : "none"}
             strokeWidth={rect.property.stroke ? rect.property.strokeWidth : 0}
@@ -117,8 +126,8 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
           <St.CurrentRectangle
             x={currentRect.x}
             y={currentRect.y}
-            width={Math.abs(currentRect.width)}
-            height={Math.abs(currentRect.height)}
+            width={currentRect.width}
+            height={currentRect.height}
             fill={
               currentRect.property.fill
                 ? currentRect.property.fillColor
