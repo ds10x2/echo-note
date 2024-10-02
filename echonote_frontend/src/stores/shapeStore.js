@@ -1,9 +1,17 @@
 import { create } from "zustand";
+import { theme } from "@/shared/styles/theme";
 
 const shapeStore = create((set, get) => ({
   rectangles: {},
   circles: {},
   currentPage: 1,
+  property: {
+    fill: true,
+    fillColor: theme.colors.shapeFillDefaultColor,
+    stroke: true,
+    strokeColor: theme.colors.shapeStrokeDefaultColor,
+    strokeWidth: 1,
+  },
 
   addRectangle: (rectangle) => {
     const currentPage = get().currentPage;
@@ -77,6 +85,17 @@ const shapeStore = create((set, get) => ({
   getCircles: () => {
     const currentPage = get().currentPage;
     return get().circles[currentPage] || [];
+  },
+
+  getProperty: () => {
+    const property = get().property;
+    return property;
+  },
+
+  setProperty: (property) => {
+    set(() => ({
+      property: property,
+    }));
   },
 
   setCurrentPageForShape: (page) => set(() => ({ currentPage: page })),

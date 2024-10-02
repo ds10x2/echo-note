@@ -4,7 +4,7 @@ import shapeStore from "@/stores/shapeStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
-  const { setRectangles } = shapeStore();
+  const { setRectangles, property } = shapeStore();
   const { mode } = drawingTypeStore();
 
   const [isDrawing, setIsDrawing] = useState(false);
@@ -43,7 +43,15 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
       setIsDrawing(true);
       const startX = e.nativeEvent.offsetX;
       const startY = e.nativeEvent.offsetY;
-      setCurrentRect({ x: startX, y: startY, width: 0, height: 0 });
+
+      // 새로운 사각형에 기본 속성 추가
+      setCurrentRect({
+        x: startX,
+        y: startY,
+        width: 0,
+        height: 0,
+        property: property,
+      });
     }
   };
 
@@ -100,6 +108,9 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
             y={rect.y}
             width={Math.abs(rect.width)}
             height={Math.abs(rect.height)}
+            fill={rect.property.fill ? rect.property.fillColor : "none"}
+            stroke={rect.property.stroke ? rect.property.strokeColor : "none"}
+            strokeWidth={rect.property.stroke ? rect.property.strokeWidth : 0}
           />
         ))}
         {currentRect && (
@@ -108,6 +119,19 @@ const ShapeEditor = ({ currentCircles, currentPageRecs }) => {
             y={currentRect.y}
             width={Math.abs(currentRect.width)}
             height={Math.abs(currentRect.height)}
+            fill={
+              currentRect.property.fill
+                ? currentRect.property.fillColor
+                : "none"
+            }
+            stroke={
+              currentRect.property.stroke
+                ? currentRect.property.strokeColor
+                : "none"
+            }
+            strokeWidth={
+              currentRect.property.stroke ? currentRect.property.strokeWidth : 0
+            }
           />
         )}
       </St.StyledSVG>

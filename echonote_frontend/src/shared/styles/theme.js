@@ -18,5 +18,7 @@ export const theme = {
     editButtonColor: "#FFFFFF",
     editButtonBorderColor: "#cecece",
     modalBackground: "#414141",
+    shapeFillDefaultColor: "#94acd8",
+    shapeStrokeDefaultColor: "#000000",
   },
 };
