@@ -20,5 +20,7 @@ export const theme = {
     modalBackground: "#414141",
     shapeFillDefaultColor: "#94acd8",
     shapeStrokeDefaultColor: "#000000",
+    textEditBackground: "#ffffff00",
+    textSelectedStrokeColor: "#94acd8",
   },
 };

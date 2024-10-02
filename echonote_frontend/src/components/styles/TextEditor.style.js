@@ -1,5 +1,6 @@
 import { styled } from "styled-components";
 import { shouldNotForwardPropsWithKeys } from "@shared/utils/shouldForwardProp";
+import { theme } from "@/shared/styles/theme";
 
 export const TextContainer = styled.div.withConfig({
   shouldForwardProp: shouldNotForwardPropsWithKeys(["mode"]),
@@ -26,7 +27,7 @@ export const TextBox = styled.div
       top: `${props.y}px`,
       cursor: props.isEditing ? "text" : "move",
       backgroundColor: props.isEditing
-        ? "rgba(255, 255, 255, 0.8)"
+        ? `${theme.colors.textEditBackground}`
         : "transparent",
     },
   }))`
@@ -34,12 +35,13 @@ export const TextBox = styled.div
   padding: 4px;
   z-index: 1;
   border: ${({ isDragging }) =>
-    isDragging ? "2px solid blue" : "1px solid transparent"};
+    isDragging ? `1px solid ${theme.colors.textSelectedStrokeColor}` : "none"};
+  border-radius: 3px;
   background-color: ${({ isDragging, isEditing }) =>
     isDragging
       ? "rgba(173, 216, 230, 0.5)"
       : isEditing
-      ? "rgba(255, 255, 255, 0.8)"
+      ? `${theme.colors.textEditBackground}`
       : "transparent"};
   transition: border 0.2s, background-color 0.2s;
   user-select: none;
@@ -49,7 +51,7 @@ export const TextBox = styled.div
 export const TextArea = styled.textarea`
   font-size: 16px;
   border: 1px solid #ddd;
-  background-color: transparent;
+  background-color: ${theme.colors.textEditBackground};
   resize: none;
   padding: 2px;
   outline: none;
