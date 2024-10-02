@@ -80,7 +80,7 @@ public class VoiceServiceImpl implements VoiceService {
 	@Override
 	public void insertSTT(STT stt){
 		try {
-			STT insert = sttRepository.insert(stt);
+			STT insert = sttRepository.save(stt);
 			log.info("Inserted STT with ID: " + insert.getId());
 		} catch (DuplicateKeyException e) {
 			log.error("STT with this ID already exists.");
