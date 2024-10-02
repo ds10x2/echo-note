@@ -11,6 +11,7 @@ import {
 } from "@components/styles/STTBar.style";
 import { FaPen } from "react-icons/fa";
 import SearchBar from "@components/common/SearchBar";
+import STTResult from "@services/STTservice/stt";
 
 const STTBar = () => {
   const { isSTTBarOpened } = useSidebarStore();
@@ -19,6 +20,8 @@ const STTBar = () => {
   const toggleHighLight = () => {
     setIsHighLight(!isHighLight);
   };
+
+
 
   return (
     <>
@@ -35,6 +38,7 @@ const STTBar = () => {
         <Divider />
         <STTBarContent isOpened={isSTTBarOpened}>
           <p>이곳에 텍스트가 들어갑니다. STT 관련 내용을 추가할 수 있습니다.</p>
+          <STTResult id={1}/>
         </STTBarContent>
       </STTBarContainer>
     </>
