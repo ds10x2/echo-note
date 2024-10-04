@@ -1,67 +1,38 @@
-import React, { useEffect, useRef } from "react";
-import * as St from "./styles/PdfEditor.style";
+// PdfEditor.jsx
+import React, { useEffect, useRef, useState } from "react";
+import * as St from "@components/styles/PdfEditor.style";
 import TextEditor from "@components/TextEditor";
-import useTextStore from "@stores/useTextStore";
+import textStore from "@stores/textStore";
+import ShapeEditor from "@components/ShapeEditor";
+import shapeStore from "@/stores/shapeStore";
+import pageStore from "@/stores/pageStore";
+import drawingTypeStore from "@/stores/drawingTypeStore";
 
-const PdfEditor = ({ scale }) => {
-  const containerRef = useRef();
-  const { isTextMode, addTextItem } = useTextStore();
+const PdfEditor = ({ scale, containerRef }) => {
+  const { getCurrentPageItems, setCurrentPageForText } = textStore();
+  const { currentPage, setCurrentPage } = pageStore();
+  const { mode } = drawingTypeStore();
   const isDraggingRef = useRef(false);
   const hasDraggedRef = useRef(false);
 
-  // 텍스트 박스 추가
-  const handleAddTextBox = (e) => {
-    if (isDraggingRef.current || hasDraggedRef.current) return;
-
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const x = (clientX - containerRect.left) / scale;
-    const y = (clientY - containerRect.top) / scale;
-
-    addTextItem({
-      id: Date.now(),
-      x,
-      y,
-      text: "",
-      isEditing: true,
-      isDragging: false,
-      offsetX: 0,
-      offsetY: 0,
-      fontSize: 16,
-    });
-  };
-
-  const handleClickEvent = (e) => {
-    if (isTextMode) {
-      handleAddTextBox(e);
-    }
-  };
+  //사각형
+  const [rectangles, setRectangles] = useState([]); // 그려진 사각형 목록
 
   useEffect(() => {
-    const container = containerRef.current;
-
-    container.addEventListener("mousedown", handleClickEvent);
-    container.addEventListener("mouseup", () => {
-      isDraggingRef.current = false;
-    });
-
-    return () => {
-      container.removeEventListener("mousedown", handleClickEvent);
-      container.removeEventListener("mouseup", () => {
-        isDraggingRef.current = false;
-      });
-    };
-  }, []);
+    setCurrentPage(currentPage);
+    setCurrentPageForText(currentPage);
+  }, [currentPage]);
 
   return (
-    <St.PdfEditorContainer ref={containerRef} onClick={handleClickEvent}>
+    <St.PdfEditorContainer>
       <TextEditor
         scale={scale}
         hasDraggedRef={hasDraggedRef}
         isDraggingRef={isDraggingRef}
+        currentPageItems={getCurrentPageItems()}
+        parentContainerRef={containerRef}
       />
+      <ShapeEditor currentPageItems={getCurrentPageItems()} />
     </St.PdfEditorContainer>
   );
 };

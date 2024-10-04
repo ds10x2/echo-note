@@ -1,4 +1,5 @@
 import { styled } from "styled-components";
+import { theme } from "@/shared/styles/theme";
 
 export const PdfCanvasContainer = styled.div.attrs((props) => ({
   style: {
@@ -7,6 +8,9 @@ export const PdfCanvasContainer = styled.div.attrs((props) => ({
     transform: `scale(${props.scale})`,
   },
 }))`
-  border: 1px solid;
   position: relative;
+  box-shadow: 0 0 10px ${theme.colors.pdfShadowColor};
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

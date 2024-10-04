@@ -1,0 +1,71 @@
+#root {
+  width: 100vw;
+  height: 100vh;
+  background: black;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#App {
+  background: white;
+  position: relative;
+}
+
+.sttContainer{
+  margin: 0;
+  padding: 0;
+  height: 550px; /* 원하는 높이 설정 */
+  overflow-y: scroll; /* 세로 방향 스크롤 활성화 */
+  /*border: 1px solid #ccc; !* 필요에 따라 경계선 추가 *!*/
+  -ms-overflow-style: none; /* Internet Explorer and Edge */
+  /*scrollbar-width: none; !* Firefox *!*/
+}
+
+.sttContainer::-webkit-scrollbar {
+  width: 10px; /* 스크롤바 너비 */
+  opacity: 0; /* 기본적으로 투명 */
+  transition: opacity 0.3s; /* 부드러운 전환 효과 */
+}
+
+.sttContainer:hover::-webkit-scrollbar {
+  opacity: 1; /* 마우스를 올릴 때 스크롤바 보이기 */
+}
+
+.sttContainer::-webkit-scrollbar-thumb {
+  background-color: #ccc; /* 스크롤바 색상 */
+  border-radius: 10px;
+}
+
+.sttContainer::-webkit-scrollbar-track {
+  background-color: #F1F5F9; /* 스크롤바 트랙 색상 */
+  border-radius: 10px;
+}
+
+.sttContainer > ul{
+  margin:0;
+  padding: 0;
+}
+
+.sttContainer > ul > li{
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  list-style-type: none;
+}
+.sttContainer > ul > li > a{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  text-decoration: none;
+  color: cornflowerblue;
+}
+.sttContainer > ul > li > a:hover{
+  color: purple;
+}
+
+.sttContainer > ul > li > p{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
