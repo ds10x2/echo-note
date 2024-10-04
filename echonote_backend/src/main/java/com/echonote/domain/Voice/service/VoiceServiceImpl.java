@@ -165,8 +165,9 @@ public class VoiceServiceImpl implements VoiceService {
 		} catch (Exception e) {
 			log.error("An error occurred while inserting STT: " + e.getMessage());
 		}
-
 	}
+
+
 
 	@CrossOrigin(origins = "http://localhost:5173")
 	@Override

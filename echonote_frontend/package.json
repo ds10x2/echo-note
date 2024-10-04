@@ -12,7 +12,6 @@
   "dependencies": {
     "@wavesurfer/react": "^1.0.7",
     "axios": "^1.7.7",
-    "cors": "^2.8.5",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.6.82",
     "prop-types": "^15.8.1",
