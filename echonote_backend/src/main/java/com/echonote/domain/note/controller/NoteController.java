@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.amazonaws.HttpMethod;
+import com.echonote.domain.Voice.dto.VoiceSendRequest;
 import com.echonote.domain.note.dto.NoteCreateRequest;
 import com.echonote.domain.note.dto.NoteCreateResponse;
-import com.echonote.domain.note.dto.PresignedUrlResponse;
+import com.echonote.domain.note.dto.UrlResponse;
 import com.echonote.domain.note.service.NoteServiceImpl;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,14 +32,27 @@ public class NoteController {
 	@Value("${amazon.aws.bucket}")
 	private String bucketName;
 
+	// 확장자명에 따라 presigned url 반환
 	@GetMapping
-	@Operation(summary = "Pdf Presigned url 요청", description = "pdf S3 업로드를 위한 presigned url 요청")
-	public ResponseEntity<PresignedUrlResponse> generatePresignedUrl() {
+	@Operation(summary = "PDF Presigned url 요청", description = "PDF S3 업로드를 위한 presigned url과 객체 Url을 요청")
+	public ResponseEntity<UrlResponse> generatePresignedUrl() {
 
-		PresignedUrlResponse response = noteService.generatePreSignUrl(UUID.randomUUID() + ".pdf", bucketName,
-			HttpMethod.PUT);
+		UrlResponse response = noteService.generatePreSignUrl(UUID.randomUUID() + ".wav", bucketName,
+			com.amazonaws.HttpMethod.PUT);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PostMapping
+	@Operation(summary = "PDF 저장 및 분석", description = "노트 PDF를 DB에 생성합니다.")
+	public ResponseEntity<NoteCreateResponse> save(@RequestBody VoiceSendRequest voiceSendRequest) {
+
+		Long userId = 1L;
+		String processId = UUID.randomUUID().toString();
+		// noteService.sendVoice(userId, processId, voiceSendRequest);
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+
 	}
 
 	@PostMapping
