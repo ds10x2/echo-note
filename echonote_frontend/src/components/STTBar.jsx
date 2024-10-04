@@ -11,7 +11,7 @@ import {
 } from "@components/styles/STTBar.style";
 import { FaPen } from "react-icons/fa";
 import SearchBar from "@components/common/SearchBar";
-import STTResult from "@services/STTservice/stt";
+import STTResult from "@services/STTservice/STT";
 
 const STTBar = () => {
     const { isSTTBarOpened } = useSidebarStore();
@@ -36,7 +36,7 @@ const STTBar = () => {
             try {
                 const payload = {
                     id: noteId, // note_id는 필요에 맞게 설정
-                    result: modifiedData,
+                    result: modifiedData
                 };
 
                 console.log(payload);
