@@ -14,6 +14,8 @@ RUN npm ci
 # 소스코드 복사
 COPY . /app
 
+ENV VITE_API_URL={VITE_API_URL}
+
 # 소스 코드 빌드
 RUN npm run build
 
