@@ -25,6 +25,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.echonote.domain.Memo.entity.Memo;
 import com.echonote.domain.Voice.dao.VoiceRepository;
 import com.echonote.domain.Voice.dto.AnalysisResultRequest;
+import com.echonote.domain.Voice.dto.FlaskSendRequest;
 import com.echonote.domain.Voice.dto.STTRequest;
 import com.echonote.domain.Voice.dto.STTResponse;
 import com.echonote.domain.Voice.dto.STTResultRequest;
@@ -75,7 +76,7 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 	@Override
-	public void sendVoice(Long userId, VoiceSendRequest voiceSendRequest) {
+	public void sendVoice(Long userId, String processId, VoiceSendRequest voiceSendRequest) {
 
 		// 1. DB에 S3 URL 저장
 		Note note = noteRepository.findById(voiceSendRequest.getNoteId())
@@ -87,11 +88,16 @@ public class VoiceServiceImpl implements VoiceService {
 		System.out.println("DB 저장 성공");
 
 		// 2. Flask 모델 요청
-		sendSTTFlask(voiceSendRequest);
-		sendAnalysisFlask(voiceSendRequest);
+		FlaskSendRequest flaskSendRequest = FlaskSendRequest.builder()
+			.processId(processId)
+			.noteId(voiceSendRequest.getNoteId())
+			.objectUrl(voiceSendRequest.getObjectUrl())
+			.build();
+		sendSTTFlask(flaskSendRequest);
+		// sendAnalysisFlask(flaskSendRequest);
 	}
 
-	public STTResponse sendSTTFlask(VoiceSendRequest voiceSendRequest) {
+	public STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
 		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // Flask 서버 URL
 
 		// HTTP 헤더 설정
@@ -99,7 +105,7 @@ public class VoiceServiceImpl implements VoiceService {
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
 
 		// 요청에 데이터 추가
-		HttpEntity<VoiceSendRequest> entity = new HttpEntity<>(voiceSendRequest, headers);
+		HttpEntity<FlaskSendRequest> entity = new HttpEntity<>(flaskSendRequest, headers);
 
 		// Flask 서버로 POST 요청 보내기
 		ResponseEntity<STTResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
@@ -116,7 +122,7 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 	// 음성 분석 모델에 보내기
-	public void sendAnalysisFlask(VoiceSendRequest voiceSendRequest) {
+	public void sendAnalysisFlask(FlaskSendRequest flaskSendRequest) {
 		String flaskUrl = "http://70.12.130.111:5000/";  // Flask 서버 URL
 
 		// HTTP 헤더 설정
@@ -124,7 +130,7 @@ public class VoiceServiceImpl implements VoiceService {
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
 
 		// 요청에 데이터 추가
-		HttpEntity<VoiceSendRequest> entity = new HttpEntity<>(voiceSendRequest, headers);
+		HttpEntity<FlaskSendRequest> entity = new HttpEntity<>(flaskSendRequest, headers);
 
 		// Flask 서버로 POST 요청 보내기
 		restTemplate.exchange(flaskUrl, HttpMethod.POST, entity, VoiceAnalysisResponse.class);

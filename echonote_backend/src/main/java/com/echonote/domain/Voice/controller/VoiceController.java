@@ -55,8 +55,7 @@ public class VoiceController {
 
 		Long userId = 1L;
 		String processId = UUID.randomUUID().toString();
-		voiceSendRequest.setProcessId(processId);
-		voiceService.sendVoice(userId, voiceSendRequest);
+		voiceService.sendVoice(userId, processId, voiceSendRequest);
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
 

@@ -21,7 +21,7 @@ public interface VoiceService {
 
 	void deleteSTT(long id, List<Long> sttId);
 
-	void sendVoice(Long userId, VoiceSendRequest voiceSendRequest);
+	void sendVoice(Long userId, String processId, VoiceSendRequest voiceSendRequest);
 
 	void saveSTTResult(STTResultRequest sttResultRequest);
 
