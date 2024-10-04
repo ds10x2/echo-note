@@ -186,8 +186,7 @@ public class VoiceServiceImpl implements VoiceService {
 	@Override
 	public void updateSTT(STT stt) {
 		long id = stt.getId();
-		System.out.println(stt.toString());
-
+		
 		// Null 체크 추가
 		List<STTRequest> results = stt.getResult();
 		if (results == null || results.isEmpty()) {
