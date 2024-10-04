@@ -11,7 +11,7 @@ import {
 // API 호출 함수
 export const getSTTResult = async (id) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}voice/stt?id=${id}`, {
+        const response = await fetch(`${VITE_API_URL}voice/stt?id=${id}`, {
             method: "GET",
             headers: {
                 Accept: "application/json",
