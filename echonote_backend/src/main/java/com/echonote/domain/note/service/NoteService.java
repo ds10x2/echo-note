@@ -7,8 +7,8 @@ import com.echonote.domain.note.dto.UrlResponse;
 
 public interface NoteService {
 	UrlResponse generatePreSignUrl(String filePath,
-		String bucketName,
-		HttpMethod httpMethod);
+								   String bucketName,
+								   HttpMethod httpMethod);
 
 	NoteCreateResponse addNote(Long userId, NoteCreateRequest noteCreateRequest);
 }

@@ -55,7 +55,7 @@ public class NoteServiceImpl implements NoteService {
 
 		Note note = Note.builder()
 			.user(user)
-			.pdf_path(noteCreateRequest.getPresignedUrl())
+			.pdf_path(noteCreateRequest.getObjectUrl())
 			.create_at(LocalDateTime.now()).build();
 
 		NoteCreateResponse res = new NoteCreateResponse();

@@ -44,18 +44,6 @@ public class NoteController {
 	}
 
 	@PostMapping
-	@Operation(summary = "PDF 저장 및 분석", description = "노트 PDF를 DB에 생성합니다.")
-	public ResponseEntity<NoteCreateResponse> save(@RequestBody VoiceSendRequest voiceSendRequest) {
-
-		Long userId = 1L;
-		String processId = UUID.randomUUID().toString();
-		// noteService.sendVoice(userId, processId, voiceSendRequest);
-
-		return new ResponseEntity<>(null, HttpStatus.OK);
-
-	}
-
-	@PostMapping
 	@Operation(summary = "노트 생성", description = "업로드한 pdf에 대한 노트 생성")
 	public ResponseEntity<NoteCreateResponse> createNote(@RequestBody NoteCreateRequest noteCreateRequest) {
 
