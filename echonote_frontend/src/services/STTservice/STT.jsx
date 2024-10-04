@@ -10,7 +10,10 @@ import {
 
 // API 호출 함수
 export const getSTTResult = async (id) => {
+    console.log("try 전");
+    console.log(`${import.meta.env.VITE_API_URL}voice/stt?id=${id}`);
     try {
+        console.log("try 후");
         const response = await fetch(`${import.meta.env.VITE_API_URL}voice/stt?id=${id}`, {
             method: "GET",
             headers: {
@@ -19,8 +22,8 @@ export const getSTTResult = async (id) => {
             },
             mode: "cors", // CORS 모드 설정
         });
-        console.log("api path")
-        console.log(`${import.meta.env.VITE_API_URL}voice/stt?id=${id}`)
+        console.log("api path~!~!~");
+        console.log(`${import.meta.env.VITE_API_URL}voice/stt?id=${id}`);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
