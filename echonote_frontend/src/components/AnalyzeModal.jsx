@@ -8,9 +8,11 @@ import {
   ColorOption,
 } from "@components/styles/AnalyzeModal.style";
 import PropTypes from "prop-types";
+import Github, { GithubPlacement } from "@uiw/react-color-github";
 
 const AnalyzeModal = ({ isOpen, onClose, position }) => {
   const [isVisible, setIsVisible] = useState(isOpen);
+  const [hex, setHex] = useState("#fff");
 
   useEffect(() => {
     if (isOpen) {
@@ -39,16 +41,21 @@ const AnalyzeModal = ({ isOpen, onClose, position }) => {
         <AnalyzedSection>
           <button className="direction-btn active">상하</button>
           <button className="direction-btn">좌우</button>
+          <button className="direction-btn">좌우</button>
         </AnalyzedSection>
         <ModalHeader>텍스트 설정</ModalHeader>
         <BackgroundColorSection>
-          <ColorOption className="color-option selected" />
-          <ColorOption className="color-option" />
-          <ColorOption className="color-option" />
+          <Github
+            color={hex}
+            placement={GithubPlacement.TopLeft}
+            style={{
+              "--github-background-color": "#2c2c2c",
+            }}
+            onChange={(color) => {
+              setHex(color.hex);
+            }}
+          />
         </BackgroundColorSection>
-        <div className="footer">
-          <button className="footer-btn">다크 모드일 때 색상 조절</button>
-        </div>
       </AnalyzeModalContainer>
     </ModalBackdrop>
   );
