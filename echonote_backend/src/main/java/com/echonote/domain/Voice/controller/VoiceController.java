@@ -64,8 +64,7 @@ public class VoiceController {
 	@PostMapping("/sttResult")
 	@Operation(summary = "STT 모델 결과 받기", description = "Flask STT 모델에서 처리된 결과를 받습니다.")
 	public ResponseEntity<String> receiveSTTResult(@RequestBody STTResultRequest sttResultRequest) {
-		System.out.println(sttResultRequest);
-		// voiceService.saveSTTResult(sttResultRequest);
+		voiceService.saveSTTResult(sttResultRequest);
 		// voiceService.checkAndProcessVoice(sttResultRequest.getProcessId());
 		return ResponseEntity.ok("STT 완료");
 	}

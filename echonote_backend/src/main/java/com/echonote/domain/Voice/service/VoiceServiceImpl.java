@@ -31,7 +31,6 @@ import com.echonote.domain.Voice.dto.STTResponse;
 import com.echonote.domain.Voice.dto.STTResultRequest;
 import com.echonote.domain.Voice.dto.TwoFlaskResult;
 import com.echonote.domain.Voice.dto.UrlResponse;
-import com.echonote.domain.Voice.dto.VoiceAnalysisResponse;
 import com.echonote.domain.Voice.dto.VoiceSendRequest;
 import com.echonote.domain.Voice.entity.STT;
 import com.echonote.domain.note.dao.NoteRepository;
@@ -94,11 +93,11 @@ public class VoiceServiceImpl implements VoiceService {
 			.objectUrl(voiceSendRequest.getObjectUrl())
 			.build();
 		sendSTTFlask(flaskSendRequest);
-		// sendAnalysisFlask(flaskSendRequest);
+		// sendAnalysisFlask(flaskSendRequest); // 음성 분석 모델에 요청 보내기
 	}
 
 	public STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
-		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // Flask 서버 URL
+		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
 
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
@@ -123,7 +122,7 @@ public class VoiceServiceImpl implements VoiceService {
 
 	// 음성 분석 모델에 보내기
 	public void sendAnalysisFlask(FlaskSendRequest flaskSendRequest) {
-		String flaskUrl = "http://70.12.130.111:5000/";  // Flask 서버 URL
+		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/";  // 음성 분석 모델 API URL
 
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
@@ -133,14 +132,15 @@ public class VoiceServiceImpl implements VoiceService {
 		HttpEntity<FlaskSendRequest> entity = new HttpEntity<>(flaskSendRequest, headers);
 
 		// Flask 서버로 POST 요청 보내기
-		restTemplate.exchange(flaskUrl, HttpMethod.POST, entity, VoiceAnalysisResponse.class);
-
+		ResponseEntity<STTResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
+			STTResponse.class);
+		
 		// 응답 처리 (필요에 따라)
-		// if (response.getStatusCode().is2xxSuccessful()) {
-		// 	System.out.println("성공적으로 Flask 서버에 전송되었습니다: " + response.getBody());
-		// } else {
-		// 	System.err.println("Flask 서버 요청 실패: " + response.getStatusCode());
-		// }
+		if (response.getStatusCode().is2xxSuccessful()) {
+			System.out.println("성공적으로 Flask 서버에 전송되었습니다: " + response.getBody());
+		} else {
+			System.err.println("Flask 서버 요청 실패: " + response.getStatusCode());
+		}
 	}
 
 	@Override
@@ -166,12 +166,15 @@ public class VoiceServiceImpl implements VoiceService {
 		// 두 결과가 모두 도착하면 처리
 		if (twoFlaskResult != null && twoFlaskResult.getSttResultRequest() != null
 			&& twoFlaskResult.getAnalysisResultRequest() != null) {
+			// MongoDB에 조합한 결과 저장
 			// voiceRepository.save(matchResult(twoFlaskResult));
+
 			// 저장 완료 후 삭제
 			resultStore.remove(processId);
 		}
 	}
 
+	// 두 모델 결과 조합하는 메소드
 	private STT matchResult(TwoFlaskResult twoFlaskResult) {
 		STT totalResult = new STT();
 
