@@ -19,7 +19,8 @@ export const getSTTResult = async (id) => {
             },
             mode: "cors", // CORS 모드 설정
         });
-
+        console.log("api path")
+        console.log(`${import.meta.env.VITE_API_URL}voice/stt?id=${id}`)
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
