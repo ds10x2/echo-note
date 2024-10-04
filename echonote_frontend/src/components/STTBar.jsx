@@ -35,13 +35,13 @@ const STTBar = () => {
         if (modifiedData.length > 0) {
             try {
                 const payload = {
-                    note_id: noteId, // note_id는 필요에 맞게 설정
-                    update: modifiedData,
+                    id: noteId, // note_id는 필요에 맞게 설정
+                    result: modifiedData,
                 };
 
                 console.log(payload);
 
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/update`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}voice/stt`, {
                     method: "PUT",
                     headers: {
                         Accept: "application/json",
