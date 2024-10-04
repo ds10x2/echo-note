@@ -2,11 +2,15 @@ package com.echonote.domain.Memo.entity;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import com.echonote.domain.Memo.dto.MemoRequest;
+import com.mongodb.lang.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.aspectj.lang.annotation.RequiredTypes;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,11 +27,12 @@ public class Memo {
     @Id
     private long id;
 
-    @OneToMany
-    private List<MemoRequest.memoDto> memo;
-    // IntelliJ에서 TableDB 구조를 확인할 수 없어서 생긴 에러. 빌드됨
+    @Nullable
+    private Map<String, List<MemoRequest.MemoText>> text;
 
-//    @CreatedBy
-//    private Date create_at;
+    @Nullable
+    private Map<String, List<MemoRequest.MemoText>> rectangle;
 
+    @Nullable
+    private Map<String, List<MemoRequest.MemoText>> circle;
 }
