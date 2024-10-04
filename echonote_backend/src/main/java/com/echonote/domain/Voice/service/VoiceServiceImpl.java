@@ -169,7 +169,7 @@ public class VoiceServiceImpl implements VoiceService {
 
 
 
-	@CrossOrigin(origins = "http://localhost:5173")
+//	@CrossOrigin(origins = "http://localhost:5173")
 	@Override
 	public STT getSTT(long id) {
 		Optional<STT> stt = voiceRepository.findById(id);
@@ -186,11 +186,20 @@ public class VoiceServiceImpl implements VoiceService {
 	@Override
 	public void updateSTT(STT stt) {
 		long id = stt.getId();
+		System.out.println(stt.toString());
 
-		for (STTRequest sttInfo : stt.getResult()) {
+		// Null 체크 추가
+		List<STTRequest> results = stt.getResult();
+		if (results == null || results.isEmpty()) {
+			log.warn("STT 결과가 null이거나 비어있습니다.");
+			return; // 결과가 없으면 메서드 종료
+		}
 
-			Query query = new Query(Criteria.where("id").is(id).and("segment.id").is(sttInfo));
-			Update update = new Update().set("stt.$.segment", sttInfo.getText());
+		for (STTRequest sttInfo : results) {
+			Query query = new Query(Criteria.where("id").is(id).and("result.id").is(sttInfo.getId()));
+			log.info("Executing query: " + query); // 쿼리 로깅 추가
+			Update update = new Update().set("result.$.text", sttInfo.getText());
+			log.info("Update set: "+update);
 
 			try {
 				UpdateResult result = mongoTemplate.updateFirst(query, update, STT.class);
@@ -205,6 +214,7 @@ public class VoiceServiceImpl implements VoiceService {
 			}
 		}
 	}
+
 
 	@Override
 	public void deleteSTT(long id, List<Long> sttId) {

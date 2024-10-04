@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 // API 호출 함수
 export const getSTTResult = async (id) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}?id=${id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}voice/stt?id=${id}`, {
             method: "GET",
             headers: {
                 Accept: "application/json",
