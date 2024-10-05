@@ -14,7 +14,7 @@ import com.echonote.domain.User.entity.User;
 import com.echonote.domain.note.dao.NoteRepository;
 import com.echonote.domain.note.dto.NoteCreateRequest;
 import com.echonote.domain.note.dto.NoteCreateResponse;
-import com.echonote.domain.note.dto.PresignedUrlResponse;
+import com.echonote.domain.note.dto.UrlResponse;
 import com.echonote.domain.note.entity.Note;
 import com.echonote.global.aop.exception.BusinessLogicException;
 import com.echonote.global.aop.exception.ErrorCode;
@@ -31,7 +31,7 @@ public class NoteServiceImpl implements NoteService {
 	@Autowired
 	private AmazonS3 amazonS3;
 
-	public PresignedUrlResponse generatePreSignUrl(String filePath,
+	public UrlResponse generatePreSignUrl(String filePath,
 		String bucketName,
 		HttpMethod httpMethod) {
 
@@ -39,10 +39,10 @@ public class NoteServiceImpl implements NoteService {
 		calendar.setTime(new Date());
 		calendar.add(Calendar.MINUTE, 10); //validfy of 10 minutes
 
-		PresignedUrlResponse res = new PresignedUrlResponse();
+		UrlResponse res = new UrlResponse();
 		res.setPresignedUrl(
 			amazonS3.generatePresignedUrl(bucketName, filePath, calendar.getTime(), httpMethod).toString());
-
+		res.setObjectUrl("https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/" + filePath);
 		return res;
 
 	}
@@ -55,7 +55,7 @@ public class NoteServiceImpl implements NoteService {
 
 		Note note = Note.builder()
 			.user(user)
-			.pdf_path(noteCreateRequest.getPresignedUrl())
+			.pdf_path(noteCreateRequest.getObjectUrl())
 			.create_at(LocalDateTime.now()).build();
 
 		NoteCreateResponse res = new NoteCreateResponse();
