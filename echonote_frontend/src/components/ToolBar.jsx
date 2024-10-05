@@ -1,25 +1,25 @@
-import { useState, useRef, useEffect } from "react";
-import { RiSpeakLine } from "react-icons/ri";
-import { FaPen, FaTextHeight, FaImage, FaShapes, FaStar } from "react-icons/fa";
-import { VscSettings } from "react-icons/vsc";
-import { BiWindowAlt, BiChevronsDown, BiChevronsUp } from "react-icons/bi";
-import { IoMicSharp } from "react-icons/io5";
-import useSidebarStore from "@stores/sideBarStore";
-import PdfSettingModal from "@components/PdfSettingModal";
 import AnalyzeModal from "@components/AnalyzeModal";
+import PdfSettingModal from "@components/PdfSettingModal";
 import {
-  Divider,
-  ToolBarContainer,
-  ToolBarHeader,
-  ToolBarContent,
-  ToolBarButton,
-  Title,
-  IconButton,
-  ToolBarIcon,
-  SideBarButton,
   AnimatedToolBarContent,
+  Divider,
+  IconButton,
   SettingButton,
+  SideBarButton,
+  Title,
+  ToolBarButton,
+  ToolBarContainer,
+  ToolBarContent,
+  ToolBarHeader,
+  ToolBarIcon,
 } from "@components/styles/ToolBar.style";
+import useSidebarStore from "@stores/sideBarStore";
+import { useEffect, useRef, useState } from "react";
+import { BiChevronsDown, BiChevronsUp, BiWindowAlt } from "react-icons/bi";
+import { FaImage, FaPen, FaShapes, FaStar, FaTextHeight } from "react-icons/fa";
+import { IoMicSharp } from "react-icons/io5";
+import { RiSpeakLine } from "react-icons/ri";
+import { VscSettings } from "react-icons/vsc";
 
 const ToolBar = () => {
   const {
@@ -34,6 +34,7 @@ const ToolBar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPdfSettingModalOpen, setIsPdfSettingModalOpen] = useState(false);
   const [isAnalyzeModalOpen, setIsAnalyzeModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("");
   const [buttonPosition, setButtonPosition] = useState(null);
   const settingButtonRef = useRef(null);
 
@@ -58,25 +59,23 @@ const ToolBar = () => {
     setIsAnalyzeModalOpen(!isAnalyzeModalOpen);
   };
 
-  const handleAnalyzeModalOpen = () => {
+  const handleAnalyzeModalOpen = (ModalType) => {
     setIsPdfSettingModalOpen(false);
+    setModalType(ModalType);
 
-    const modalWidth = 300; // AnalyzeModal의 너비
+    const modalWidth = 300; 
     const adjustedLeft = buttonPosition.left - modalWidth;
 
-    // 위치 업데이트
     setButtonPosition((prevPosition) => ({
-      ...prevPosition, // 기존 값 유지
-      left: adjustedLeft, // left 값 업데이트
+      ...prevPosition, 
+      left: adjustedLeft, 
     }));
 
-    // 모달을 약간의 지연 시간 후에 열기
     setTimeout(() => {
       setIsAnalyzeModalOpen(true);
-    }, 200); // 200ms의 지연 시간
+    }, 200); 
   };
 
-  // buttonPosition이 업데이트된 후에 AnalyzeModal을 열기 위한 useEffect
   useEffect(() => {
     if (buttonPosition && buttonPosition.left === 710) {
       setIsAnalyzeModalOpen(true);
@@ -142,13 +141,14 @@ const ToolBar = () => {
         isOpen={isPdfSettingModalOpen}
         onClose={togglePdfModal}
         position={buttonPosition}
-        toggleAnalyzeModal={handleAnalyzeModalOpen} // PdfSettingModal에서 AnalyzeModal 열기
+        toggleAnalyzeModal={handleAnalyzeModalOpen} 
       />
 
       <AnalyzeModal
         isOpen={isAnalyzeModalOpen}
         onClose={toggleAnalyzeModal}
         position={buttonPosition}
+        modalType={modalType}
       />
     </ToolBarContainer>
   );

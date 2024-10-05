@@ -1,13 +1,13 @@
 import {
-  ModalContainer,
   ModalBackdrop,
-  ModalHeader,
-  ModalList,
   ModalButton,
+  ModalContainer,
+  ModalHeader,
   ModalItem,
+  ModalList,
 } from "@components/styles/PdfSettingModal.style";
-import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 
 const PdfSettingModal = ({ isOpen, onClose, position, toggleAnalyzeModal }) => {
   const [animate, setAnimate] = useState(false);
@@ -38,8 +38,8 @@ const PdfSettingModal = ({ isOpen, onClose, position, toggleAnalyzeModal }) => {
         style={{ top: position?.top, left: position?.left }}
       >
         <ModalHeader>
-          <ModalButton onClick={toggleAnalyzeModal}>음성 분석</ModalButton>
-          <ModalButton>키워드 설정</ModalButton>
+          <ModalButton onClick={() => toggleAnalyzeModal("음성")}>음성 분석</ModalButton>
+          <ModalButton onClick={() => toggleAnalyzeModal("키워드")}>키워드 설정</ModalButton>
         </ModalHeader>
         <ModalList>
           <ModalItem>태그</ModalItem>

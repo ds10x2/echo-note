@@ -37,12 +37,12 @@ export const ModalBackdrop = styled.div`
 
 export const ModalContainer = styled.div`
   position: absolute;
-  background: #2c2c2c;
+  background: ${(props) => props.theme.colors.modalBackground};
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   width: 220px;
-  color: white;
+  color: ${(props) => props.theme.colors.textLightColor};
   animation: fadeOut 0.2s ease-out forwards; // 닫기 애니메이션
 
   &.open {
