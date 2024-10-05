@@ -25,7 +25,14 @@ const TextEditor = ({
   const [curItems, setCurItems] = useState(currentPageItems);
   const [updatedItems, setUpdatedItems] = useState([]);
   const containerRef = useRef();
-  const [selectedItemId, setSelectedItemId] = useState(null); // 선택된 텍스트박스 ID 상태
+  const [selectedItemId, setSelectedItemId] = useState(null);
+
+  // 현재 페이지 아이템이 변경되었을 때만 상태를 업데이트
+  useEffect(() => {
+    if (JSON.stringify(currentPageItems) !== JSON.stringify(curItems)) {
+      setCurItems(currentPageItems);
+    }
+  }, [currentPageItems]);
 
   const handleAddTextBox = (e) => {
     if (isDraggingRef.current || hasDraggedRef.current) return;
@@ -81,15 +88,11 @@ const TextEditor = ({
     };
   }, [mode.text]);
 
-  useEffect(() => {
-    setCurItems(currentPageItems);
-  }, [currentPageItems]);
-
   const handleMouseDown = (e, id) => {
     e.stopPropagation();
     isDraggingRef.current = true;
     hasDraggedRef.current = false;
-    setSelectedItemId(id); // 텍스트박스 클릭 시 해당 ID를 선택
+    setSelectedItemId(id);
 
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -192,12 +195,13 @@ const TextEditor = ({
     document.body.style.userSelect = "auto";
   };
 
+  // 상태 업데이트 최적화: 업데이트가 있을 때만 실행되도록 설정
   useEffect(() => {
     if (updatedItems.length > 0) {
       updatedItems.forEach(({ id, x, y }) => {
         updateTextItemPosition(id, x, y);
       });
-      setUpdatedItems([]);
+      setUpdatedItems([]); // 업데이트 후 초기화
     }
   }, [updatedItems]);
 
@@ -241,7 +245,6 @@ const TextEditor = ({
     return fontSize * longestLine.length;
   };
 
-  // 삭제 핸들러
   const handleDelete = () => {
     if (selectedItemId !== null) {
       setCurItems(curItems.filter((item) => item.id !== selectedItemId));
@@ -250,7 +253,6 @@ const TextEditor = ({
     }
   };
 
-  // 수정 핸들러
   const handleEdit = () => {
     setCurItems((items) =>
       items.map((item) =>
@@ -258,12 +260,25 @@ const TextEditor = ({
       )
     );
   };
+
   const updateCurTextItem = (id, newText) => {
     setCurItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id ? { ...item, text: newText } : item
       )
     );
+  };
+
+  const handleBlur = (id) => {
+    const currentItem = curItems.find((item) => item.id === id);
+    if (!currentItem.text.trim()) {
+      setCurItems(curItems.filter((item) => item.id !== id));
+      deleteTextItem(id);
+    } else {
+      updateTextItem(id, currentItem.text);
+      finishEditing(id);
+    }
+    setSelectedItemId(null);
   };
 
   return (
@@ -288,10 +303,7 @@ const TextEditor = ({
               value={item.text}
               autoFocus
               onChange={(e) => updateCurTextItem(item.id, e.target.value)}
-              onBlur={() => {
-                updateTextItem(item.id, item.text);
-                finishEditing(item.id);
-              }}
+              onBlur={() => handleBlur(item.id)}
               onKeyDown={(e) => handleKeyDown(e, item.id)}
               style={{ fontSize: `${item.fontSize}px` }}
             />
