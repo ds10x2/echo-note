@@ -1,8 +1,64 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import * as St from "./styles/TextEditor.style";
 import EditButton from "@components/common/EditButton";
 import textStore from "@stores/textStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
+
+// 텍스트박스 컴포넌트를 메모이제이션
+const TextBox = React.memo(
+  ({
+    item,
+    handleMouseDown,
+    handleKeyDown,
+    updateCurTextItem,
+    handleBlur,
+    selectedItemId,
+    handleDelete,
+    handleEdit,
+  }) => {
+    return (
+      <St.TextBox
+        key={item.id}
+        data-id={item.id}
+        x={item.x}
+        y={item.y}
+        isEditing={item.isEditing}
+        isDragging={item.isDragging}
+        className="text-box"
+        onMouseDown={(e) => handleMouseDown(e, item.id)}
+        onTouchStart={(e) => handleMouseDown(e, item.id)}
+        style={{
+          fontSize: `${item.fontSize}px`,
+        }}
+      >
+        {item.isEditing ? (
+          <St.TextArea
+            value={item.text}
+            autoFocus
+            onChange={(e) => updateCurTextItem(item.id, e.target.value)}
+            onBlur={() => handleBlur(item.id)}
+            onKeyDown={(e) => handleKeyDown(e, item.id)}
+            style={{ fontSize: `${item.fontSize}px` }}
+          />
+        ) : (
+          <St.TextDetail fontSize={item.fontSize}>{item.text}</St.TextDetail>
+        )}
+        {selectedItemId === item.id && (
+          <St.ButtonContainer className="edit-button-container">
+            <EditButton buttonText="삭제" onClick={handleDelete} />
+            <EditButton buttonText="수정" onClick={handleEdit} />
+          </St.ButtonContainer>
+        )}
+      </St.TextBox>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.item === nextProps.item && // 아이템이 동일한 경우만 리렌더링 방지
+      prevProps.selectedItemId === nextProps.selectedItemId
+    );
+  }
+);
 
 const TextEditor = ({
   hasDraggedRef,
@@ -34,47 +90,65 @@ const TextEditor = ({
     }
   }, [currentPageItems]);
 
-  const handleAddTextBox = (e) => {
-    if (isDraggingRef.current || hasDraggedRef.current) return;
+  const handleAddTextBox = useCallback(
+    (e) => {
+      if (isDraggingRef.current || hasDraggedRef.current) return;
 
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const parentScrollLeft = parentContainerRef.current.scrollLeft;
-    const parentScrollTop = parentContainerRef.current.scrollTop;
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const parentScrollLeft = parentContainerRef.current.scrollLeft;
+      const parentScrollTop = parentContainerRef.current.scrollTop;
 
-    const x = (clientX + parentScrollLeft - containerRect.left) / scale;
-    const y = (clientY + parentScrollTop - containerRect.top) / scale;
+      const x = (clientX + parentScrollLeft - containerRect.left) / scale;
+      const y = (clientY + parentScrollTop - containerRect.top) / scale;
 
-    addTextItem({
-      id: Date.now(),
-      x,
-      y,
-      text: "",
-      isEditing: true,
-      isDragging: false,
-      offsetX: 0,
-      offsetY: 0,
-      fontSize: 16,
-    });
+      addTextItem({
+        id: Date.now(),
+        x,
+        y,
+        text: "",
+        isEditing: true,
+        isDragging: false,
+        offsetX: 0,
+        offsetY: 0,
+        fontSize: 16,
+      });
 
-    setSelectedItemId(null);
-  };
+      setSelectedItemId(null);
+    },
+    [addTextItem, isDraggingRef, hasDraggedRef, scale, parentContainerRef]
+  );
 
-  const handleClickEvent = (e) => {
-    if (mode.text) {
-      if (e.target.closest(".edit-button-container")) {
-        return;
+  const handleClickEvent = useCallback(
+    (e) => {
+      if (mode.text) {
+        // 수정 중인 텍스트 박스에서 추가 클릭 이벤트를 막음
+        if (e.target.closest(".edit-button-container")) {
+          return;
+        }
+
+        const clickedTextBox = e.target.closest(".text-box");
+        if (clickedTextBox) {
+          const clickedItemId = parseInt(clickedTextBox.dataset.id, 10);
+          // 선택된 아이템이 수정 중인지 확인
+          if (
+            curItems.find((item) => item.id === clickedItemId && item.isEditing)
+          ) {
+            return; // 수정 중인 텍스트 박스는 무시
+          }
+        }
+
+        if (!clickedTextBox) {
+          handleAddTextBox(e);
+        } else {
+          setSelectedItemId(null);
+        }
       }
-
-      if (!e.target.closest(".text-box")) {
-        handleAddTextBox(e);
-      } else {
-        setSelectedItemId(null);
-      }
-    }
-  };
+    },
+    [handleAddTextBox, curItems, mode.text]
+  );
 
   useEffect(() => {
     const container = containerRef.current;
@@ -86,7 +160,7 @@ const TextEditor = ({
     return () => {
       container.removeEventListener("mousedown", handleClickEvent);
     };
-  }, [mode.text]);
+  }, [handleClickEvent, mode.text]);
 
   const handleMouseDown = (e, id) => {
     e.stopPropagation();
@@ -284,39 +358,17 @@ const TextEditor = ({
   return (
     <St.TextContainer ref={containerRef} mode={mode.text}>
       {curItems.map((item) => (
-        <St.TextBox
+        <TextBox
           key={item.id}
-          x={item.x}
-          y={item.y}
-          isEditing={item.isEditing}
-          isDragging={item.isDragging}
-          className="text-box"
-          onMouseDown={(e) => handleMouseDown(e, item.id)}
-          onTouchStart={(e) => handleMouseDown(e, item.id)}
-          style={{
-            fontSize: `${item.fontSize}px`,
-          }}
-          minWidth={calculateMinWidth(item.text, item.fontSize)}
-        >
-          {item.isEditing ? (
-            <St.TextArea
-              value={item.text}
-              autoFocus
-              onChange={(e) => updateCurTextItem(item.id, e.target.value)}
-              onBlur={() => handleBlur(item.id)}
-              onKeyDown={(e) => handleKeyDown(e, item.id)}
-              style={{ fontSize: `${item.fontSize}px` }}
-            />
-          ) : (
-            <St.TextDetail fontSize={item.fontSize}>{item.text}</St.TextDetail>
-          )}
-          {selectedItemId === item.id && (
-            <St.ButtonContainer className="edit-button-container">
-              <EditButton buttonText="삭제" onClick={handleDelete} />
-              <EditButton buttonText="수정" onClick={handleEdit} />
-            </St.ButtonContainer>
-          )}
-        </St.TextBox>
+          item={item}
+          handleMouseDown={handleMouseDown}
+          handleKeyDown={handleKeyDown}
+          updateCurTextItem={updateCurTextItem}
+          handleBlur={handleBlur}
+          selectedItemId={selectedItemId}
+          handleDelete={handleDelete}
+          handleEdit={handleEdit}
+        />
       ))}
     </St.TextContainer>
   );
