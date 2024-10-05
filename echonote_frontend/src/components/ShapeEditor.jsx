@@ -17,20 +17,20 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
 
   const [currentRects, setCurrentRects] = useState(currentPageRecs);
   const [currentCircles, setCurrentCircles] = useState(currentPageCircles);
-  const [selectedShapeId, setSelectedShapeId] = useState(null);
+  const [selectedShape, setSelectedShape] = useState({ id: null, type: null });
 
   useEffect(() => {
     setCurrentRects(currentPageRecs);
     setCurrentCircles(currentPageCircles);
-    setSelectedShapeId(null);
+    setSelectedShape({ id: null, type: null });
   }, [currentPageRecs, currentPageCircles]);
 
+  // 마우스를 눌렀을 때 그리기나 드래그 상태를 설정
   const handleMouseDownRec = (e) => {
     if (!mode.shape) return;
 
     e.stopPropagation();
 
-    // 사각형 클릭 및 드래그 처리
     const clickedRectIndex = currentRects.findIndex(
       (rect) =>
         e.nativeEvent.offsetX >= rect.x &&
@@ -39,15 +39,13 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
         e.nativeEvent.offsetY <= rect.y + rect.height
     );
 
-    // 원 클릭 및 드래그 처리
     const clickedCircleIndex = currentCircles.findIndex((circle) => {
       const dx = e.nativeEvent.offsetX - circle.cx;
       const dy = e.nativeEvent.offsetY - circle.cy;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      return distance <= circle.r; // 원의 반지름 내에 있는지 확인
+      return distance <= circle.r;
     });
 
-    // 사각형 드래그
     if (clickedRectIndex !== -1) {
       setIsDragging(true);
       setDraggingIndex(clickedRectIndex);
@@ -55,20 +53,16 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
         x: e.nativeEvent.offsetX - currentRects[clickedRectIndex].x,
         y: e.nativeEvent.offsetY - currentRects[clickedRectIndex].y,
       });
-      setSelectedShapeId(clickedRectIndex);
-    }
-    // 원 드래그
-    else if (clickedCircleIndex !== -1) {
+      setSelectedShape({ id: clickedRectIndex, type: "rectangle" });
+    } else if (clickedCircleIndex !== -1) {
       setIsDragging(true);
       setDraggingIndex(clickedCircleIndex);
       setOffset({
         x: e.nativeEvent.offsetX - currentCircles[clickedCircleIndex].cx,
         y: e.nativeEvent.offsetY - currentCircles[clickedCircleIndex].cy,
       });
-      setSelectedShapeId(clickedCircleIndex);
-    }
-    // 사각형 그리기 시작
-    else if (shapeMode.rectangle) {
+      setSelectedShape({ id: clickedCircleIndex, type: "circle" });
+    } else if (shapeMode.rectangle) {
       setIsDrawing(true);
       const startX = e.nativeEvent.offsetX;
       const startY = e.nativeEvent.offsetY;
@@ -82,10 +76,8 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
         height: 0,
         property: property,
       });
-      setSelectedShapeId(null);
-    }
-    // 원 그리기 시작
-    else if (shapeMode.circle) {
+      setSelectedShape({ id: null, type: null });
+    } else if (shapeMode.circle) {
       setIsDrawing(true);
       const startX = e.nativeEvent.offsetX;
       const startY = e.nativeEvent.offsetY;
@@ -96,14 +88,12 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
         r: 0,
         property: property,
       });
-      setSelectedShapeId(null);
+      setSelectedShape({ id: null, type: null });
     }
   };
 
-  // 마우스가 움직일 때 사각형 또는 원을 그리거나 드래그 상태에 따라 이동
   const handleMouseMoveRec = (e) => {
     if (isDrawing && currentRect) {
-      // 사각형 그리기
       const newX = e.nativeEvent.offsetX;
       const newY = e.nativeEvent.offsetY;
       const newWidth = newX - currentRect.startX;
@@ -111,13 +101,12 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
 
       setCurrentRect({
         ...currentRect,
-        x: newWidth < 0 ? newX : currentRect.startX, // x 좌표 보정
-        y: newHeight < 0 ? newY : currentRect.startY, // y 좌표 보정
-        width: Math.abs(newWidth), // 절대값으로 width 계산
-        height: Math.abs(newHeight), // 절대값으로 height 계산
+        x: newWidth < 0 ? newX : currentRect.startX,
+        y: newHeight < 0 ? newY : currentRect.startY,
+        width: Math.abs(newWidth),
+        height: Math.abs(newHeight),
       });
     } else if (isDrawing && currentCircle) {
-      // 원 그리기
       const newX = e.nativeEvent.offsetX;
       const newY = e.nativeEvent.offsetY;
       const dx = newX - currentCircle.cx;
@@ -130,9 +119,12 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
       });
     }
 
-    // 사각형 드래그
-    if (isDragging && draggingIndex !== null && shapeMode.rectangle) {
-      const updatedRectangles = currentRects.map((rect, index) => {
+    if (
+      isDragging &&
+      draggingIndex !== null &&
+      selectedShape.type === "rectangle"
+    ) {
+      const updatedRects = currentRects.map((rect, index) => {
         if (index === draggingIndex) {
           return {
             ...rect,
@@ -142,12 +134,14 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
         }
         return rect;
       });
-      setCurrentRects(updatedRectangles);
-      setSelectedShapeId(null);
+      setCurrentRects(updatedRects);
     }
 
-    // 원 드래그
-    if (isDragging && draggingIndex !== null && shapeMode.circle) {
+    if (
+      isDragging &&
+      draggingIndex !== null &&
+      selectedShape.type === "circle"
+    ) {
       const updatedCircles = currentCircles.map((circle, index) => {
         if (index === draggingIndex) {
           return {
@@ -159,51 +153,47 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
         return circle;
       });
       setCurrentCircles(updatedCircles);
-      setSelectedShapeId(null);
     }
   };
 
-  // 마우스를 놓을 때 사각형 또는 원 그리기나 드래그를 완료하고 상태를 초기화
   const handleMouseUpRec = () => {
     if (isDrawing && currentRect) {
-      // 사각형 그리기 완료 후 추가
       setCurrentRects((prevRects) => [...prevRects, currentRect]);
-      setCurrentRect(null); // currentRect 초기화
-      setIsDrawing(false); // 그리기 상태 초기화
+      setCurrentRect(null);
+      setIsDrawing(false);
     }
 
     if (isDrawing && currentCircle) {
-      // 원 그리기 완료 후 추가
       setCurrentCircles((prevCircles) => [...prevCircles, currentCircle]);
-      setCurrentCircle(null); // currentCircle 초기화
-      setIsDrawing(false); // 그리기 상태 초기화
+      setCurrentCircle(null);
+      setIsDrawing(false);
     }
 
     if (isDragging) {
-      setIsDragging(false); // 드래그 상태 초기화
-      setDraggingIndex(null); // 드래그 인덱스 초기화
+      setIsDragging(false);
+      setDraggingIndex(null);
     }
 
-    setRectangles(currentRects); // 사각형 상태 업데이트
-    setCircles(currentCircles); // 원 상태 업데이트
+    setRectangles(currentRects);
+    setCircles(currentCircles);
   };
 
   const handleDelete = () => {
-    if (selectedShapeId !== null) {
-      const updatedRects = currentRects.filter(
-        (_, index) => index !== selectedShapeId
-      );
-      const updatedCircles = currentCircles.filter(
-        (_, index) => index !== selectedShapeId
-      );
-
-      setCurrentRects(updatedRects);
-      setCurrentCircles(updatedCircles);
-
-      setRectangles(updatedRects);
-      setCircles(updatedCircles);
-
-      setSelectedShapeId(null);
+    if (selectedShape.id !== null) {
+      if (selectedShape.type === "rectangle") {
+        const updatedRects = currentRects.filter(
+          (_, index) => index !== selectedShape.id
+        );
+        setCurrentRects(updatedRects);
+        setRectangles(updatedRects);
+      } else if (selectedShape.type === "circle") {
+        const updatedCircles = currentCircles.filter(
+          (_, index) => index !== selectedShape.id
+        );
+        setCurrentCircles(updatedCircles);
+        setCircles(updatedCircles);
+      }
+      setSelectedShape({ id: null, type: null });
     }
   };
 
@@ -226,10 +216,9 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
             stroke={rect.property.stroke ? rect.property.strokeColor : "none"}
             strokeWidth={rect.property.stroke ? rect.property.strokeWidth : 0}
             className="rectangle"
-            onClick={() => setSelectedShapeId(index)}
+            onClick={() => setSelectedShape({ id: index, type: "rectangle" })}
           />
         ))}
-
         {currentCircles.map((circle, index) => (
           <St.StyledCircle
             key={index}
@@ -244,7 +233,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
               circle.property.stroke ? circle.property.strokeWidth : 0
             }
             className="circle"
-            onClick={() => setSelectedShapeId(index)}
+            onClick={() => setSelectedShape({ id: index, type: "circle" })}
           />
         ))}
         {currentRect && (
@@ -268,7 +257,6 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
             }
           />
         )}
-
         {currentCircle && (
           <St.CurrentCircle
             cx={currentCircle.cx}
@@ -292,16 +280,16 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
           />
         )}
       </St.StyledSVG>
-      {selectedShapeId !== null && (
+      {selectedShape.id !== null && (
         <St.ButtonContainer
           $top={
-            currentRects[selectedShapeId]?.y ||
-            currentCircles[selectedShapeId]?.cy ||
+            currentRects[selectedShape.id]?.y ||
+            currentCircles[selectedShape.id]?.cy ||
             0
           }
           $left={
-            (currentRects[selectedShapeId]?.x ||
-              currentCircles[selectedShapeId]?.cx ||
+            (currentRects[selectedShape.id]?.x ||
+              currentCircles[selectedShape.id]?.cx ||
               0) + 10
           }
         >
