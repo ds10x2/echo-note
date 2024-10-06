@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import * as St from "@/components/styles/ShapeEditor.style";
 import shapeStore from "@/stores/shapeStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
@@ -26,7 +26,8 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
     setSelectedShape({ id: null, type: null });
   }, [currentPageRecs, currentPageCircles]);
 
-  const handleDelete = () => {
+  const handleDelete = (e) => {
+    e.stopPropagation(); // 이벤트 전파 방지
     if (selectedShape.id !== null) {
       if (selectedShape.type === "rectangle") {
         const updatedRects = currentRects.filter(
@@ -125,8 +126,6 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
 
   const handleMove = useCallback(
     (e) => {
-      // e.preventDefault(); // 스크롤 방지
-
       let x, y;
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
