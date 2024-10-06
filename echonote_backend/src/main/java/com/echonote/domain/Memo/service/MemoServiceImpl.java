@@ -37,7 +37,6 @@ public class MemoServiceImpl implements MemoService {
 
     // 메모 업데이트
     @Override
-    @Override
     public void updateMemo(Memo list) {
         long memoId = list.getId();
 
