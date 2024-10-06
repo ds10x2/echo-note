@@ -4,7 +4,7 @@ import shapeStore from "@/stores/shapeStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 import EditButton from "@components/common/EditButton";
 
-const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
+const ShapeEditor = ({ currentPageCircles, currentPageRecs, scale }) => {
   const { setRectangles, setCircles, property } = shapeStore();
   const { mode, shapeMode } = drawingTypeStore();
 
@@ -54,8 +54,10 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
       const container = svgRef.current.getBoundingClientRect();
-      const x = clientX - container.left;
-      const y = clientY - container.top;
+      const scaleFactor = 1 / scale; // scale을 반영하여 계산
+
+      const x = (clientX - container.left) * scaleFactor; // scale 적용
+      const y = (clientY - container.top) * scaleFactor; // scale 적용
 
       const clickedRectIndex = currentRects.findIndex(
         (rect) =>
@@ -117,6 +119,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
       shapeMode.rectangle,
       shapeMode.circle,
       property,
+      scale, // scale이 바뀔 때마다 좌표 계산을 다시 해야 하므로 추가
     ]
   );
 
@@ -126,8 +129,10 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       const container = svgRef.current.getBoundingClientRect();
-      x = clientX - container.left;
-      y = clientY - container.top;
+      const scaleFactor = 1 / scale;
+
+      x = (clientX - container.left) * scaleFactor; // scale 적용
+      y = (clientY - container.top) * scaleFactor; // scale 적용
 
       if (isDrawing && currentRect) {
         const newWidth = x - currentRect.startX;
@@ -187,12 +192,12 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
       selectedShape,
       currentRects,
       currentCircles,
+      scale, // scale을 추가하여 계산을 정확하게 유지
     ]
   );
 
   const handleEnd = useCallback(() => {
     if (isDrawing && currentRect) {
-      // 상태 추가 전에 store의 addRectangle 메서드를 통해 현재 페이지의 도형에 추가
       shapeStore.getState().addRectangle(currentRect);
       setCurrentRect(null);
       setIsDrawing(false);
@@ -201,7 +206,6 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
       setCurrentCircle(null);
       setIsDrawing(false);
     } else if (isDragging) {
-      // 드래그가 끝났을 때 상태 업데이트
       if (selectedShape.type === "rectangle") {
         shapeStore
           .getState()
