@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { theme } from "@/shared/styles/theme";
 import { shouldNotForwardPropsWithKeys } from "@shared/utils/shouldForwardProp";
 
 // SVG 컨테이너
@@ -39,7 +40,7 @@ export const StyledCircle = styled.circle.attrs((props) => ({
     cx: props.cx,
     cy: props.cy,
     r: props.r,
-    fill: props.fill || "#348fc3",
+    fill: props.fill || theme.colors.shapeFillDefaultColor,
     stroke: props.stroke || "#000",
     strokeWidth: props.strokeWidth || 2,
   },
