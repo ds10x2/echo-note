@@ -1,22 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import PdfCanvas from "@components/PdfCanvas";
 import * as St from "@components/styles/PdfViewer.style";
-import pageStore from "@/stores/pageStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 import PropertyEditor from "@/components/TmpShapeProperty";
 
 const PdfViewer = ({}) => {
   const containerRef = useRef();
-  const [pages, setPages] = useState(1); // PDF 최대 페이지 수
   const [scale, setScale] = useState(1);
   const oldScaleRef = useRef(scale); // 이전 스케일 값을 저장할 useRef
 
-  const { setShapeMode, setTextMode, mode } = drawingTypeStore();
-  const { currentPage, setCurrentPage } = pageStore();
-
-  // 페이지 이동
-  const nextPage = () => currentPage < pages && setCurrentPage(currentPage + 1);
-  const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
+  const { setCircleMode, shapeMode, setRectangleMode } = drawingTypeStore();
 
   // 줌인 줌아웃
   const zoomIn = () => scale < 7 && setScale((prev) => prev + 0.5);
@@ -58,29 +51,20 @@ const PdfViewer = ({}) => {
     <St.PdfContainer ref={containerRef}>
       <St.ButtonContainer>
         <div>
-          <button onClick={nextPage}>다음 페이지</button>
-          <button onClick={prevPage}>이전 페이지</button>
-        </div>
-        <div>
           <button onClick={zoomIn}>확대</button>
           <button onClick={zoomOut}>축소</button>
         </div>
         <div>
-          <button onClick={() => setShapeMode()}>
-            {mode.shape ? "사각형모드on" : "사각형모드off"}
+          <button onClick={() => setCircleMode()}>
+            {shapeMode.circle ? "Circle mode on" : "off"}
           </button>
-          <button onClick={() => setTextMode()}>
-            {mode.text ? "Text Mode On" : "Text Mode Off"}
+          <button onClick={() => setRectangleMode()}>
+            {shapeMode.rectangle ? "rec mode on" : "off"}
           </button>
         </div>
         <PropertyEditor />
       </St.ButtonContainer>
-      <PdfCanvas
-        getPages={setPages}
-        page={currentPage}
-        scale={scale}
-        containerRef={containerRef}
-      />
+      <PdfCanvas scale={scale} containerRef={containerRef} />
     </St.PdfContainer>
   );
 };

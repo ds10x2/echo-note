@@ -1,5 +1,20 @@
+<<<<<<< HEAD
 import AnalyzeModal from "@components/AnalyzeModal";
 import PdfSettingModal from "@components/PdfSettingModal";
+=======
+import { useState } from "react";
+import { RiSpeakLine } from "react-icons/ri";
+import { FaPen, FaTextHeight, FaImage, FaShapes, FaStar } from "react-icons/fa";
+import { BiWindowAlt, BiChevronsDown, BiChevronsUp } from "react-icons/bi";
+import {
+  IoMicSharp,
+  IoChevronBackOutline,
+  IoChevronForwardOutline,
+} from "react-icons/io5";
+import useSidebarStore from "@stores/sideBarStore";
+import drawingTypeStore from "@stores/drawingTypeStore";
+import pageStore from "@stores/pageStore";
+>>>>>>> 2dee67e (style: 텍스트, 도형, 페이지 이동 - 툴바 연결 (#9))
 import {
   AnimatedToolBarContent,
   Divider,
@@ -30,7 +45,12 @@ const ToolBar = () => {
     isRecordingBarOpened,
     toggleRecordingBar,
   } = useSidebarStore();
+<<<<<<< HEAD
 
+=======
+  const { mode, setTextMode, setShapeMode } = drawingTypeStore();
+  const { nextPage, prevPage } = pageStore();
+>>>>>>> 2dee67e (style: 텍스트, 도형, 페이지 이동 - 툴바 연결 (#9))
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPdfSettingModalOpen, setIsPdfSettingModalOpen] = useState(false);
   const [isAnalyzeModalOpen, setIsAnalyzeModalOpen] = useState(false);
@@ -106,9 +126,20 @@ const ToolBar = () => {
           />
           <Divider />
           <ToolBarIcon as={FaPen} />
-          <ToolBarIcon as={FaTextHeight} />
+          <ToolBarIcon
+            as={FaTextHeight}
+            onClick={setTextMode}
+            isActive={mode.text}
+          />
           <ToolBarIcon as={FaImage} />
-          <ToolBarIcon as={FaShapes} />
+          <ToolBarIcon
+            as={FaShapes}
+            onClick={setShapeMode}
+            isActive={mode.shape}
+          />
+          <Divider />
+          <IconButton as={IoChevronBackOutline} onClick={prevPage} />
+          <IconButton as={IoChevronForwardOutline} onClick={nextPage} />
         </ToolBarButton>
         <SideBarButton>
           <IconButton

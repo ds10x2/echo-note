@@ -58,7 +58,9 @@ export const Divider = styled.div`
   margin: 0 10px;
 `;
 
-export const ToolBarIcon = styled.div`
+export const ToolBarIcon = styled.div.withConfig({
+  shouldForwardProp: (prop) => !["isActive"].includes(prop), // isActive만 필터링
+})`
   font-size: 15px;
   cursor: pointer;
   margin: 0 5px;
@@ -67,9 +69,8 @@ export const ToolBarIcon = styled.div`
     color: ${(props) => props.theme.colors.iconHover};
   }
 
-  &:active {
-    color: ${(props) => props.theme.colors.iconActive};
-  }
+  color: ${({ isActive, theme }) =>
+    isActive ? theme.colors.iconHover : theme.colors.iconColor};
 `;
 
 // 오른쪽에 위치하는 Collapse 버튼 (SideBarButton)
