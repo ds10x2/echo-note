@@ -16,11 +16,10 @@ const PdfEditor = ({ scale, containerRef }) => {
   const isDraggingRef = useRef(false);
   const hasDraggedRef = useRef(false);
 
-  //사각형
-  const [rectangles, setRectangles] = useState([]); // 그려진 사각형 목록
-
   useEffect(() => {
-    setCurrentPage(currentPage);
+    if (pageStore.getState().currentPage !== currentPage) {
+      setCurrentPage(currentPage);
+    }
     setCurrentPageForText(currentPage);
     setCurrentPageForShape(currentPage);
   }, [currentPage]);
