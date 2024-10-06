@@ -8,7 +8,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
   const { setRectangles, setCircles, property } = shapeStore();
   const { mode, shapeMode } = drawingTypeStore();
 
-  const svgRef = useRef(null); // SVG 요소 참조를 위한 useRef
+  const svgRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [draggingIndex, setDraggingIndex] = useState(null);
@@ -27,7 +27,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
   }, [currentPageRecs, currentPageCircles]);
 
   const handleDelete = (e) => {
-    e.stopPropagation(); // 이벤트 전파 방지
+    e.stopPropagation();
     if (selectedShape.id !== null) {
       if (selectedShape.type === "rectangle") {
         const updatedRects = currentRects.filter(
@@ -71,7 +71,6 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
         return Math.sqrt(dx * dx + dy * dy) <= circle.r;
       });
 
-      // 도형이 클릭되었을 때는 mode.shape에 상관없이 드래그가 가능하도록 설정
       if (clickedRectIndex !== -1) {
         setIsDragging(true);
         setDraggingIndex(clickedRectIndex);
@@ -88,10 +87,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
           y: y - currentCircles[clickedCircleIndex].cy,
         });
         setSelectedShape({ id: clickedCircleIndex, type: "circle" });
-      }
-
-      // 도형을 그리는 경우는 mode.shape가 true일 때만 동작
-      else if (mode.shape && shapeMode.rectangle) {
+      } else if (mode.shape && shapeMode.rectangle) {
         setIsDrawing(true);
         setCurrentRect({
           x,
@@ -214,8 +210,6 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
 
     setRectangles(currentRects);
     setCircles(currentCircles);
-
-    // 클릭 좌표 초기화
     setOffset({ x: 0, y: 0 });
   }, [
     isDrawing,
@@ -243,14 +237,14 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
   return (
     <St.ShapeContainer $modeShape={mode.shape}>
       <St.StyledSVG
-        ref={svgRef} // SVG 참조 추가
+        ref={svgRef}
         onMouseDown={handleMouseDownRec}
         onMouseMove={handleMove}
         onMouseUp={handleEnd}
         onMouseLeave={handleEnd}
-        onTouchStart={handleMouseDownRec} // 터치 시작 이벤트
-        onTouchMove={handleMove} // 터치 이동 이벤트
-        onTouchEnd={handleEnd} // 터치 종료 이벤트
+        onTouchStart={handleMouseDownRec}
+        onTouchMove={handleMove}
+        onTouchEnd={handleEnd}
       >
         {currentRects.map((rect, index) => (
           <St.StyledRectangle
