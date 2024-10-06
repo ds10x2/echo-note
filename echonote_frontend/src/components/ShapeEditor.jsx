@@ -47,7 +47,6 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
 
   const handleMouseDownRec = useCallback(
     (e) => {
-      if (!mode.shape) return;
       e.stopPropagation();
 
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -71,6 +70,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
         return Math.sqrt(dx * dx + dy * dy) <= circle.r;
       });
 
+      // 도형이 클릭되었을 때는 mode.shape에 상관없이 드래그가 가능하도록 설정
       if (clickedRectIndex !== -1) {
         setIsDragging(true);
         setDraggingIndex(clickedRectIndex);
@@ -87,7 +87,10 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
           y: y - currentCircles[clickedCircleIndex].cy,
         });
         setSelectedShape({ id: clickedCircleIndex, type: "circle" });
-      } else if (shapeMode.rectangle) {
+      }
+
+      // 도형을 그리는 경우는 mode.shape가 true일 때만 동작
+      else if (mode.shape && shapeMode.rectangle) {
         setIsDrawing(true);
         setCurrentRect({
           x,
@@ -99,7 +102,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
           property: property,
         });
         setSelectedShape({ id: null, type: null });
-      } else if (shapeMode.circle) {
+      } else if (mode.shape && shapeMode.circle) {
         setIsDrawing(true);
         setCurrentCircle({
           cx: x,
