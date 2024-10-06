@@ -17,6 +17,7 @@ const DrawingToolBar = ({
   onRedoChange,
   onClearChange,
   onResetChange,
+  onReadOnlyChange
 }) => {
   const [activeTool, setActiveTool] = useState(null);
   const [showSlider, setShowSlider] = useState(false);
@@ -30,6 +31,7 @@ const DrawingToolBar = ({
       !strokeWidthRef.current.contains(event.target)
     ) {
       setShowSlider(false);
+      onReadOnlyChange(false);
     }
 
     // event가 캔버스로 전달되지 않도록 중단
@@ -48,9 +50,11 @@ const DrawingToolBar = ({
   const handlePenClick = () => {
     if (activeTool === 'pen') {
       setShowSlider(true);
+      onReadOnlyChange(true);
     } else {
       setActiveTool('pen');
       setShowSlider(false);
+      onReadOnlyChange(false);
       onPenClick();
     }
   };
@@ -59,9 +63,11 @@ const DrawingToolBar = ({
   const handleEraserClick = () => {
     if (activeTool === 'eraser') {
       setShowSlider(true);
+      onReadOnlyChange(true);
     } else {
       setActiveTool('eraser');
       setShowSlider(false);
+      onReadOnlyChange(false);
       onEraserClick();
     }
   };

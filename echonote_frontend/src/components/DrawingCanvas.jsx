@@ -3,11 +3,11 @@ import { ReactSketchCanvas } from "react-sketch-canvas";
 import * as St from "@components/styles/DrawingEditor.style";
 import canvasStore from "@stores/canvasStore";
 
-const DrawingCanvas = forwardRef(({ strokeWidth, eraserWidth, strokeColor, eraseMode }, ref) => {
+const DrawingCanvas = forwardRef(({ strokeWidth, eraserWidth, strokeColor, eraseMode, readOnly }, ref) => {
   useEffect(() => {
     const { getCanvasPath } = canvasStore.getState();
     const savedPaths = getCanvasPath();
-  
+
     if (ref.current) {
       ref.current.clearCanvas();
       if (savedPaths) {
@@ -45,16 +45,25 @@ const DrawingCanvas = forwardRef(({ strokeWidth, eraserWidth, strokeColor, erase
 
   return (
     <St.DrawingCanvasContainer>
-      <ReactSketchCanvas
-        ref={ref}
-        strokeColor={strokeColor || "#000"}
-        strokeWidth={strokeWidth || 5}
-        eraserWidth={eraserWidth || 5}
-        width="100%"
-        height="100%"
-        canvasColor="transparent"
-        onChange={handleCanvasChange}
-      />
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          pointerEvents: readOnly ? "none" : "auto",
+        }}
+      >
+        <ReactSketchCanvas
+          ref={ref}
+          strokeColor={strokeColor || "#000"}
+          strokeWidth={strokeWidth || 5}
+          eraserWidth={eraserWidth || 5}
+          width="100%"
+          height="100%"
+          canvasColor="transparent"
+          onChange={handleCanvasChange}
+          readOnly={readOnly}
+        />
+      </div>
     </St.DrawingCanvasContainer>
   );
 });

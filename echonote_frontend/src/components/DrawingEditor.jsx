@@ -11,6 +11,7 @@ const DrawingEditor = () => {
   const [strokeWidth, setStrokeWidth] = useState(5);
   const [eraserWidth, setEraserWidth] = useState(10);
   const [strokeColor, setStrokeColor] = useState("#000000");
+  const [readOnly, setReadOnly] = useState(false);
 
   const handleEraserClick = () => {
     setEraseMode(true);
@@ -50,6 +51,10 @@ const DrawingEditor = () => {
     canvasRef.current?.resetCanvas();
   };
 
+  const handleReadOnlyChange = (isReadOnly) => {
+    setReadOnly(isReadOnly);
+  };
+
   return (
     <St.DrawingEditorContainer>
       <DrawingToolBar
@@ -66,6 +71,7 @@ const DrawingEditor = () => {
         onRedoChange={handleRedoClick}
         onClearChange={handleClearClick}
         onResetChange={handleResetClick}
+		onReadOnlyChange={handleReadOnlyChange}
       />
       <DrawingCanvas
         ref={canvasRef}
@@ -73,6 +79,7 @@ const DrawingEditor = () => {
         eraserWidth={eraserWidth}
         strokeColor={strokeColor}
         eraseMode={eraseMode}
+		readOnly={readOnly}
       />
     </St.DrawingEditorContainer>
   );
