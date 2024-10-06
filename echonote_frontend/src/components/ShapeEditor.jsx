@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import * as St from "@/components/styles/ShapeEditor.style";
 import shapeStore from "@/stores/shapeStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
@@ -25,138 +25,150 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
     setSelectedShape({ id: null, type: null });
   }, [currentPageRecs, currentPageCircles]);
 
-  // 마우스를 눌렀을 때 그리기나 드래그 상태를 설정
-  const handleMouseDownRec = (e) => {
-    if (!mode.shape) return;
+  const handleMouseDownRec = useCallback(
+    (e) => {
+      if (!mode.shape) return;
+      e.stopPropagation();
 
-    e.stopPropagation();
+      const clickedRectIndex = currentRects.findIndex(
+        (rect) =>
+          e.nativeEvent.offsetX >= rect.x &&
+          e.nativeEvent.offsetX <= rect.x + rect.width &&
+          e.nativeEvent.offsetY >= rect.y &&
+          e.nativeEvent.offsetY <= rect.y + rect.height
+      );
 
-    const clickedRectIndex = currentRects.findIndex(
-      (rect) =>
-        e.nativeEvent.offsetX >= rect.x &&
-        e.nativeEvent.offsetX <= rect.x + rect.width &&
-        e.nativeEvent.offsetY >= rect.y &&
-        e.nativeEvent.offsetY <= rect.y + rect.height
-    );
-
-    const clickedCircleIndex = currentCircles.findIndex((circle) => {
-      const dx = e.nativeEvent.offsetX - circle.cx;
-      const dy = e.nativeEvent.offsetY - circle.cy;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      return distance <= circle.r;
-    });
-
-    if (clickedRectIndex !== -1) {
-      setIsDragging(true);
-      setDraggingIndex(clickedRectIndex);
-      setOffset({
-        x: e.nativeEvent.offsetX - currentRects[clickedRectIndex].x,
-        y: e.nativeEvent.offsetY - currentRects[clickedRectIndex].y,
+      const clickedCircleIndex = currentCircles.findIndex((circle) => {
+        const dx = e.nativeEvent.offsetX - circle.cx;
+        const dy = e.nativeEvent.offsetY - circle.cy;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        return distance <= circle.r;
       });
-      setSelectedShape({ id: clickedRectIndex, type: "rectangle" });
-    } else if (clickedCircleIndex !== -1) {
-      setIsDragging(true);
-      setDraggingIndex(clickedCircleIndex);
-      setOffset({
-        x: e.nativeEvent.offsetX - currentCircles[clickedCircleIndex].cx,
-        y: e.nativeEvent.offsetY - currentCircles[clickedCircleIndex].cy,
-      });
-      setSelectedShape({ id: clickedCircleIndex, type: "circle" });
-    } else if (shapeMode.rectangle) {
-      setIsDrawing(true);
-      const startX = e.nativeEvent.offsetX;
-      const startY = e.nativeEvent.offsetY;
 
-      setCurrentRect({
-        x: startX,
-        y: startY,
-        startX: startX,
-        startY: startY,
-        width: 0,
-        height: 0,
-        property: property,
-      });
-      setSelectedShape({ id: null, type: null });
-    } else if (shapeMode.circle) {
-      setIsDrawing(true);
-      const startX = e.nativeEvent.offsetX;
-      const startY = e.nativeEvent.offsetY;
+      if (clickedRectIndex !== -1) {
+        setIsDragging(true);
+        setDraggingIndex(clickedRectIndex);
+        setOffset({
+          x: e.nativeEvent.offsetX - currentRects[clickedRectIndex].x,
+          y: e.nativeEvent.offsetY - currentRects[clickedRectIndex].y,
+        });
+        setSelectedShape({ id: clickedRectIndex, type: "rectangle" });
+      } else if (clickedCircleIndex !== -1) {
+        setIsDragging(true);
+        setDraggingIndex(clickedCircleIndex);
+        setOffset({
+          x: e.nativeEvent.offsetX - currentCircles[clickedCircleIndex].cx,
+          y: e.nativeEvent.offsetY - currentCircles[clickedCircleIndex].cy,
+        });
+        setSelectedShape({ id: clickedCircleIndex, type: "circle" });
+      } else if (shapeMode.rectangle) {
+        setIsDrawing(true);
+        const startX = e.nativeEvent.offsetX;
+        const startY = e.nativeEvent.offsetY;
 
-      setCurrentCircle({
-        cx: startX,
-        cy: startY,
-        r: 0,
-        property: property,
-      });
-      setSelectedShape({ id: null, type: null });
-    }
-  };
+        setCurrentRect({
+          x: startX,
+          y: startY,
+          startX: startX,
+          startY: startY,
+          width: 0,
+          height: 0,
+          property: property,
+        });
+        setSelectedShape({ id: null, type: null });
+      } else if (shapeMode.circle) {
+        setIsDrawing(true);
+        const startX = e.nativeEvent.offsetX;
+        const startY = e.nativeEvent.offsetY;
 
-  const handleMouseMoveRec = (e) => {
-    if (isDrawing && currentRect) {
-      const newX = e.nativeEvent.offsetX;
-      const newY = e.nativeEvent.offsetY;
-      const newWidth = newX - currentRect.startX;
-      const newHeight = newY - currentRect.startY;
+        setCurrentCircle({
+          cx: startX,
+          cy: startY,
+          r: 0,
+          property: property,
+        });
+        setSelectedShape({ id: null, type: null });
+      }
+    },
+    [
+      currentRects,
+      currentCircles,
+      mode.shape,
+      shapeMode.rectangle,
+      shapeMode.circle,
+    ]
+  );
 
-      setCurrentRect({
-        ...currentRect,
-        x: newWidth < 0 ? newX : currentRect.startX,
-        y: newHeight < 0 ? newY : currentRect.startY,
-        width: Math.abs(newWidth),
-        height: Math.abs(newHeight),
-      });
-    } else if (isDrawing && currentCircle) {
-      const newX = e.nativeEvent.offsetX;
-      const newY = e.nativeEvent.offsetY;
-      const dx = newX - currentCircle.cx;
-      const dy = newY - currentCircle.cy;
-      const newRadius = Math.sqrt(dx * dx + dy * dy);
+  const handleMouseMoveRec = useCallback(
+    (e) => {
+      if (isDrawing && currentRect) {
+        const newX = e.nativeEvent.offsetX;
+        const newY = e.nativeEvent.offsetY;
+        const newWidth = newX - currentRect.startX;
+        const newHeight = newY - currentRect.startY;
 
-      setCurrentCircle({
-        ...currentCircle,
-        r: newRadius,
-      });
-    }
+        setCurrentRect({
+          ...currentRect,
+          x: newWidth < 0 ? newX : currentRect.startX,
+          y: newHeight < 0 ? newY : currentRect.startY,
+          width: Math.abs(newWidth),
+          height: Math.abs(newHeight),
+        });
+      } else if (isDrawing && currentCircle) {
+        const newX = e.nativeEvent.offsetX;
+        const newY = e.nativeEvent.offsetY;
+        const dx = newX - currentCircle.cx;
+        const dy = newY - currentCircle.cy;
+        const newRadius = Math.sqrt(dx * dx + dy * dy);
 
-    if (
-      isDragging &&
-      draggingIndex !== null &&
-      selectedShape.type === "rectangle"
-    ) {
-      const updatedRects = currentRects.map((rect, index) => {
-        if (index === draggingIndex) {
-          return {
-            ...rect,
-            x: e.nativeEvent.offsetX - offset.x,
-            y: e.nativeEvent.offsetY - offset.y,
-          };
+        setCurrentCircle({
+          ...currentCircle,
+          r: newRadius,
+        });
+      }
+
+      if (isDragging && draggingIndex !== null) {
+        if (selectedShape.type === "rectangle") {
+          const updatedRects = currentRects.map((rect, index) => {
+            if (index === draggingIndex) {
+              return {
+                ...rect,
+                x: e.nativeEvent.offsetX - offset.x,
+                y: e.nativeEvent.offsetY - offset.y,
+              };
+            }
+            return rect;
+          });
+          setCurrentRects(updatedRects);
+        } else if (selectedShape.type === "circle") {
+          const updatedCircles = currentCircles.map((circle, index) => {
+            if (index === draggingIndex) {
+              return {
+                ...circle,
+                cx: e.nativeEvent.offsetX - offset.x,
+                cy: e.nativeEvent.offsetY - offset.y,
+              };
+            }
+            return circle;
+          });
+          setCurrentCircles(updatedCircles);
         }
-        return rect;
-      });
-      setCurrentRects(updatedRects);
-    }
+      }
+    },
+    [
+      isDrawing,
+      currentRect,
+      currentCircle,
+      isDragging,
+      draggingIndex,
+      offset,
+      selectedShape,
+      currentRects,
+      currentCircles,
+    ]
+  );
 
-    if (
-      isDragging &&
-      draggingIndex !== null &&
-      selectedShape.type === "circle"
-    ) {
-      const updatedCircles = currentCircles.map((circle, index) => {
-        if (index === draggingIndex) {
-          return {
-            ...circle,
-            cx: e.nativeEvent.offsetX - offset.x,
-            cy: e.nativeEvent.offsetY - offset.y,
-          };
-        }
-        return circle;
-      });
-      setCurrentCircles(updatedCircles);
-    }
-  };
-
-  const handleMouseUpRec = () => {
+  const handleMouseUpRec = useCallback(() => {
     if (isDrawing && currentRect) {
       setCurrentRects((prevRects) => [...prevRects, currentRect]);
       setCurrentRect(null);
@@ -176,9 +188,18 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
 
     setRectangles(currentRects);
     setCircles(currentCircles);
-  };
+  }, [
+    isDrawing,
+    currentRect,
+    currentCircle,
+    isDragging,
+    currentRects,
+    currentCircles,
+    setRectangles,
+    setCircles,
+  ]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (selectedShape.id !== null) {
       if (selectedShape.type === "rectangle") {
         const updatedRects = currentRects.filter(
@@ -195,10 +216,10 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
       }
       setSelectedShape({ id: null, type: null });
     }
-  };
+  }, [selectedShape, currentRects, currentCircles, setRectangles, setCircles]);
 
   return (
-    <St.ShapeContainer modeShape={mode.shape}>
+    <St.ShapeContainer $modeShape={mode.shape}>
       <St.StyledSVG
         onMouseDown={handleMouseDownRec}
         onMouseMove={handleMouseMoveRec}
@@ -215,7 +236,6 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
             fill={rect.property.fill ? rect.property.fillColor : "none"}
             stroke={rect.property.stroke ? rect.property.strokeColor : "none"}
             strokeWidth={rect.property.stroke ? rect.property.strokeWidth : 0}
-            className="rectangle"
             onClick={() => setSelectedShape({ id: index, type: "rectangle" })}
           />
         ))}
@@ -232,7 +252,6 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
             strokeWidth={
               circle.property.stroke ? circle.property.strokeWidth : 0
             }
-            className="circle"
             onClick={() => setSelectedShape({ id: index, type: "circle" })}
           />
         ))}
