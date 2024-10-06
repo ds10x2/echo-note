@@ -8,7 +8,7 @@ import shapeStore from "@/stores/shapeStore";
 import pageStore from "@/stores/pageStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 
-const PdfEditor = ({ scale, containerRef }) => {
+const PdfEditor = ({ scale, containerRef, originalSize }) => {
   const { getCurrentPageItems, setCurrentPageForText } = textStore();
   const { getRectangles, getCircles, setCurrentPageForShape } = shapeStore();
   const { currentPage, setCurrentPage } = pageStore();
@@ -25,7 +25,7 @@ const PdfEditor = ({ scale, containerRef }) => {
   }, [currentPage]);
 
   return (
-    <St.PdfEditorContainer>
+    <St.PdfEditorContainer originalSize={originalSize} scale={scale}>
       <TextEditor
         scale={scale}
         hasDraggedRef={hasDraggedRef}

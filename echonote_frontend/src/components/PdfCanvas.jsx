@@ -9,8 +9,9 @@ const PdfCanvas = ({ url, containerRef }) => {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs`;
 
   const [pdfRef, setPdfRef] = useState(null);
-  const { currentPage, setPages, scale } = pageStore();
+  const { currentPage, setPages, scale } = pageStore(); // zustand의 상태와 액션 가져오기
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
 
   const sampleUrl =
@@ -19,21 +20,18 @@ const PdfCanvas = ({ url, containerRef }) => {
   const renderPage = useCallback(
     (pageNum, pdf = pdfRef) => {
       if (pdf && containerRef.current) {
-        // containerRef.current가 존재하는지 확인
         pdf.getPage(pageNum).then((page) => {
           const containerWidth = containerRef.current.clientWidth;
           const containerHeight = containerRef.current.clientHeight;
 
           const viewport = page.getViewport({ scale: 1 });
-          // 화면 비율에 맞게 PDF를 스케일링
           const widthScale = (containerWidth / viewport.width) * 0.9;
           const heightScale = (containerHeight / viewport.height) * 0.9;
-          const scaleFactor = Math.min(widthScale, heightScale); // 화면에 맞추기 위해 더 작은 스케일 사용
+          const scaleFactor = Math.min(widthScale, heightScale);
 
-          console.log(widthScale, " ", heightScale);
-          console.log(scaleFactor);
-
-          const scaledViewport = page.getViewport({ scale: scaleFactor });
+          const scaledViewport = page.getViewport({
+            scale: scaleFactor * scale,
+          });
 
           const canvas = canvasRef.current;
           canvas.height = scaledViewport.height;
@@ -42,6 +40,11 @@ const PdfCanvas = ({ url, containerRef }) => {
           setCanvasSize({
             width: scaledViewport.width,
             height: scaledViewport.height,
+          });
+
+          setOriginalSize({
+            width: scaledViewport.width / scale,
+            height: scaledViewport.height / scale,
           });
 
           const renderContext = {
@@ -67,18 +70,20 @@ const PdfCanvas = ({ url, containerRef }) => {
         });
       }
     },
-    [pdfRef]
+    [pdfRef, scale, containerRef]
   );
 
-  // currentPage가 바뀔 때마다 페이지를 렌더링
+  // currentPage, scale이 바뀔 때마다 페이지 렌더링
   useEffect(() => {
     renderPage(currentPage, pdfRef);
-  }, [currentPage, pdfRef]);
+  }, [currentPage, pdfRef, scale, renderPage]);
 
+  // PDF 로드 후 페이지 설정
   useEffect(() => {
     if (pdfRef) setPages(pdfRef.numPages);
-  }, [pdfRef]);
+  }, [pdfRef, setPages]);
 
+  // PDF 문서를 로드
   useEffect(() => {
     const loadingTask = pdfjsLib.getDocument(sampleUrl);
     loadingTask.promise.then(
@@ -92,14 +97,11 @@ const PdfCanvas = ({ url, containerRef }) => {
   }, [url]);
 
   return (
-    <St.PdfCanvasContainer
-      width={canvasSize.width}
-      height={canvasSize.height}
-      scale={scale}
-    >
+    <St.PdfCanvasContainer width={canvasSize.width} height={canvasSize.height}>
       <canvas ref={canvasRef}></canvas>
       <PdfEditor
         scale={scale}
+        originalSize={originalSize}
         currentPage={currentPage}
         containerRef={containerRef}
       />
