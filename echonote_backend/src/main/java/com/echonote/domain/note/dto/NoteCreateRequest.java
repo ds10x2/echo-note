@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class NoteCreateRequest {
-	private String presignedUrl;
+	private String objectUrl;
 }
