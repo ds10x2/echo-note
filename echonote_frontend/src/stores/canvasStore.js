@@ -2,15 +2,22 @@ import { create } from "zustand";
 
 // Canvas 관련 상태 관리
 const canvasStore = create((set, get) => ({
-  savedCanvasPath: null, // 저장된 SVG 데이터
+  savedCanvasPath: null, // 저장된 경로 데이터
+  savedCanvasImage: null, // 저장된 이미지 데이터
 
-  // SVG 데이터를 저장하는 함수
+  // 경로 데이터를 저장하는 함수
   setCanvasPath: (data) => set(() => ({ savedCanvasPath: data })),
 
-  // 저장된 SVG 데이터를 불러오는 함수 (set 사용 불필요)
+  // 저장된 경로 데이터를 불러오는 함수
   getCanvasPath: () => get().savedCanvasPath,
 
-  // 저장된 SVG 데이터를 초기화하는 함수
+  // 이미지 데이터를 저장하는 함수
+  setCanvasImage: (image) => set(() => ({ savedCanvasImage: image })),
+
+  // 저장된 이미지 데이터를 불러오는 함수
+  getCanvasImage: () => get().savedCanvasImage,
+
+  // 경로 데이터를 초기화하는 함수
   clearCanvasPath: () => set(() => ({ savedCanvasPath: null })),
 }));
 

@@ -8,6 +8,7 @@ import RecordingBar from "@components/RecordingBar";
 import { Layout, MainContent, rootStyle, appStyle } from "@/Layout.style";
 import STTBar from "@components/STTBar";
 import DrawingEditor from "@components/DrawingEditor";
+import canvasStore from "@stores/canvasStore";
 
 class App extends Component {
   state = {
@@ -35,6 +36,9 @@ class App extends Component {
   };
 
   render() {
+    const { getCanvasImage } = canvasStore.getState();
+    const savedImage = getCanvasImage();
+	
     return (
       <div style={rootStyle}>
         <div style={appStyle}>
@@ -46,10 +50,13 @@ class App extends Component {
               <PdfBar />
               <MainContent>
                 {this.state.isDrawingEditorOpened ? (
-                  <DrawingEditor
-                  />
+                  <DrawingEditor />
                 ) : (
-                  <p>페이지 내용이 여기에 들어갑니다.</p>
+                  savedImage ? (
+                    <img src={savedImage} alt="Saved Canvas" />
+                  ) : (
+                    <p>페이지 내용이 여기에 들어갑니다.</p>
+                  )
                 )}
               </MainContent>
               <STTBar />

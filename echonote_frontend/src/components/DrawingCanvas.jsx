@@ -18,9 +18,10 @@ const DrawingCanvas = forwardRef(({ strokeWidth, eraserWidth, strokeColor, erase
   }, [eraseMode]);
 
   const handleCanvasChange = () => {
-    const { setCanvasPath } = canvasStore.getState();
+    const { setCanvasPath, setCanvasImage } = canvasStore.getState();
     
     if (onRefChange && ref.current) {
+      // Path 저장
       ref.current
         .exportPaths()
         .then((data) => {
@@ -29,6 +30,24 @@ const DrawingCanvas = forwardRef(({ strokeWidth, eraserWidth, strokeColor, erase
         .catch((e) => {
           console.log("Error exporting paths:", e);
         });
+      
+      // Svg 저장
+      if (ref.current) {
+        ref.current.exportSvg()
+          .then((data) => {
+            console.log("SVG Exported Successfully", data);
+      
+            // base64로 인코딩 처리
+            const svgDataUrl = "data:image/svg+xml;base64," + btoa(data);
+            setCanvasImage(svgDataUrl);
+          })
+          .catch((error) => {
+            console.error("Error exporting SVG:", error);
+          });
+      } else {
+        console.log("Canvas reference is not ready.");
+      }
+        
     }
   };
 
