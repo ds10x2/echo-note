@@ -7,11 +7,13 @@ import PdfBar from "@components/PdfBar";
 import RecordingBar from "@components/RecordingBar";
 import { Layout, MainContent, rootStyle, appStyle } from "@/Layout.style";
 import STTBar from "@components/STTBar";
+import DrawingEditor from "@components/DrawingEditor";
 
 class App extends Component {
   state = {
     isPdfBarOpened: false, // PdfBar 열림/닫힘 상태 관리
     isSTTBarOpened: false, // STTBar 열림/닫힘 상태 관리
+    isDrawingEditorOpened: false, // DrawingEditor 열림/닫힘 상태 관리
   };
 
   togglePdfBar = () => {
@@ -26,18 +28,29 @@ class App extends Component {
     }));
   };
 
+  toggleDrawingEditor = () => {
+    this.setState((prevState) => ({
+      isDrawingEditorOpened: !prevState.isDrawingEditorOpened,
+    }));
+  };
+
   render() {
     return (
       <div style={rootStyle}>
         <div style={appStyle}>
           <ThemeProvider theme={theme}>
             <GlobalStyles />
-            <ToolBar />
+            <ToolBar onToggleDrawingEditor={this.toggleDrawingEditor} />
             <Layout>
               <RecordingBar />
               <PdfBar />
               <MainContent>
-                <p>페이지 내용이 여기에 들어갑니다.</p>
+                {this.state.isDrawingEditorOpened ? (
+                  <DrawingEditor
+                  />
+                ) : (
+                  <p>페이지 내용이 여기에 들어갑니다.</p>
+                )}
               </MainContent>
               <STTBar />
             </Layout>

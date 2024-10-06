@@ -17,7 +17,7 @@ import {
   AnimatedToolBarContent,
 } from "@components/styles/ToolBar.style";
 
-const ToolBar = () => {
+const ToolBar = ({ onToggleDrawingEditor }) => {
   const {
     isPdfBarOpened,
     isSTTBarOpened,
@@ -27,9 +27,15 @@ const ToolBar = () => {
     toggleRecordingBar,
   } = useSidebarStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isPenActive, setIsPenActive] = useState(false);
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  const handlePenClick = () => {
+    setIsPenActive(!isPenActive);
+    onToggleDrawingEditor();
   };
 
   return (
@@ -51,7 +57,11 @@ const ToolBar = () => {
             isActive={isRecordingBarOpened}
           />
           <Divider />
-          <ToolBarIcon as={FaPen} />
+          <IconButton
+            as={FaPen}
+            onClick={handlePenClick}
+            isActive={isPenActive}
+          />
           <ToolBarIcon as={FaTextHeight} />
           <ToolBarIcon as={FaImage} />
           <ToolBarIcon as={FaShapes} />
