@@ -2,17 +2,24 @@ import React, { useRef, useState } from "react";
 import * as St from "@components/styles/DrawingEditor.style";
 import DrawingToolBar from "@components/DrawingToolBar";
 import DrawingCanvas from "@components/DrawingCanvas";
+import canvasStore from "@/stores/canvasStore";
 
 const DrawingEditor = () => {
-  const canvasRef = useRef(null);
+  const { getCanvasPath } = canvasStore.getState();
+  const canvasRef = useRef(getCanvasPath());
   const [eraseMode, setEraseMode] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(5);
   const [eraserWidth, setEraserWidth] = useState(10);
   const [strokeColor, setStrokeColor] = useState("#000000");
+  const [canvasPaths, setCanvasPaths] = useState([]);
+
+  const handleRefChange = (updatedPaths) => {
+    setCanvasPaths(updatedPaths);
+  };
 
   const handleEraserClick = () => {
     setEraseMode(true);
-	canvasRef.current?.eraseMode(true);
+	  canvasRef.current?.eraseMode(true);
   };
 
   const handlePenClick = () => {
@@ -71,6 +78,7 @@ const DrawingEditor = () => {
         eraserWidth={eraserWidth}
         strokeColor={strokeColor}
         eraseMode={eraseMode}
+        onRefChange={handleRefChange}
       />
     </St.DrawingEditorContainer>
   );
