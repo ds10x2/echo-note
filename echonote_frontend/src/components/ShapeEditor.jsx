@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import * as St from "@/components/styles/ShapeEditor.style";
 import shapeStore from "@/stores/shapeStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
@@ -8,6 +8,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
   const { setRectangles, setCircles, property } = shapeStore();
   const { mode, shapeMode } = drawingTypeStore();
 
+  const svgRef = useRef(null); // SVG 요소 참조를 위한 useRef
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [draggingIndex, setDraggingIndex] = useState(null);
@@ -25,52 +26,74 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
     setSelectedShape({ id: null, type: null });
   }, [currentPageRecs, currentPageCircles]);
 
+  const handleDelete = () => {
+    if (selectedShape.id !== null) {
+      if (selectedShape.type === "rectangle") {
+        const updatedRects = currentRects.filter(
+          (_, index) => index !== selectedShape.id
+        );
+        setCurrentRects(updatedRects);
+        setRectangles(updatedRects);
+      } else if (selectedShape.type === "circle") {
+        const updatedCircles = currentCircles.filter(
+          (_, index) => index !== selectedShape.id
+        );
+        setCurrentCircles(updatedCircles);
+        setCircles(updatedCircles);
+      }
+      setSelectedShape({ id: null, type: null });
+    }
+  };
+
   const handleMouseDownRec = useCallback(
     (e) => {
       if (!mode.shape) return;
       e.stopPropagation();
 
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      const container = svgRef.current.getBoundingClientRect();
+      const x = clientX - container.left;
+      const y = clientY - container.top;
+
       const clickedRectIndex = currentRects.findIndex(
         (rect) =>
-          e.nativeEvent.offsetX >= rect.x &&
-          e.nativeEvent.offsetX <= rect.x + rect.width &&
-          e.nativeEvent.offsetY >= rect.y &&
-          e.nativeEvent.offsetY <= rect.y + rect.height
+          x >= rect.x &&
+          x <= rect.x + rect.width &&
+          y >= rect.y &&
+          y <= rect.y + rect.height
       );
 
       const clickedCircleIndex = currentCircles.findIndex((circle) => {
-        const dx = e.nativeEvent.offsetX - circle.cx;
-        const dy = e.nativeEvent.offsetY - circle.cy;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        return distance <= circle.r;
+        const dx = x - circle.cx;
+        const dy = y - circle.cy;
+        return Math.sqrt(dx * dx + dy * dy) <= circle.r;
       });
 
       if (clickedRectIndex !== -1) {
         setIsDragging(true);
         setDraggingIndex(clickedRectIndex);
         setOffset({
-          x: e.nativeEvent.offsetX - currentRects[clickedRectIndex].x,
-          y: e.nativeEvent.offsetY - currentRects[clickedRectIndex].y,
+          x: x - currentRects[clickedRectIndex].x,
+          y: y - currentRects[clickedRectIndex].y,
         });
         setSelectedShape({ id: clickedRectIndex, type: "rectangle" });
       } else if (clickedCircleIndex !== -1) {
         setIsDragging(true);
         setDraggingIndex(clickedCircleIndex);
         setOffset({
-          x: e.nativeEvent.offsetX - currentCircles[clickedCircleIndex].cx,
-          y: e.nativeEvent.offsetY - currentCircles[clickedCircleIndex].cy,
+          x: x - currentCircles[clickedCircleIndex].cx,
+          y: y - currentCircles[clickedCircleIndex].cy,
         });
         setSelectedShape({ id: clickedCircleIndex, type: "circle" });
       } else if (shapeMode.rectangle) {
         setIsDrawing(true);
-        const startX = e.nativeEvent.offsetX;
-        const startY = e.nativeEvent.offsetY;
-
         setCurrentRect({
-          x: startX,
-          y: startY,
-          startX: startX,
-          startY: startY,
+          x,
+          y,
+          startX: x,
+          startY: y,
           width: 0,
           height: 0,
           property: property,
@@ -78,12 +101,9 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
         setSelectedShape({ id: null, type: null });
       } else if (shapeMode.circle) {
         setIsDrawing(true);
-        const startX = e.nativeEvent.offsetX;
-        const startY = e.nativeEvent.offsetY;
-
         setCurrentCircle({
-          cx: startX,
-          cy: startY,
+          cx: x,
+          cy: y,
           r: 0,
           property: property,
         });
@@ -96,31 +116,35 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
       mode.shape,
       shapeMode.rectangle,
       shapeMode.circle,
+      property,
     ]
   );
 
-  const handleMouseMoveRec = useCallback(
+  const handleMove = useCallback(
     (e) => {
-      if (isDrawing && currentRect) {
-        const newX = e.nativeEvent.offsetX;
-        const newY = e.nativeEvent.offsetY;
-        const newWidth = newX - currentRect.startX;
-        const newHeight = newY - currentRect.startY;
+      e.preventDefault(); // 스크롤 방지
 
+      let x, y;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const container = svgRef.current.getBoundingClientRect();
+      x = clientX - container.left;
+      y = clientY - container.top;
+
+      if (isDrawing && currentRect) {
+        const newWidth = x - currentRect.startX;
+        const newHeight = y - currentRect.startY;
         setCurrentRect({
           ...currentRect,
-          x: newWidth < 0 ? newX : currentRect.startX,
-          y: newHeight < 0 ? newY : currentRect.startY,
+          x: newWidth < 0 ? x : currentRect.startX,
+          y: newHeight < 0 ? y : currentRect.startY,
           width: Math.abs(newWidth),
           height: Math.abs(newHeight),
         });
       } else if (isDrawing && currentCircle) {
-        const newX = e.nativeEvent.offsetX;
-        const newY = e.nativeEvent.offsetY;
-        const dx = newX - currentCircle.cx;
-        const dy = newY - currentCircle.cy;
+        const dx = x - currentCircle.cx;
+        const dy = y - currentCircle.cy;
         const newRadius = Math.sqrt(dx * dx + dy * dy);
-
         setCurrentCircle({
           ...currentCircle,
           r: newRadius,
@@ -133,8 +157,8 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
             if (index === draggingIndex) {
               return {
                 ...rect,
-                x: e.nativeEvent.offsetX - offset.x,
-                y: e.nativeEvent.offsetY - offset.y,
+                x: x - offset.x,
+                y: y - offset.y,
               };
             }
             return rect;
@@ -145,8 +169,8 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
             if (index === draggingIndex) {
               return {
                 ...circle,
-                cx: e.nativeEvent.offsetX - offset.x,
-                cy: e.nativeEvent.offsetY - offset.y,
+                cx: x - offset.x,
+                cy: y - offset.y,
               };
             }
             return circle;
@@ -168,7 +192,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
     ]
   );
 
-  const handleMouseUpRec = useCallback(() => {
+  const handleEnd = useCallback(() => {
     if (isDrawing && currentRect) {
       setCurrentRects((prevRects) => [...prevRects, currentRect]);
       setCurrentRect(null);
@@ -188,6 +212,9 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
 
     setRectangles(currentRects);
     setCircles(currentCircles);
+
+    // 클릭 좌표 초기화
+    setOffset({ x: 0, y: 0 });
   }, [
     isDrawing,
     currentRect,
@@ -199,32 +226,27 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
     setCircles,
   ]);
 
-  const handleDelete = useCallback(() => {
-    if (selectedShape.id !== null) {
-      if (selectedShape.type === "rectangle") {
-        const updatedRects = currentRects.filter(
-          (_, index) => index !== selectedShape.id
-        );
-        setCurrentRects(updatedRects);
-        setRectangles(updatedRects);
-      } else if (selectedShape.type === "circle") {
-        const updatedCircles = currentCircles.filter(
-          (_, index) => index !== selectedShape.id
-        );
-        setCurrentCircles(updatedCircles);
-        setCircles(updatedCircles);
-      }
-      setSelectedShape({ id: null, type: null });
-    }
-  }, [selectedShape, currentRects, currentCircles, setRectangles, setCircles]);
+  useEffect(() => {
+    const svgElement = svgRef.current;
+    const options = { passive: false }; // passive: false 설정
+    svgElement.addEventListener("touchmove", handleMove, options);
+
+    return () => {
+      svgElement.removeEventListener("touchmove", handleMove, options);
+    };
+  }, [handleMove]);
 
   return (
     <St.ShapeContainer $modeShape={mode.shape}>
       <St.StyledSVG
+        ref={svgRef} // SVG 참조 추가
         onMouseDown={handleMouseDownRec}
-        onMouseMove={handleMouseMoveRec}
-        onMouseUp={handleMouseUpRec}
-        onMouseLeave={handleMouseUpRec}
+        onMouseMove={handleMove}
+        onMouseUp={handleEnd}
+        onMouseLeave={handleEnd}
+        onTouchStart={handleMouseDownRec} // 터치 시작 이벤트
+        onTouchMove={handleMove} // 터치 이동 이벤트
+        onTouchEnd={handleEnd} // 터치 종료 이벤트
       >
         {currentRects.map((rect, index) => (
           <St.StyledRectangle
