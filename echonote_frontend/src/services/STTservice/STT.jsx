@@ -19,7 +19,6 @@ export const getSTTResult = async (id) => {
             },
             mode: "cors", // CORS 모드 설정
         });
-
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
