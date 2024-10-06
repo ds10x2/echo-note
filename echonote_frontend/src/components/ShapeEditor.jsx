@@ -122,7 +122,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
 
   const handleMove = useCallback(
     (e) => {
-      e.preventDefault(); // 스크롤 방지
+      // e.preventDefault(); // 스크롤 방지
 
       let x, y;
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -227,14 +227,16 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
   ]);
 
   useEffect(() => {
-    const svgElement = svgRef.current;
-    const options = { passive: false }; // passive: false 설정
-    svgElement.addEventListener("touchmove", handleMove, options);
+    const touchMoveHandler = (e) => {
+      e.preventDefault();
+    };
+
+    window.addEventListener("touchmove", touchMoveHandler, { passive: false });
 
     return () => {
-      svgElement.removeEventListener("touchmove", handleMove, options);
+      window.removeEventListener("touchmove", touchMoveHandler);
     };
-  }, [handleMove]);
+  }, []);
 
   return (
     <St.ShapeContainer $modeShape={mode.shape}>
