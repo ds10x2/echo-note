@@ -217,12 +217,12 @@ const TextEditor = ({
       setCurItems((items) =>
         items.map((item) => {
           if (item.isDragging) {
-            let newX = clientX - item.offsetX;
-            let newY = clientY - item.offsetY;
+            let newX = (clientX - item.offsetX) / scale; // scale 적용
+            let newY = (clientY - item.offsetY) / scale; // scale 적용
 
             const containerRect = containerRef.current.getBoundingClientRect();
-            const containerWidth = containerRect.width;
-            const containerHeight = containerRect.height;
+            const containerWidth = containerRect.width / scale; // scale 적용
+            const containerHeight = containerRect.height / scale; // scale 적용
 
             const textBoxWidth = 100;
             const textBoxHeight = item.fontSize;
