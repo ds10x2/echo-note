@@ -4,12 +4,12 @@ import * as pdfjsLib from "pdfjs-dist";
 import PdfEditor from "@components/PdfEditor";
 import pageStore from "@/stores/pageStore"; // zustand 스토어 가져오기
 
-const PdfCanvas = ({ url, scale, containerRef }) => {
+const PdfCanvas = ({ url, containerRef }) => {
   const canvasRef = useRef();
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs`;
 
   const [pdfRef, setPdfRef] = useState(null);
-  const { currentPage, setPages } = pageStore();
+  const { currentPage, setPages, scale } = pageStore();
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
 

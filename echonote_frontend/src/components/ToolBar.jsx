@@ -1,7 +1,5 @@
-<<<<<<< HEAD
 import AnalyzeModal from "@components/AnalyzeModal";
 import PdfSettingModal from "@components/PdfSettingModal";
-=======
 import { useState } from "react";
 import { RiSpeakLine } from "react-icons/ri";
 import { FaPen, FaTextHeight, FaImage, FaShapes, FaStar } from "react-icons/fa";
@@ -11,10 +9,10 @@ import {
   IoChevronBackOutline,
   IoChevronForwardOutline,
 } from "react-icons/io5";
+import { LuZoomIn, LuZoomOut } from "react-icons/lu";
 import useSidebarStore from "@stores/sideBarStore";
 import drawingTypeStore from "@stores/drawingTypeStore";
 import pageStore from "@stores/pageStore";
->>>>>>> 2dee67e (style: 텍스트, 도형, 페이지 이동 - 툴바 연결 (#9))
 import {
   AnimatedToolBarContent,
   Divider,
@@ -45,12 +43,10 @@ const ToolBar = () => {
     isRecordingBarOpened,
     toggleRecordingBar,
   } = useSidebarStore();
-<<<<<<< HEAD
 
-=======
   const { mode, setTextMode, setShapeMode } = drawingTypeStore();
-  const { nextPage, prevPage } = pageStore();
->>>>>>> 2dee67e (style: 텍스트, 도형, 페이지 이동 - 툴바 연결 (#9))
+
+  const { nextPage, prevPage, zoomIn, zoomOut } = pageStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPdfSettingModalOpen, setIsPdfSettingModalOpen] = useState(false);
   const [isAnalyzeModalOpen, setIsAnalyzeModalOpen] = useState(false);
@@ -83,17 +79,17 @@ const ToolBar = () => {
     setIsPdfSettingModalOpen(false);
     setModalType(ModalType);
 
-    const modalWidth = 300; 
+    const modalWidth = 300;
     const adjustedLeft = buttonPosition.left - modalWidth;
 
     setButtonPosition((prevPosition) => ({
-      ...prevPosition, 
-      left: adjustedLeft, 
+      ...prevPosition,
+      left: adjustedLeft,
     }));
 
     setTimeout(() => {
       setIsAnalyzeModalOpen(true);
-    }, 200); 
+    }, 200);
   };
 
   useEffect(() => {
@@ -138,6 +134,9 @@ const ToolBar = () => {
             isActive={mode.shape}
           />
           <Divider />
+          <IconButton as={LuZoomOut} onClick={zoomOut} />
+          <IconButton as={LuZoomIn} onClick={zoomIn} />
+          <Divider />
           <IconButton as={IoChevronBackOutline} onClick={prevPage} />
           <IconButton as={IoChevronForwardOutline} onClick={nextPage} />
         </ToolBarButton>
@@ -172,7 +171,7 @@ const ToolBar = () => {
         isOpen={isPdfSettingModalOpen}
         onClose={togglePdfModal}
         position={buttonPosition}
-        toggleAnalyzeModal={handleAnalyzeModalOpen} 
+        toggleAnalyzeModal={handleAnalyzeModalOpen}
       />
 
       <AnalyzeModal
