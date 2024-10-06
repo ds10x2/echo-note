@@ -192,34 +192,38 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs }) => {
 
   const handleEnd = useCallback(() => {
     if (isDrawing && currentRect) {
-      setCurrentRects((prevRects) => [...prevRects, currentRect]);
+      // 상태 추가 전에 store의 addRectangle 메서드를 통해 현재 페이지의 도형에 추가
+      shapeStore.getState().addRectangle(currentRect);
       setCurrentRect(null);
       setIsDrawing(false);
-    }
-
-    if (isDrawing && currentCircle) {
-      setCurrentCircles((prevCircles) => [...prevCircles, currentCircle]);
+    } else if (isDrawing && currentCircle) {
+      shapeStore.getState().addCircle(currentCircle);
       setCurrentCircle(null);
       setIsDrawing(false);
-    }
-
-    if (isDragging) {
+    } else if (isDragging) {
+      // 드래그가 끝났을 때 상태 업데이트
+      if (selectedShape.type === "rectangle") {
+        shapeStore
+          .getState()
+          .updateRectangle(draggingIndex, currentRects[draggingIndex]);
+      } else if (selectedShape.type === "circle") {
+        shapeStore
+          .getState()
+          .updateCircle(draggingIndex, currentCircles[draggingIndex]);
+      }
       setIsDragging(false);
       setDraggingIndex(null);
     }
-
-    setRectangles(currentRects);
-    setCircles(currentCircles);
     setOffset({ x: 0, y: 0 });
   }, [
     isDrawing,
     currentRect,
     currentCircle,
     isDragging,
+    draggingIndex,
     currentRects,
     currentCircles,
-    setRectangles,
-    setCircles,
+    selectedShape,
   ]);
 
   useEffect(() => {
