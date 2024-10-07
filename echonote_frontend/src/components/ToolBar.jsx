@@ -173,22 +173,17 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
             </ToolBarIconDetail>
           </ToolBarIconContainer>
           <ToolBarIcon as={FaImage} />
-          <ToolBarIconContainer>
-            <ToolBarIcon
-              as={
-                !mode.shape
-                  ? FaShapes
-                  : shapeMode.rectangle
-                  ? FaRegSquare
-                  : FaRegCircle
-              }
-              onClick={handleShapeMode}
-              isActive={mode.shape}
-            />
-            <ToolBarIconDetail isOpen={mode.shape}>
-              <ToolBarIcon as={FaPalette} />
-            </ToolBarIconDetail>
-          </ToolBarIconContainer>
+          <ToolBarIcon
+            as={
+              !mode.shape
+                ? FaShapes
+                : shapeMode.rectangle
+                ? FaRegSquare
+                : FaRegCircle
+            }
+            onClick={handleShapeMode}
+            isActive={mode.shape}
+          />
           <Divider />
           <IconButton as={LuZoomOut} onClick={zoomOut} />
           <IconButton as={LuZoomIn} onClick={zoomIn} />
