@@ -8,8 +8,10 @@ import {
   FaImage,
   FaShapes,
   FaStar,
-  FaCircle,
-  FaStop,
+  FaRegCircle,
+  FaRegSquare,
+  FaCaretDown,
+  FaPalette,
 } from "react-icons/fa";
 import { BiWindowAlt, BiChevronsDown, BiChevronsUp } from "react-icons/bi";
 import {
@@ -33,8 +35,13 @@ import {
   ToolBarContent,
   ToolBarHeader,
   ToolBarIcon,
+  ToolBarIconDetail,
+  FontSizeText,
+  FontSizeButton,
+  ToolBarIconContainer,
 } from "@components/styles/ToolBar.style";
 import { VscSettings } from "react-icons/vsc";
+import textStore from "@/stores/textStore";
 
 const ToolBar = ({ onToggleDrawingEditor }) => {
   const {
@@ -56,6 +63,7 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
   } = drawingTypeStore();
 
   const { nextPage, prevPage, zoomIn, zoomOut, currentPage } = pageStore();
+  const { fontProperty, setFontSize } = textStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPdfSettingModalOpen, setIsPdfSettingModalOpen] = useState(false);
   const [isAnalyzeModalOpen, setIsAnalyzeModalOpen] = useState(false);
@@ -153,19 +161,34 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
             onClick={handlePenClick}
             isActive={isPenActive}
           />
-          <ToolBarIcon
-            as={FaTextHeight}
-            onClick={setTextMode}
-            isActive={mode.text}
-          />
+          <ToolBarIconContainer>
+            <ToolBarIcon
+              as={FaTextHeight}
+              onClick={setTextMode}
+              isActive={mode.text}
+            />
+            <ToolBarIconDetail isOpen={mode.text}>
+              <FontSizeText>{fontProperty.fontSize}px</FontSizeText>
+              <FontSizeButton as={FaCaretDown} />
+            </ToolBarIconDetail>
+          </ToolBarIconContainer>
           <ToolBarIcon as={FaImage} />
-          <ToolBarIcon
-            as={
-              !mode.shape ? FaShapes : shapeMode.rectangle ? FaStop : FaCircle
-            }
-            onClick={handleShapeMode}
-            isActive={mode.shape}
-          />
+          <ToolBarIconContainer>
+            <ToolBarIcon
+              as={
+                !mode.shape
+                  ? FaShapes
+                  : shapeMode.rectangle
+                  ? FaRegSquare
+                  : FaRegCircle
+              }
+              onClick={handleShapeMode}
+              isActive={mode.shape}
+            />
+            <ToolBarIconDetail isOpen={mode.shape}>
+              <ToolBarIcon as={FaPalette} />
+            </ToolBarIconDetail>
+          </ToolBarIconContainer>
           <Divider />
           <IconButton as={LuZoomOut} onClick={zoomOut} />
           <IconButton as={LuZoomIn} onClick={zoomIn} />

@@ -109,3 +109,41 @@ export const SettingButton = styled.div`
   justify-content: center;
   cursor: pointer;
 `;
+
+//폰트 사이즈, 도형 색상 열고 닫는용
+export const ToolBarIconContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+// 폰트, 도형 애니메이션
+export const ToolBarIconDetail = styled.div.withConfig({
+  shouldForwardProp: (prop) => !["isOpen"].includes(prop), // isOpen만 필터링
+})`
+  max-width: ${(props) => (props.isOpen ? "80px" : "0")};
+  opacity: ${(props) => (props.isOpen ? "1" : "0")};
+  transform-origin: left;
+  transition: max-width 0.5s ease, opacity 0.5s ease, visibility 0.5s ease;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  margin-left: ${(props) => (props.isOpen ? "5px" : "0")};
+`;
+
+export const FontSizeText = styled.div`
+  font-size: 14px;
+`;
+
+export const FontSizeButton = styled.div.withConfig({
+  shouldForwardProp: (prop) => !["isActive"].includes(prop), // isActive만 필터링
+})`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  margin: 0 5px;
+  color: ${({ isActive, theme }) =>
+    isActive ? theme.colors.iconHover : theme.colors.iconColor};
+`;

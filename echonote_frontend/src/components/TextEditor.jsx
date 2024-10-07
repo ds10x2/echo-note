@@ -112,7 +112,7 @@ const TextEditor = ({
         isDragging: false,
         offsetX: 0,
         offsetY: 0,
-        fontSize: 16,
+        fontSize: textStore.getState().fontProperty.fontSize,
       });
 
       setSelectedItemId(null);
