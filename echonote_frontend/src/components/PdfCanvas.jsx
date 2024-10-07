@@ -116,7 +116,7 @@ const PdfCanvas = ({
         <DrawingEditor scale={scale} />
       ) : (
         <DrawingEditorContainer>
-          <img src={savedImage} alt="Saved Canvas" />
+          {savedImage && <img src={savedImage} alt="Saved Canvas" />}
         </DrawingEditorContainer>
       )}
     </St.PdfCanvasContainer>
