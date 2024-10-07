@@ -39,10 +39,12 @@ class App extends Component {
               <PdfBar />
               <MainContent>
                 <p>페이지 내용이 여기에 들어갑니다.</p>
+
+                <PdfButton />
               </MainContent>
+
               <STTBar />
 
-              <PdfButton />
             </Layout>
           </ThemeProvider>
         </div>
