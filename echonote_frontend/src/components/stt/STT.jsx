@@ -1,4 +1,4 @@
-import "@components/stt/styles.css";
+import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import {
   STTContainer,
@@ -8,30 +8,7 @@ import {
   ResultText,
 } from "@/components/styles/STT.style";
 import { useAudioStore } from "@stores/recordStore";
-
-// API 호출 함수
-export const getSTTResult = async (id) => {
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}voice/stt?id=${id}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        mode: "cors", // CORS 모드 설정
-      }
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return null; // 에러 발생 시 null 반환
-  }
-};
+import { getSTTResult } from "@services/sttApi";
 
 // 시간 포맷팅 함수 (초를 분:초로 변환)
 const formatTime = (seconds) => {
@@ -85,7 +62,6 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     }
   };
 
-  // 상위 컴포넌트로 수정된 데이터를 전달하는 함수
   useEffect(() => {
     if (onSubmit) {
       onSubmit(modifiedTexts);
@@ -99,19 +75,18 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
           {sttData.map((segment) => (
             <STTResultItem key={segment.id}>
               <ResultLink
-                href="#"
-                onClick={() => setStartTime(parseFloat(segment.start))}
+                onClick={() => setStartTime(Number(segment.start).toFixed(6))}
               >
                 {formatTime(parseFloat(segment.start))} ~{" "}
                 {formatTime(parseFloat(segment.end))}
               </ResultLink>
               <ResultText
                 contentEditable={isEditMode}
-                onBlur={(e) => handleTextChange(segment.id, e.target.innerText)} // Save text on edit
+                onBlur={(e) => handleTextChange(segment.id, e.target.innerText)}
                 suppressContentEditableWarning={true} // Prevent warning
-                $isEditMode={isEditMode} // isEditMode prop 전달
+                $isEditMode={isEditMode}
               >
-                {highlightText(segment.text)} {/* Display highlighted text */}
+                {highlightText(segment.text)}
               </ResultText>
             </STTResultItem>
           ))}
@@ -121,6 +96,13 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
       )}
     </STTContainer>
   );
+};
+
+STTComponent.propTypes = {
+  id: PropTypes.number.isRequired,
+  searchTerm: PropTypes.string,
+  isEditMode: PropTypes.bool.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default STTComponent;

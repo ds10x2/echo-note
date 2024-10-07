@@ -31,11 +31,13 @@ const AudioWave = () => {
   const [speedBarVisible, setSpeedBarVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audioUrl, setAudioUrl] = useState(null); // 녹음 파일이 없으면 null
+  // const [audioUrl, setAudioUrl] = useState(null);
+  const [audioUrl, setAudioUrl] = useState("src/assets/hitsong.wav");
+
   const [recordTime, setRecordTime] = useState(0);
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
   const [objectUrl, setObjectUrl] = useState(null); // presigned URL 저장
-  const { startTime } = useAudioStore();
+  const { startTime, setStartTime } = useAudioStore();
 
   const [fileId, setFileId] = useState(2);
 
@@ -120,9 +122,11 @@ const AudioWave = () => {
   }, [wavesurfer]);
 
   useEffect(() => {
-    // zustand로부터 받아온 startTime으로 오디오 시작 시간 설정
     if (wavesurfer && startTime !== null && audioUrl) {
-      wavesurfer.play(startTime); // 설정된 startTime에서 재생 시작
+      wavesurfer.setTime(startTime);
+      setTimeout(() => {
+        wavesurfer.getCurrentTime(), setStartTime(null);
+      }, 200); // 200ms 정도의 딜레이를 주고 확인
     }
   }, [startTime, wavesurfer, audioUrl]);
 
