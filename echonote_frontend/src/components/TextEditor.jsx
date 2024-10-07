@@ -8,7 +8,7 @@ import drawingTypeStore from "@/stores/drawingTypeStore";
 const TextBox = React.memo(
   ({
     item,
-    handleMouseDown,
+    handleTouchStart,
     handleKeyDown,
     updateCurTextItem,
     handleBlur,
@@ -25,7 +25,7 @@ const TextBox = React.memo(
         isEditing={item.isEditing}
         isDragging={item.isDragging}
         className="text-box"
-        onMouseDown={(e) => handleMouseDown(e, item.id)} // 터치 이벤트 제거
+        onTouchStart={(e) => handleTouchStart(e, item.id)} // 터치 이벤트로 변경
         style={{
           fontSize: `${item.fontSize}px`,
         }}
@@ -93,8 +93,8 @@ const TextEditor = ({
     (e) => {
       if (isDraggingRef.current || hasDraggedRef.current) return;
 
-      const clientX = e.clientX; // 터치 이벤트 제거
-      const clientY = e.clientY; // 터치 이벤트 제거
+      const clientX = e.touches[0].clientX; // 터치 이벤트로 변경
+      const clientY = e.touches[0].clientY; // 터치 이벤트로 변경
 
       const containerRect = containerRef.current.getBoundingClientRect();
       const parentScrollLeft = parentContainerRef.current.scrollLeft;
@@ -120,7 +120,7 @@ const TextEditor = ({
     [addTextItem, isDraggingRef, hasDraggedRef, scale, parentContainerRef]
   );
 
-  const handleClickEvent = useCallback(
+  const handleTouchEvent = useCallback(
     (e) => {
       if (mode.text) {
         // 수정 중인 텍스트 박스에서 추가 클릭 이벤트를 막음
@@ -150,22 +150,22 @@ const TextEditor = ({
     const container = containerRef.current;
 
     if (mode.text) {
-      container.addEventListener("mousedown", handleClickEvent); // 터치 이벤트 제거
+      container.addEventListener("touchstart", handleTouchEvent); // 터치 이벤트로 변경
     }
 
     return () => {
-      container.removeEventListener("mousedown", handleClickEvent); // 터치 이벤트 제거
+      container.removeEventListener("touchstart", handleTouchEvent); // 터치 이벤트로 변경
     };
-  }, [handleClickEvent, mode.text]);
+  }, [handleTouchEvent, mode.text]);
 
-  const handleMouseDown = (e, id) => {
+  const handleTouchStart = (e, id) => {
     e.stopPropagation();
     isDraggingRef.current = true;
     hasDraggedRef.current = false;
     setSelectedItemId(id);
 
-    const clientX = e.clientX; // 터치 이벤트 제거
-    const clientY = e.clientY; // 터치 이벤트 제거
+    const clientX = e.touches[0].clientX; // 터치 이벤트로 변경
+    const clientY = e.touches[0].clientY; // 터치 이벤트로 변경
 
     const parentScrollLeft = parentContainerRef.current.scrollLeft;
     const parentScrollTop = parentContainerRef.current.scrollTop;
@@ -196,10 +196,10 @@ const TextEditor = ({
     document.body.style.userSelect = "none";
   };
 
-  const handleMouseMove = (e) => {
+  const handleTouchMove = (e) => {
     if (isDraggingRef.current) {
-      const clientX = e.clientX; // 터치 이벤트 제거
-      const clientY = e.clientY; // 터치 이벤트 제거
+      const clientX = e.touches[0].clientX; // 터치 이벤트로 변경
+      const clientY = e.touches[0].clientY; // 터치 이벤트로 변경
 
       setCurItems((items) =>
         items.map((item) => {
@@ -236,7 +236,7 @@ const TextEditor = ({
     }
   };
 
-  const handleMouseUp = () => {
+  const handleTouchEnd = () => {
     if (isDraggingRef.current) {
       isDraggingRef.current = false;
 
@@ -277,12 +277,12 @@ const TextEditor = ({
 
   useEffect(() => {
     const container = containerRef.current;
-    container.addEventListener("mousemove", handleMouseMove);
-    container.addEventListener("mouseup", handleMouseUp);
+    container.addEventListener("touchmove", handleTouchMove); // 터치 이벤트로 변경
+    container.addEventListener("touchend", handleTouchEnd); // 터치 이벤트로 변경
 
     return () => {
-      container.removeEventListener("mousemove", handleMouseMove);
-      container.removeEventListener("mouseup", handleMouseUp);
+      container.removeEventListener("touchmove", handleTouchMove); // 터치 이벤트로 변경
+      container.removeEventListener("touchend", handleTouchEnd); // 터치 이벤트로 변경
     };
   }, []);
 
@@ -344,7 +344,7 @@ const TextEditor = ({
         <TextBox
           key={item.id}
           item={item}
-          handleMouseDown={handleMouseDown}
+          handleTouchStart={handleTouchStart}
           handleKeyDown={handleKeyDown}
           updateCurTextItem={updateCurTextItem}
           handleBlur={handleBlur}
