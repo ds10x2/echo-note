@@ -249,7 +249,7 @@ const ShapeEditor = ({
 
   useEffect(() => {
     const handleTouchMove = (e) => {
-      if (isDragging) {
+      if (mode.shape && isDragging) {
         e.preventDefault(); // 드래그 중일 때만 스크롤 차단
       }
     };
