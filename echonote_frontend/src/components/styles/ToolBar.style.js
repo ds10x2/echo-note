@@ -15,11 +15,12 @@ export const ToolBarContainer = styled.div`
 // 상단 제목과 접기 버튼을 담은 헤더 영역
 export const ToolBarHeader = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; /* Center the title horizontally */
+  align-items: center; /* Center the title vertically */
   margin: 5px 0px;
   width: 100%;
   padding-bottom: 10px;
+  position: relative; /* For absolute positioning of the setting button */
   border-bottom: 1px solid rgba(77, 77, 77, 0.1);
 `;
 
@@ -97,4 +98,13 @@ export const Title = styled.h1`
   font-size: 1.2rem;
   color: ${(props) => props.theme.colors.textColor};
   margin: 0;
+`;
+
+export const SettingButton = styled.div`
+  position: absolute;
+  right: 10px; /* Ensure it aligns on the far right */
+  display: flex;
+  align-items: center; /* Vertical centering */
+  justify-content: center;
+  cursor: pointer;
 `;
