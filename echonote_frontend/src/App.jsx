@@ -38,7 +38,7 @@ class App extends Component {
               <RecordingBar />
               <PdfBar />
               <MainContent>
-                <p>페이지 내용이 여기에 들어갑니다.</p>
+
 
                 <PdfButton />
               </MainContent>
