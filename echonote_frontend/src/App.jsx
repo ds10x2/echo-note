@@ -37,6 +37,15 @@ class App extends Component {
   };
 
   render() {
+    const originalWarn = console.warn;
+    console.warn = (message, ...args) => {
+      // "No stroke found!" 경고 메시지를 무시
+      if (typeof message === "string" && message.includes("No stroke found!")) {
+        return;
+      }
+      originalWarn(message, ...args);
+    };
+
     const { getCanvasImage } = canvasStore.getState();
     const savedImage = getCanvasImage();
 
