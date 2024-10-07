@@ -17,5 +17,10 @@ export const theme = {
     pdfShadowColor: "#00000021",
     editButtonColor: "#FFFFFF",
     editButtonBorderColor: "#cecece",
+    modalBackground: "#414141",
+    shapeFillDefaultColor: "#ffffff00",
+    shapeStrokeDefaultColor: "#000000",
+    textEditBackground: "#ffffff00",
+    textSelectedStrokeColor: "#94acd8",
   },
 };

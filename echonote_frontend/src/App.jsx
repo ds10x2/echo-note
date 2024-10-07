@@ -6,9 +6,11 @@ import ToolBar from "@components/ToolBar";
 import PdfBar from "@components/PdfBar";
 import RecordingBar from "@components/RecordingBar";
 import { Layout, MainContent, rootStyle, appStyle } from "@/Layout.style";
-import STTBar from "@components/STTBar";
+import STTBar from "@components/stt/STTBar";
 import DrawingEditor from "@components/DrawingEditor";
 import canvasStore from "@stores/canvasStore";
+import PdfViewer from "@components/PdfViewer";
+import PdfButton from "@services/PDFupload/PdfUpdate";
 
 class App extends Component {
   state = {
@@ -49,6 +51,7 @@ class App extends Component {
               <RecordingBar />
               <PdfBar />
               <MainContent>
+                <PdfViewer />
                 {this.state.isDrawingEditorOpened ? (
                   <DrawingEditor />
                 ) : (
@@ -60,6 +63,7 @@ class App extends Component {
                 )}
               </MainContent>
               <STTBar />
+              {/* <PdfButton /> */}
             </Layout>
           </ThemeProvider>
         </div>

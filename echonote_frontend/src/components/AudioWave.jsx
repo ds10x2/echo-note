@@ -3,7 +3,8 @@ import { useWavesurfer } from "@wavesurfer/react";
 import RecordPlugin from "wavesurfer.js/dist/plugins/record.esm.js";
 import { FaPlayCircle, FaPauseCircle, FaStopCircle } from "react-icons/fa";
 import { MdOutlineReplayCircleFilled } from "react-icons/md";
-import { PiRecordFill, PiRecordBold } from "react-icons/pi";
+import { IoIosSend } from "react-icons/io";
+import { PiRecordFill } from "react-icons/pi";
 import { RiSpeedFill } from "react-icons/ri";
 import {
   Timer,
@@ -15,6 +16,12 @@ import {
   PlayPauseButton,
   StopReplayButton,
 } from "@components/styles/AudioWave.style";
+import {
+  getPresignedUrl,
+  saveRecordedFile,
+  S3UploadRecord,
+} from "@services/recordApi";
+import { useAudioStore } from "@stores/recordStore";
 
 const AudioWave = () => {
   const containerRef = useRef(null);
@@ -27,6 +34,10 @@ const AudioWave = () => {
   const [audioUrl, setAudioUrl] = useState(null); // 녹음 파일이 없으면 null
   const [recordTime, setRecordTime] = useState(0);
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
+  const [objectUrl, setObjectUrl] = useState(null); // presigned URL 저장
+  const { startTime } = useAudioStore();
+
+  const [fileId, setFileId] = useState(2);
 
   const { wavesurfer, currentTime } = useWavesurfer({
     container: containerRef,
@@ -58,22 +69,43 @@ const AudioWave = () => {
         setRecordTime(time / 1000);
       });
 
-      recPlugin.on("record-end", (blob) => {
+      recPlugin.on("record-end", async (blob) => {
         if (blob.size === 0) {
-          console.error("Recording failed: Blob is empty.");
+          alert("녹음이 너무 짧습니다! 새로운 녹음이 진행됩니다.");
+          record.startRecording();
           return;
         }
-
+        // 녹음된 Blob 객체로부터 오디오 URL을 생성하고 상태에 저장
         const recordedUrl = URL.createObjectURL(blob);
-        setAudioUrl(recordedUrl);
+        setAudioUrl(recordedUrl); // audioUrl에 저장
         setIsRecording(false);
+
+        try {
+          const data = await getPresignedUrl();
+          setObjectUrl(data.object_url);
+          console.log("object URL: " + objectUrl);
+
+          // Blob을 File 객체로 변환
+          const wavFile = new File([blob], "record.wav", {
+            type: "audio/wav",
+          });
+          if (!objectUrl) {
+            await S3UploadRecord(data.presigned_url, wavFile);
+          }
+
+          // 서버로 녹음된 파일 정보 저장
+          await saveRecordedFile(2, objectUrl);
+        } catch (error) {
+          console.error("Error during recording process:", error);
+          setIsRecording(false);
+          return;
+        }
       });
 
       return recPlugin;
     }
   }, [wavesurfer]);
 
-  // 음성이 끝까지 재생되면 자동으로 isPlaying을 false로 설정
   useEffect(() => {
     if (wavesurfer) {
       wavesurfer.on("finish", () => {
@@ -82,10 +114,17 @@ const AudioWave = () => {
     }
     return () => {
       if (wavesurfer) {
-        wavesurfer.un("finish");
+        wavesurfer.destroy();
       }
     };
   }, [wavesurfer]);
+
+  useEffect(() => {
+    // zustand로부터 받아온 startTime으로 오디오 시작 시간 설정
+    if (wavesurfer && startTime !== null && audioUrl) {
+      wavesurfer.play(startTime); // 설정된 startTime에서 재생 시작
+    }
+  }, [startTime, wavesurfer, audioUrl]);
 
   const togglePlayPause = () => {
     if (!wavesurfer) return;
@@ -107,23 +146,15 @@ const AudioWave = () => {
 
   const handleStartStopRecording = async () => {
     try {
-      // 마이크 접근 권한 요청
-      // await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      // 장치 탐색
       const devices = await RecordPlugin.getAvailableAudioDevices();
       const deviceId = devices[0]?.deviceId;
 
-      if (isRecording) {
-        if (recordTime < 1) {
-          console.error("Recording too short, please record longer.");
-          return;
-        }
-        record.stopRecording();
+      if (recordTime >= 1) {
+        record.stopRecording(); // 녹음 중단
       } else {
         setAudioUrl(null);
         setRecordTime(0);
-        record.startRecording({ deviceId });
+        record.startRecording({ deviceId }); // 녹음 시작
       }
     } catch (error) {
       console.error("Error accessing microphone or starting recording", error);
@@ -173,7 +204,7 @@ const AudioWave = () => {
         </PlayPauseButton>
       ) : (
         <PlayPauseButton onClick={toggleStartStop}>
-          {isRecording ? <PiRecordFill /> : <PiRecordBold />}
+          {isRecording ? <FaStopCircle /> : <PiRecordFill />}
         </PlayPauseButton>
       )}
 
@@ -208,7 +239,7 @@ const AudioWave = () => {
         </>
       )}
       <StopReplayButton onClick={handleStartStopRecording}>
-        {audioUrl ? <MdOutlineReplayCircleFilled /> : <FaStopCircle />}
+        {audioUrl ? <MdOutlineReplayCircleFilled /> : <IoIosSend />}
       </StopReplayButton>
     </AudioContainer>
   );
