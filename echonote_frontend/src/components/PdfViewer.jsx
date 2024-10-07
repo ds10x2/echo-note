@@ -4,7 +4,7 @@ import * as St from "@components/styles/PdfViewer.style";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 import PropertyEditor from "@/components/TmpShapeProperty";
 
-const PdfViewer = ({ isDrawingEditorOpened, savedImage }) => {
+const PdfViewer = ({ isDrawingEditorOpened }) => {
   const containerRef = useRef();
 
   const { setCircleMode, shapeMode, setRectangleMode } = drawingTypeStore();
@@ -25,7 +25,6 @@ const PdfViewer = ({ isDrawingEditorOpened, savedImage }) => {
       <PdfCanvas
         containerRef={containerRef}
         isDrawingEditorOpened={isDrawingEditorOpened}
-        savedImage={savedImage}
       />
     </St.PdfContainer>
   );

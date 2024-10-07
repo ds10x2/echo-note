@@ -4,7 +4,7 @@ import DrawingToolBar from "@components/DrawingToolBar";
 import DrawingCanvas from "@components/DrawingCanvas";
 import canvasStore from "@/stores/canvasStore";
 
-const DrawingEditor = ({ scale }) => {
+const DrawingEditor = ({ scale, page }) => {
   const { getCanvasPath } = canvasStore.getState();
   const canvasRef = useRef(getCanvasPath());
   const [eraseMode, setEraseMode] = useState(false);
@@ -81,6 +81,7 @@ const DrawingEditor = ({ scale }) => {
         eraseMode={eraseMode}
         readOnly={readOnly}
         scale={scale}
+        page={page}
       />
     </St.DrawingEditorContainer>
   );

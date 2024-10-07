@@ -5,12 +5,12 @@ import canvasStore from "@stores/canvasStore";
 
 const DrawingCanvas = forwardRef(
   (
-    { strokeWidth, eraserWidth, strokeColor, eraseMode, readOnly, scale },
+    { strokeWidth, eraserWidth, strokeColor, eraseMode, readOnly, scale, page },
     ref
   ) => {
     useEffect(() => {
       const { getCanvasPath } = canvasStore.getState();
-      const savedPaths = getCanvasPath();
+      const savedPaths = getCanvasPath(page);
 
       if (ref.current) {
         ref.current.clearCanvas();
@@ -28,7 +28,7 @@ const DrawingCanvas = forwardRef(
         }
         ref.current.eraseMode(eraseMode);
       }
-    }, [eraseMode, scale]);
+    }, [eraseMode, scale, page]);
 
     const handleCanvasChange = () => {
       const { setCanvasPath, setCanvasImage } = canvasStore.getState();
@@ -38,7 +38,7 @@ const DrawingCanvas = forwardRef(
         ref.current
           .exportPaths()
           .then((data) => {
-            if (data.length == 0) {
+            if (data.length === 0) {
               return;
             }
 
@@ -51,7 +51,7 @@ const DrawingCanvas = forwardRef(
               })),
             }));
 
-            setCanvasPath(unscaledPaths);
+            setCanvasPath(page, unscaledPaths);
           })
           .catch((e) => {
             console.log("Error exporting paths:", e);
@@ -62,7 +62,7 @@ const DrawingCanvas = forwardRef(
           .exportSvg()
           .then((data) => {
             const svgDataUrl = "data:image/svg+xml;base64," + btoa(data);
-            setCanvasImage(svgDataUrl);
+            setCanvasImage(page, svgDataUrl);
           })
           .catch((error) => {
             console.error("Error exporting SVG:", error);

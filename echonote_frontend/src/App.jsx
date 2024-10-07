@@ -46,9 +46,6 @@ class App extends Component {
       originalWarn(message, ...args);
     };
 
-    const { getCanvasImage } = canvasStore.getState();
-    const savedImage = getCanvasImage();
-
     return (
       <div style={rootStyle}>
         <div style={appStyle}>
@@ -61,7 +58,6 @@ class App extends Component {
               <MainContent>
                 <PdfViewer
                   isDrawingEditorOpened={this.state.isDrawingEditorOpened}
-                  savedImage={savedImage}
                 />
               </MainContent>
               <STTBar />
