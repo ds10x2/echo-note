@@ -86,7 +86,6 @@ const TextEditor = ({
   // 현재 페이지 아이템이 변경되었을 때만 상태를 업데이트
   useEffect(() => {
     if (JSON.stringify(currentPageItems) !== JSON.stringify(curItems)) {
-      console.log("Updating current page items");
       setCurItems(currentPageItems);
     }
   }, [currentPageItems]);
@@ -104,8 +103,6 @@ const TextEditor = ({
 
       const x = (clientX + parentScrollLeft - containerRect.left) / scale;
       const y = (clientY + parentScrollTop - containerRect.top) / scale;
-
-      console.log("Adding new text box at:", x, y);
 
       addTextItem({
         id: Date.now(),
@@ -129,7 +126,6 @@ const TextEditor = ({
       if (mode.text) {
         // 수정 중인 텍스트 박스에서 추가 클릭 이벤트를 막음
         if (e.target.closest(".edit-button-container")) {
-          console.log("Clicked on edit button container, ignoring event");
           return;
         }
 
@@ -140,10 +136,8 @@ const TextEditor = ({
           if (
             curItems.some((item) => item.id === clickedItemId && item.isEditing)
           ) {
-            console.log("Clicked on editing text box, ignoring event");
             return; // 수정 중인 텍스트 박스 클릭 무시
           }
-          console.log("Selecting text box with id:", clickedItemId);
           setSelectedItemId(clickedItemId);
         } else {
           handleAddTextBox(e); // 새로운 텍스트 박스 추가
@@ -158,12 +152,12 @@ const TextEditor = ({
 
     if (mode.text) {
       container.addEventListener("mousedown", handleClickEvent);
-      console.log("Added mouse down event listener");
+      container.addEventListener("touchstart", handleClickEvent);
     }
 
     return () => {
       container.removeEventListener("mousedown", handleClickEvent);
-      console.log("Removed mouse down event listener");
+      container.removeEventListener("touchstart", handleClickEvent);
     };
   }, [handleClickEvent, mode.text]);
 
@@ -189,8 +183,6 @@ const TextEditor = ({
       parentScrollTop -
       (item.y * scale + containerRef.current.offsetTop);
 
-    console.log("Mouse down on item:", id, "Offset:", offsetX, offsetY);
-
     setCurItems((items) =>
       items.map((item) =>
         item.id === id
@@ -211,8 +203,6 @@ const TextEditor = ({
     if (isDraggingRef.current) {
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-      console.log("Mouse moving while dragging");
 
       setCurItems((items) =>
         items.map((item) => {
@@ -253,8 +243,6 @@ const TextEditor = ({
     if (isDraggingRef.current) {
       isDraggingRef.current = false;
 
-      console.log("Mouse up, stopping drag");
-
       setCurItems((items) => {
         return items.map((item) => {
           if (item.isDragging) {
@@ -283,7 +271,6 @@ const TextEditor = ({
   // 상태 업데이트 최적화: 업데이트가 있을 때만 실행되도록 설정
   useEffect(() => {
     if (updatedItems.length > 0) {
-      console.log("Updating text item positions", updatedItems);
       updatedItems.forEach(({ id, x, y }) => {
         updateTextItemPosition(id, x, y);
       });
@@ -324,7 +311,6 @@ const TextEditor = ({
 
   const handleDelete = () => {
     if (selectedItemId !== null) {
-      console.log("Deleting item:", selectedItemId);
       setCurItems(curItems.filter((item) => item.id !== selectedItemId));
       deleteTextItem(selectedItemId);
       setSelectedItemId(null);
@@ -332,7 +318,6 @@ const TextEditor = ({
   };
 
   const handleEdit = () => {
-    console.log("Editing item:", selectedItemId);
     setCurItems((items) =>
       items.map((item) =>
         item.id === selectedItemId ? { ...item, isEditing: true } : item
@@ -341,7 +326,6 @@ const TextEditor = ({
   };
 
   const updateCurTextItem = (id, newText) => {
-    console.log("Updating text item:", id, "New text:", newText);
     setCurItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id ? { ...item, text: newText } : item
@@ -352,11 +336,9 @@ const TextEditor = ({
   const handleBlur = (id) => {
     const currentItem = curItems.find((item) => item.id === id);
     if (!currentItem.text.trim()) {
-      console.log("Blurred item is empty, deleting:", id);
       setCurItems(curItems.filter((item) => item.id !== id));
       deleteTextItem(id);
     } else {
-      console.log("Finishing editing item:", id);
       updateTextItem(id, currentItem.text);
       finishEditing(id);
     }
