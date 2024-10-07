@@ -1,6 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import AnalyzeModal from "@components/AnalyzeModal";
 import PdfSettingModal from "@components/PdfSettingModal";
-import { useState } from "react";
 import { RiSpeakLine } from "react-icons/ri";
 import { FaPen, FaTextHeight, FaImage, FaShapes, FaStar } from "react-icons/fa";
 import { BiWindowAlt, BiChevronsDown, BiChevronsUp } from "react-icons/bi";
@@ -26,12 +26,6 @@ import {
   ToolBarHeader,
   ToolBarIcon,
 } from "@components/styles/ToolBar.style";
-import useSidebarStore from "@stores/sideBarStore";
-import { useEffect, useRef, useState } from "react";
-import { BiChevronsDown, BiChevronsUp, BiWindowAlt } from "react-icons/bi";
-import { FaImage, FaPen, FaShapes, FaStar, FaTextHeight } from "react-icons/fa";
-import { IoMicSharp } from "react-icons/io5";
-import { RiSpeakLine } from "react-icons/ri";
 import { VscSettings } from "react-icons/vsc";
 
 const ToolBar = () => {
