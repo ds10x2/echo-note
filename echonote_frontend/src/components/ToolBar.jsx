@@ -28,7 +28,7 @@ import {
 } from "@components/styles/ToolBar.style";
 import { VscSettings } from "react-icons/vsc";
 
-const ToolBar = () => {
+const ToolBar = ({ onToggleDrawingEditor }) => {
   const {
     isPdfBarOpened,
     isSTTBarOpened,
@@ -47,6 +47,7 @@ const ToolBar = () => {
   const [modalType, setModalType] = useState("");
   const [buttonPosition, setButtonPosition] = useState(null);
   const settingButtonRef = useRef(null);
+  const [isPenActive, setIsPenActive] = useState(false);
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -93,6 +94,11 @@ const ToolBar = () => {
     }
   }, [buttonPosition]);
 
+  const handlePenClick = () => {
+    setIsPenActive(!isPenActive);
+    onToggleDrawingEditor();
+  };
+
   return (
     <ToolBarContainer>
       <AnimatedToolBarContent collapsed={isCollapsed}>
@@ -115,7 +121,11 @@ const ToolBar = () => {
             isActive={isRecordingBarOpened}
           />
           <Divider />
-          <ToolBarIcon as={FaPen} />
+          <IconButton
+            as={FaPen}
+            onClick={handlePenClick}
+            isActive={isPenActive}
+          />
           <ToolBarIcon
             as={FaTextHeight}
             onClick={setTextMode}
