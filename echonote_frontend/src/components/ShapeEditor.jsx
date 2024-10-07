@@ -4,7 +4,12 @@ import shapeStore from "@/stores/shapeStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 import EditButton from "@components/common/EditButton";
 
-const ShapeEditor = ({ currentPageCircles, currentPageRecs, scale }) => {
+const ShapeEditor = ({
+  currentPageCircles,
+  currentPageRecs,
+  scale,
+  parentContainerRef,
+}) => {
   const { setRectangles, setCircles, property } = shapeStore();
   const { mode, shapeMode } = drawingTypeStore();
 
@@ -49,6 +54,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs, scale }) => {
   const handleMouseDownRec = useCallback(
     (e) => {
       e.stopPropagation();
+      setIsDragging(true);
 
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -197,6 +203,7 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs, scale }) => {
   );
 
   const handleEnd = useCallback(() => {
+    setIsDragging(false);
     if (isDrawing && currentRect) {
       shapeStore.getState().addRectangle(currentRect);
       setCurrentRect(null);
@@ -231,16 +238,34 @@ const ShapeEditor = ({ currentPageCircles, currentPageRecs, scale }) => {
   ]);
 
   useEffect(() => {
-    const touchMoveHandler = (e) => {
-      e.preventDefault();
-    };
+    const touchMoveHandler = (e) => {};
 
-    window.addEventListener("touchmove", touchMoveHandler, { passive: false });
+    window.addEventListener("touchmove", touchMoveHandler, { passive: true });
 
     return () => {
       window.removeEventListener("touchmove", touchMoveHandler);
     };
   }, []);
+
+  useEffect(() => {
+    const handleTouchMove = (e) => {
+      if (isDragging) {
+        e.preventDefault(); // 드래그 중일 때만 스크롤 차단
+      }
+    };
+
+    // 이벤트 리스너를 추가하여 드래그 중에만 스크롤을 차단
+    parentContainerRef.current?.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
+
+    return () => {
+      parentContainerRef.current?.removeEventListener(
+        "touchmove",
+        handleTouchMove
+      );
+    };
+  }, [isDragging, parentContainerRef]);
 
   return (
     <St.ShapeContainer $modeShape={mode.shape}>

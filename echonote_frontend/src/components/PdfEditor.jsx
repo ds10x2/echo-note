@@ -37,6 +37,7 @@ const PdfEditor = ({ scale, containerRef, originalSize }) => {
         currentPageRecs={getRectangles()}
         currentPageCircles={getCircles()}
         scale={scale}
+        parentContainerRef={containerRef}
       />
     </St.PdfEditorContainer>
   );
