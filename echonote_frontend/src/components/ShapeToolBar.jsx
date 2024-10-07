@@ -15,7 +15,7 @@ import { Colorful } from "@uiw/react-color";
 
 const ShapeToolBar = ({}) => {
   const { property, setFillColor, setStrokeColor } = shapeStore();
-  const { mode, shapeMode, setRectangleMode, setCircleMode } =
+  const { mode, shapeMode, setRectangleMode, setCircleMode, setShapeMode } =
     drawingTypeStore();
   const [showFillPalette, setShowFillPalette] = useState(false);
   const [showStrokePalette, setShowStrokePalette] = useState(false);
@@ -49,12 +49,12 @@ const ShapeToolBar = ({}) => {
       <St.ToolBarButton>
         <St.IconContainer>
           {/* 도형선택 */}
-          <St.IconButton
+          <St.ToggleButton
             as={FaSquare}
             isActive={shapeMode.rectangle}
             onClick={handleRectangleMode}
           />
-          <St.IconButton
+          <St.ToggleButton
             as={FaCircle}
             isActive={shapeMode.circle}
             onClick={handleCircleMode}
@@ -68,6 +68,7 @@ const ShapeToolBar = ({}) => {
               as={MdOutlineFormatColorFill}
               onClick={toggleFillPalette}
               color={property.fillColor}
+              isActive={showFillPalette}
             />
             {showFillPalette && (
               <St.ColorPalette ref={fillPaletteRef}>
@@ -87,6 +88,7 @@ const ShapeToolBar = ({}) => {
               as={MdOutlineLineWeight}
               onClick={toggleStrokePalette}
               color={property.strokeColor}
+              isActive={showStrokePalette}
             />
             {showStrokePalette && (
               <St.ColorPalette ref={strokePaletteRef}>
@@ -107,7 +109,7 @@ const ShapeToolBar = ({}) => {
         <St.IconContainer>
           {/* 도형 지우기, toolbar 닫기 */}
           <St.IconButton as={FaTrash} />
-          <St.IconButton as={FaRegCircleXmark} />
+          <St.IconButton as={FaRegCircleXmark} onClick={setShapeMode} />
         </St.IconContainer>
       </St.ToolBarButton>
     </St.DrawingToolContainer>

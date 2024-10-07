@@ -41,7 +41,21 @@ export const IconButton = styled.div.withConfig({
     isActive ? theme.colors.selectedIconBackground : "transparent"};
   border: none;
   border-radius: 15px;
-  color: ${(color) => (color ? color : theme.colors.iconColor)};
+  color: ${({ color, theme }) => (color ? color : theme.colors.iconColor)};
+  cursor: pointer;
+  font-size: 18px;
+  padding: 6px;
+`;
+
+export const ToggleButton = styled.div.withConfig({
+  shouldForwardProp: (prop) => !["isActive"].includes(prop), // isActive만 필터링
+})`
+  background-color: ${({ isActive, theme }) =>
+    isActive ? theme.colors.selectedIconBackground : "transparent"};
+  border: none;
+  border-radius: 15px;
+  color: ${({ isActive, theme }) =>
+    isActive ? theme.colors.iconHover : theme.colors.iconColor};
   cursor: pointer;
   font-size: 18px;
   padding: 6px;
