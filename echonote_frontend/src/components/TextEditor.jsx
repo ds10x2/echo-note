@@ -25,8 +25,7 @@ const TextBox = React.memo(
         isEditing={item.isEditing}
         isDragging={item.isDragging}
         className="text-box"
-        onMouseDown={(e) => handleMouseDown(e, item.id)}
-        onTouchStart={(e) => handleMouseDown(e, item.id)}
+        onMouseDown={(e) => handleMouseDown(e, item.id)} // 터치 이벤트 제거
         style={{
           fontSize: `${item.fontSize}px`,
         }}
@@ -94,8 +93,8 @@ const TextEditor = ({
     (e) => {
       if (isDraggingRef.current || hasDraggedRef.current) return;
 
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const clientX = e.clientX; // 터치 이벤트 제거
+      const clientY = e.clientY; // 터치 이벤트 제거
 
       const containerRect = containerRef.current.getBoundingClientRect();
       const parentScrollLeft = parentContainerRef.current.scrollLeft;
@@ -151,13 +150,11 @@ const TextEditor = ({
     const container = containerRef.current;
 
     if (mode.text) {
-      container.addEventListener("mousedown", handleClickEvent);
-      container.addEventListener("touchstart", handleClickEvent);
+      container.addEventListener("mousedown", handleClickEvent); // 터치 이벤트 제거
     }
 
     return () => {
-      container.removeEventListener("mousedown", handleClickEvent);
-      container.removeEventListener("touchstart", handleClickEvent);
+      container.removeEventListener("mousedown", handleClickEvent); // 터치 이벤트 제거
     };
   }, [handleClickEvent, mode.text]);
 
@@ -167,8 +164,8 @@ const TextEditor = ({
     hasDraggedRef.current = false;
     setSelectedItemId(id);
 
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const clientX = e.clientX; // 터치 이벤트 제거
+    const clientY = e.clientY; // 터치 이벤트 제거
 
     const parentScrollLeft = parentContainerRef.current.scrollLeft;
     const parentScrollTop = parentContainerRef.current.scrollTop;
@@ -201,8 +198,8 @@ const TextEditor = ({
 
   const handleMouseMove = (e) => {
     if (isDraggingRef.current) {
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const clientX = e.clientX; // 터치 이벤트 제거
+      const clientY = e.clientY; // 터치 이벤트 제거
 
       setCurItems((items) =>
         items.map((item) => {
@@ -282,14 +279,10 @@ const TextEditor = ({
     const container = containerRef.current;
     container.addEventListener("mousemove", handleMouseMove);
     container.addEventListener("mouseup", handleMouseUp);
-    container.addEventListener("touchmove", handleMouseMove);
-    container.addEventListener("touchend", handleMouseUp);
 
     return () => {
       container.removeEventListener("mousemove", handleMouseMove);
       container.removeEventListener("mouseup", handleMouseUp);
-      container.removeEventListener("touchmove", handleMouseMove);
-      container.removeEventListener("touchend", handleMouseUp);
     };
   }, []);
 
