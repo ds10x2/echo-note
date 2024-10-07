@@ -26,6 +26,7 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
   const { currentIndex, setSearchResults } = useSearchStore();
   const resultRefs = useRef([]); // 전체 세그먼트 참조 저장
   const highlightRefs = useRef([]); // 하이라이트 텍스트의 참조 저장
+  const containerRef = useRef(null); // STTContainer 참조 저장
 
   // 컴포넌트 마운트 시 API 데이터 가져오기
   useEffect(() => {
@@ -38,18 +39,6 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     fetchData();
   }, [id]);
 
-  useEffect(() => {
-    if (searchTerm) {
-      const results = [];
-      sttData.forEach((segment, index) => {
-        if (segment.text.toLowerCase().includes(searchTerm.toLowerCase())) {
-          results.push({ index, ref: resultRefs.current[index] });
-        }
-      });
-      setSearchResults(results); // 검색 결과 저장
-    }
-  }, [searchTerm, sttData, setSearchResults]);
-
   // 검색어를 포함한 부분 강조 및 참조 저장
   const highlightText = (text, index) => {
     if (!searchTerm) return text;
@@ -61,9 +50,8 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
           <span
             key={i}
             ref={(el) => {
-              // 검색어가 포함된 부분만 참조를 저장
-              if (part.toLowerCase() === searchTerm.toLowerCase()) {
-                highlightRefs.current[index] = el; // 하이라이트 부분에 대한 참조 저장
+              if (part.toLowerCase() === searchTerm.toLowerCase() && el) {
+                highlightRefs.current[index] = el; // 하이라이트 부분 참조 저장
               }
             }}
             style={
@@ -99,21 +87,71 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     }
   }, [modifiedTexts, onSubmit]);
 
+  // 검색 결과 저장 및 참조 설정
+  useEffect(() => {
+    if (searchTerm) {
+      const results = [];
+      sttData.forEach((segment, index) => {
+        if (segment.text.toLowerCase().includes(searchTerm.toLowerCase())) {
+          results.push({ index, ref: resultRefs.current[index] });
+        }
+      });
+      setSearchResults(results); // 검색 결과 저장
+    }
+  }, [searchTerm, sttData, setSearchResults]);
+
   // 하이라이트된 텍스트로 스크롤
   useEffect(() => {
-    if (highlightRefs.current[currentIndex]) {
-      console.log("Scrolling to element:", highlightRefs.current[currentIndex]); // 디버깅을 위한 로그
-      highlightRefs.current[currentIndex].scrollIntoView({
-        behavior: "smooth", // 부드러운 스크롤
-        block: "center", // 뷰포트 중앙으로 이동
-      });
+    if (highlightRefs.current[currentIndex] && containerRef.current) {
+      const highlightElement = highlightRefs.current[currentIndex];
+      const containerElement = containerRef.current;
+
+      // 하이라이트된 요소가 존재하는지 확인
+      if (highlightElement && highlightElement.offsetTop) {
+        const highlightPosition = highlightElement.offsetTop;
+        const containerScrollTop = containerElement.scrollTop;
+        const containerHeight = containerElement.offsetHeight;
+
+        // 스크롤 이동 거리 계산
+        let targetScrollTop = highlightPosition - containerHeight / 2;
+
+        // 스크롤이 음수로 설정되지 않도록 보정
+        if (targetScrollTop < 0) {
+          targetScrollTop = 0;
+        }
+
+        // 컨테이너의 최대 스크롤 범위 제한
+        const maxScrollTop =
+          containerElement.scrollHeight - containerElement.offsetHeight;
+
+        console.log("highlightPosition:", highlightPosition);
+        console.log("containerScrollTop:", containerScrollTop);
+        console.log("targetScrollTop:", targetScrollTop);
+
+        // 스크롤을 target 위치로 이동 (최대 범위를 넘지 않도록)
+        containerElement.scrollTo({
+          top: Math.min(targetScrollTop, maxScrollTop),
+          behavior: "smooth", // 부드러운 스크롤
+        });
+
+        console.log(
+          "Scrolling to element:",
+          highlightRefs.current[currentIndex]
+        );
+      } else {
+        console.log(
+          `No element or invalid offsetTop for currentIndex: ${currentIndex}`
+        );
+      }
     } else {
       console.log("No element found for currentIndex:", currentIndex);
     }
   }, [currentIndex]);
 
   return (
-    <STTContainer>
+    <STTContainer ref={containerRef}>
+      {" "}
+      {/* STTContainer에 대한 참조 추가 */}
       {sttData && sttData.length > 0 ? (
         <STTResultList>
           {sttData.map((segment, index) => (
