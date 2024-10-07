@@ -1,6 +1,7 @@
 import { styled } from "styled-components";
 
 export const DrawingEditorContainer = styled.div`
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -16,7 +17,6 @@ export const DrawingCanvasContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #ccc;
 `;
 
 export const DrawingToolContainer = styled.div`
@@ -31,8 +31,8 @@ export const DrawingToolContainer = styled.div`
   border-radius: 15px;
   box-shadow: 0 2px 3px rgba(65, 65, 65, 0.1);
   margin: 0 auto;
-  position: absolute;
-  bottom: 130px;
+  position: fixed;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;

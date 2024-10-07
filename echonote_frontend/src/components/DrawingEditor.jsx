@@ -1,10 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as St from "@components/styles/DrawingEditor.style";
 import DrawingToolBar from "@components/DrawingToolBar";
 import DrawingCanvas from "@components/DrawingCanvas";
 import canvasStore from "@/stores/canvasStore";
 
-const DrawingEditor = () => {
+const DrawingEditor = ({ scale }) => {
   const { getCanvasPath } = canvasStore.getState();
   const canvasRef = useRef(getCanvasPath());
   const [eraseMode, setEraseMode] = useState(false);
@@ -15,12 +15,12 @@ const DrawingEditor = () => {
 
   const handleEraserClick = () => {
     setEraseMode(true);
-	canvasRef.current?.eraseMode(true);
+    canvasRef.current?.eraseMode(true);
   };
 
   const handlePenClick = () => {
     setEraseMode(false);
-	canvasRef.current?.eraseMode(false);
+    canvasRef.current?.eraseMode(false);
   };
 
   const handleStrokeWidthChange = (event) => {
@@ -71,7 +71,7 @@ const DrawingEditor = () => {
         onRedoChange={handleRedoClick}
         onClearChange={handleClearClick}
         onResetChange={handleResetClick}
-		onReadOnlyChange={handleReadOnlyChange}
+        onReadOnlyChange={handleReadOnlyChange}
       />
       <DrawingCanvas
         ref={canvasRef}
@@ -79,7 +79,8 @@ const DrawingEditor = () => {
         eraserWidth={eraserWidth}
         strokeColor={strokeColor}
         eraseMode={eraseMode}
-		readOnly={readOnly}
+        readOnly={readOnly}
+        scale={scale}
       />
     </St.DrawingEditorContainer>
   );
