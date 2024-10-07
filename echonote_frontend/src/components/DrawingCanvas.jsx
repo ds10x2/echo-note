@@ -83,6 +83,7 @@ const DrawingCanvas = forwardRef(
             canvasColor="transparent"
             onChange={handleCanvasChange}
             readOnly={readOnly}
+            style={{ border: 0, borderRadius: 0 }}
           />
         </div>
       </St.DrawingCanvasContainer>
