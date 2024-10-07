@@ -121,18 +121,16 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
             isActive={isRecordingBarOpened}
           />
           <Divider />
-          <ToolBarIcon as={FaPen} />
-          <ToolBarIcon
-            as={FaTextHeight}
-            onClick={setTextMode}
-            isActive={mode.text}
-          />
           <IconButton
             as={FaPen}
             onClick={handlePenClick}
             isActive={isPenActive}
           />
-          <ToolBarIcon as={FaTextHeight} />
+          <ToolBarIcon
+            as={FaTextHeight}
+            onClick={setTextMode}
+            isActive={mode.text}
+          />
           <ToolBarIcon as={FaImage} />
           <ToolBarIcon
             as={FaShapes}
