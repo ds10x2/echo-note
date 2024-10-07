@@ -1,7 +1,6 @@
 import { styled } from "styled-components";
 
 export const DrawingEditorContainer = styled.div`
-  /* position: absolute; */
   top: 0;
   left: 0;
   width: 100%;
@@ -58,11 +57,11 @@ export const IconButton = styled.button`
   }
 `;
 
-export const SliderPopup = styled.div`
+// 공통 슬라이더 스타일 적용
+const CommonSliderPopup = styled.div`
   position: absolute;
   z-index: 9999;
   bottom: 60px;
-  left: 0;
   background-color: white;
   padding: 10px;
   border-radius: 8px;
@@ -70,52 +69,60 @@ export const SliderPopup = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
   label {
     margin-bottom: 5px;
   }
+
   input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
     width: 150px;
+    height: 6px;
+    background: #ddd;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: black;
+      cursor: pointer;
+      margin-top: -5px;
+      transition: background 0.2s;
+    }
+
+    &::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: black;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    &::-webkit-slider-runnable-track {
+      background: linear-gradient(black, black) no-repeat center;
+      height: 6px;
+      border-radius: 3px;
+    }
   }
 `;
 
-/* 펜 슬라이더 팝업 */
-export const PenSliderPopup = styled.div`
-  position: absolute;
-  z-index: 9999;
-  bottom: 60px;
+// 펜 슬라이더 팝업
+export const PenSliderPopup = styled(CommonSliderPopup)`
   left: 35px;
-  background-color: white;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  label {
-    margin-bottom: 5px;
-  }
-  input[type="range"] {
-    width: 150px;
-  }
 `;
 
-/* 지우개 슬라이더 팝업 */
-export const EraserSliderPopup = styled.div`
-  position: absolute;
-  z-index: 9999;
-  bottom: 60px;
+// 지우개 슬라이더 팝업
+export const EraserSliderPopup = styled(CommonSliderPopup)`
   left: 100px;
-  background-color: white;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  label {
-    margin-bottom: 5px;
-  }
-  input[type="range"] {
-    width: 150px;
-  }
 `;

@@ -9,7 +9,7 @@ export const ColorSelectionBtn = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: ${(props) => props.color};  // RGBA 값 사용
+  background-color: ${(props) => props.color};
   border: none;
   cursor: pointer;
 `;
@@ -17,10 +17,14 @@ export const ColorSelectionBtn = styled.div`
 export const ColorPalette = styled.div`
   position: absolute;
   z-index: 2;
-  bottom: 50px;
+  bottom: 70px;
   left: 0;
   background-color: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding:20px;
+  border-radius: 12px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
 `;

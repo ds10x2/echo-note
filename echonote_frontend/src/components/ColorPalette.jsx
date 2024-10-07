@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Sketch } from '@uiw/react-color';
+import { Colorful } from '@uiw/react-color';
 import * as St from "@components/styles/ColorPalette.style";
 
 const ColorPalette = ({ value, onChange }) => {
-  const [color, setColor] = useState(value || "#000000FF");  // hexa 기본값 설정
+  const [color, setColor] = useState(value || "#000000FF");
   const [showPalette, setShowPalette] = useState(false);
   const paletteRef = useRef(null);
 
@@ -40,7 +40,7 @@ const ColorPalette = ({ value, onChange }) => {
 
       {showPalette && (
         <St.ColorPalette ref={paletteRef}>
-          <Sketch
+          <Colorful
             color={color}
             onChange={(newColor) => {
               setColor(newColor.hexa);
