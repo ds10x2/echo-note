@@ -6,7 +6,6 @@ import {
   FaRedo,
   FaTrash,
   FaSync,
-  FaRulerVertical,
   FaPen,
 } from "react-icons/fa";
 import ColorPalette from "@components/ColorPalette";
@@ -84,14 +83,21 @@ const DrawingToolBar = ({
     <St.DrawingToolContainer>
       <ColorPalette value={strokeColor} onChange={onStrokeColorChange} />
 
-      {/* pen */}
+      {/* 펜 아이콘 */}
       <St.IconButton onClick={handlePenClick}>
-        <FaPen />
+        <FaPen color={activeTool === "pen" ? "gray" : "black"} />
       </St.IconButton>
 
       {showSlider && activeTool === "pen" && (
-        <St.PenSliderPopup ref={strokeWidthRef}>
-          <label>Pen Thickness</label>
+        <St.PenSliderPopup
+          ref={strokeWidthRef}
+          style={{
+            "--thumb-size": `${Math.min(
+              Math.max(Math.pow(strokeWidth, 1.2) * 1.15, 10),
+              28
+            )}px`,
+          }}
+        >
           <input
             type="range"
             className="form-range"
@@ -104,13 +110,20 @@ const DrawingToolBar = ({
         </St.PenSliderPopup>
       )}
 
-      {/* eraser */}
+      {/* 지우개 아이콘 */}
       <St.IconButton onClick={handleEraserClick}>
-        <FaEraser />
+        <FaEraser color={activeTool === "eraser" ? "gray" : "black"} />
       </St.IconButton>
       {showSlider && activeTool === "eraser" && (
-        <St.EraserSliderPopup ref={strokeWidthRef}>
-          <label>Eraser Thickness</label>
+        <St.EraserSliderPopup
+          ref={strokeWidthRef}
+          style={{
+            "--thumb-size": `${Math.min(
+              Math.max(Math.pow(eraserWidth, 1.2) * 1.15, 10),
+              28
+            )}px`,
+          }}
+        >
           <input
             type="range"
             className="form-range"

@@ -91,21 +91,22 @@ const CommonSliderPopup = styled.div`
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 16px;
-      height: 16px;
+      width: var(--thumb-size, 14px);
+      height: var(--thumb-size, 14px);
       border-radius: 50%;
       background: black;
       cursor: pointer;
-      margin-top: -5px;
+      margin-top: calc(-1 * (var(--thumb-size, 14px) / 2 - 3px));
       transition: background 0.2s;
     }
 
     &::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
+      width: var(--thumb-size, 14px);
+      height: var(--thumb-size, 14px);
       border-radius: 50%;
       background: black;
       cursor: pointer;
+      margin-top: calc(-1 * (var(--thumb-size, 14px) / 2 - 3px));
       transition: background 0.2s;
     }
 
