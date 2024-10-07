@@ -75,7 +75,22 @@ const PdfUpdate = () => {
             handleUpload(file); // 파일을 선택하자마자 업로드 진행
         }
     };
+// 드래그 앤 드롭 핸들러
+    const handleDrop = (event) => {
+        event.preventDefault(); // 기본 동작 방지
+        const file = event.dataTransfer.files[0]; // 드래그된 파일 가져오기
+        if (file && file.type === "application/pdf") {
+            setPdfFile(file); // 선택한 파일을 상태에 저장
+            handleUpload(file); // 파일을 업로드 진행
+        } else {
+            alert("PDF 파일만 업로드할 수 있습니다."); // PDF가 아닌 경우 경고
+        }
+    };
 
+    // 드래그 오버 시 기본 동작 방지
+    const handleDragOver = (event) => {
+        event.preventDefault(); // 기본 동작 방지
+    };
     // 버튼 클릭 시 파일 선택 창 열기
     const handleButtonClick = () => {
         fileInputRef.current.click(); // 숨겨진 input 요소 클릭
@@ -84,23 +99,28 @@ const PdfUpdate = () => {
     return (
         <div className="pdf-update">
             {/* 파일 선택 input은 화면에서 숨김 */}
-            <input
-                type="file"
-                accept="application/pdf"
-                onChange={handleFileChange}
-                ref={fileInputRef}
-                style={{ display: "none" }} // 숨기기
-            />
-            {/* 파일 선택 버튼 */}
-            <button className="plus" onClick={handleButtonClick}>파일 업로드</button>
-            {pdfUrl && (
-                <div>
-                    <h3>업로드된 PDF:</h3>
-                    <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
-                        {pdfUrl}
-                    </a>
+            {!pdfUrl ? (
+                <div className="pdf-update"
+                     onDrop={handleDrop}
+                     onDragOver={handleDragOver} // 드래그 오버 시 핸들러
+                     style={{ border: '2px dashed #ccc', padding: '20px', textAlign: 'center' }} // 스타일 추가
+                >
+                    <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={handleFileChange}
+                        ref={fileInputRef}
+                        style={{ display: "none" }} // 숨기기
+                    />
+                    {/* 파일 선택 버튼 */}
+                    <button className="plus" onClick={handleButtonClick}>PDF 업로드</button>
                 </div>
+            ):(
+
+                <p>PDF 페이지 내용이 여기에 들어갑니다.</p>
+
             )}
+
         </div>
     );
 };
