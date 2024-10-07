@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import * as St from "@/components/styles/ShapeEditor.style";
 import shapeStore from "@/stores/shapeStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
-import EditButton from "@components/common/EditButton";
 
 const ShapeEditor = ({
   currentPageCircles,
@@ -30,26 +29,6 @@ const ShapeEditor = ({
     setCurrentCircles(currentPageCircles);
     setSelectedShape({ id: null, type: null });
   }, [currentPageRecs, currentPageCircles]);
-
-  const handleDelete = (e) => {
-    e.stopPropagation();
-    if (selectedShape.id !== null) {
-      if (selectedShape.type === "rectangle") {
-        const updatedRects = currentRects.filter(
-          (_, index) => index !== selectedShape.id
-        );
-        setCurrentRects(updatedRects);
-        setRectangles(updatedRects);
-      } else if (selectedShape.type === "circle") {
-        const updatedCircles = currentCircles.filter(
-          (_, index) => index !== selectedShape.id
-        );
-        setCurrentCircles(updatedCircles);
-        setCircles(updatedCircles);
-      }
-      setSelectedShape({ id: null, type: null });
-    }
-  };
 
   const handleMouseDownRec = useCallback(
     (e) => {
@@ -352,22 +331,6 @@ const ShapeEditor = ({
           />
         )}
       </St.StyledSVG>
-      {selectedShape.id !== null && (
-        <St.ButtonContainer
-          $top={
-            currentRects[selectedShape.id]?.y ||
-            currentCircles[selectedShape.id]?.cy ||
-            0
-          }
-          $left={
-            (currentRects[selectedShape.id]?.x ||
-              currentCircles[selectedShape.id]?.cx ||
-              0) + 10
-          }
-        >
-          <EditButton buttonText="삭제" onClick={handleDelete} />
-        </St.ButtonContainer>
-      )}
     </St.ShapeContainer>
   );
 };
