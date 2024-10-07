@@ -2,7 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import AnalyzeModal from "@components/AnalyzeModal";
 import PdfSettingModal from "@components/PdfSettingModal";
 import { RiSpeakLine } from "react-icons/ri";
-import { FaPen, FaTextHeight, FaImage, FaShapes, FaStar } from "react-icons/fa";
+import {
+  FaPen,
+  FaTextHeight,
+  FaImage,
+  FaShapes,
+  FaStar,
+  FaCircle,
+  FaStop,
+} from "react-icons/fa";
 import { BiWindowAlt, BiChevronsDown, BiChevronsUp } from "react-icons/bi";
 import {
   IoMicSharp,
@@ -38,9 +46,16 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
     toggleRecordingBar,
   } = useSidebarStore();
 
-  const { mode, setTextMode, setShapeMode } = drawingTypeStore();
+  const {
+    mode,
+    setTextMode,
+    setShapeMode,
+    shapeMode,
+    setRectangleMode,
+    setCircleMode,
+  } = drawingTypeStore();
 
-  const { nextPage, prevPage, zoomIn, zoomOut } = pageStore();
+  const { nextPage, prevPage, zoomIn, zoomOut, currentPage } = pageStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPdfSettingModalOpen, setIsPdfSettingModalOpen] = useState(false);
   const [isAnalyzeModalOpen, setIsAnalyzeModalOpen] = useState(false);
@@ -48,6 +63,18 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
   const [buttonPosition, setButtonPosition] = useState(null);
   const settingButtonRef = useRef(null);
   const [isPenActive, setIsPenActive] = useState(false);
+
+  //도형모드 off -> 사각형 모드 -> 원 모드 -> 도형모드 off
+  const handleShapeMode = () => {
+    if (!mode.shape) {
+      setShapeMode();
+      setRectangleMode();
+    } else if (shapeMode.rectangle) {
+      setCircleMode();
+    } else if (shapeMode.circle) {
+      setShapeMode();
+    }
+  };
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -133,8 +160,10 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
           />
           <ToolBarIcon as={FaImage} />
           <ToolBarIcon
-            as={FaShapes}
-            onClick={setShapeMode}
+            as={
+              !mode.shape ? FaShapes : shapeMode.rectangle ? FaStop : FaCircle
+            }
+            onClick={handleShapeMode}
             isActive={mode.shape}
           />
           <Divider />
