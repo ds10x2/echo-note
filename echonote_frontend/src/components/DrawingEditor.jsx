@@ -75,8 +75,8 @@ const DrawingEditor = ({ scale }) => {
       />
       <DrawingCanvas
         ref={canvasRef}
-        strokeWidth={strokeWidth}
-        eraserWidth={eraserWidth}
+        strokeWidth={strokeWidth * scale}
+        eraserWidth={eraserWidth * scale}
         strokeColor={strokeColor}
         eraseMode={eraseMode}
         readOnly={readOnly}

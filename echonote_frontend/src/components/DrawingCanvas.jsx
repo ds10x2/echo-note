@@ -14,9 +14,10 @@ const DrawingCanvas = forwardRef(
 
       if (ref.current) {
         ref.current.clearCanvas();
-        if (savedPaths) {
+        if (savedPaths && savedPaths.length > 0) {
           const scaledPaths = savedPaths.map((path) => ({
             ...path,
+            strokeWidth: path.strokeWidth * scale,
             paths: path.paths.map((point) => ({
               x: point.x * scale,
               y: point.y * scale,
@@ -37,8 +38,13 @@ const DrawingCanvas = forwardRef(
         ref.current
           .exportPaths()
           .then((data) => {
+            if (data.length == 0) {
+              return;
+            }
+
             const unscaledPaths = data.map((path) => ({
               ...path,
+              strokeWidth: path.strokeWidth / scale,
               paths: path.paths.map((point) => ({
                 x: point.x / scale,
                 y: point.y / scale,
