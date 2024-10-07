@@ -6,10 +6,9 @@ import ToolBar from "@components/ToolBar";
 import PdfBar from "@components/PdfBar";
 import RecordingBar from "@components/RecordingBar";
 import { Layout, MainContent, rootStyle, appStyle } from "@/Layout.style";
-import STTBar from "@components/STTBar";
+import STTBar from "@components/stt/STTBar";
 import PdfViewer from "@components/PdfViewer";
-import PdfButton from "@services/PDFupload/PdfUpdate"
-
+import PdfButton from "@services/PDFupload/PdfUpdate";
 
 class App extends Component {
   state = {
@@ -43,12 +42,10 @@ class App extends Component {
                 <PdfViewer />
               </MainContent>
               <STTBar />
-
-              // <PdfButton />
+              {/* <PdfButton /> */}
             </Layout>
           </ThemeProvider>
         </div>
-
       </div>
     );
   }
