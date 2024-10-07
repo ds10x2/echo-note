@@ -37,7 +37,7 @@ public class NoteController {
 	@Operation(summary = "PDF Presigned url 요청", description = "PDF S3 업로드를 위한 presigned url과 객체 Url을 요청")
 	public ResponseEntity<UrlResponse> generatePresignedUrl() {
 
-		UrlResponse response = noteService.generatePreSignUrl(UUID.randomUUID() + ".wav", bucketName,
+		UrlResponse response = noteService.generatePreSignUrl(UUID.randomUUID() + ".pdf", bucketName,
 			com.amazonaws.HttpMethod.PUT);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
