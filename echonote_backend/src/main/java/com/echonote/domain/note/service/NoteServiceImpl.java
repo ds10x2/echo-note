@@ -40,9 +40,10 @@ public class NoteServiceImpl implements NoteService {
 		calendar.add(Calendar.MINUTE, 10); //validfy of 10 minutes
 
 		UrlResponse res = new UrlResponse();
+		String fullPath = "pdf/" + filePath;
 		res.setPresignedUrl(
-			amazonS3.generatePresignedUrl(bucketName, filePath, calendar.getTime(), httpMethod).toString());
-		res.setObjectUrl("https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/" + filePath);
+			amazonS3.generatePresignedUrl(bucketName, fullPath, calendar.getTime(), httpMethod).toString());
+		res.setObjectUrl("https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/pdf/" + fullPath);
 		return res;
 
 	}

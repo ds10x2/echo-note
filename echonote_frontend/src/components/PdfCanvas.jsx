@@ -3,8 +3,15 @@ import * as St from "./styles/PdfCanvas.style";
 import * as pdfjsLib from "pdfjs-dist";
 import PdfEditor from "@components/PdfEditor";
 import pageStore from "@/stores/pageStore"; // zustand 스토어 가져오기
+import DrawingEditor from "@components/DrawingEditor";
+import { DrawingEditorContainer } from "@components/styles/DrawingEditor.style";
 
-const PdfCanvas = ({ url, containerRef }) => {
+const PdfCanvas = ({
+  url,
+  containerRef,
+  isDrawingEditorOpened,
+  savedImage,
+}) => {
   const canvasRef = useRef();
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs`;
 
@@ -105,6 +112,13 @@ const PdfCanvas = ({ url, containerRef }) => {
         currentPage={currentPage}
         containerRef={containerRef}
       />
+      {isDrawingEditorOpened ? (
+        <DrawingEditor scale={scale} />
+      ) : (
+        <DrawingEditorContainer>
+          <img src={savedImage} alt="Saved Canvas" />
+        </DrawingEditorContainer>
+      )}
     </St.PdfCanvasContainer>
   );
 };
