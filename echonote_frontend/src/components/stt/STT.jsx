@@ -23,8 +23,9 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
   const [modifiedTexts, setModifiedTexts] = useState([]);
   const { setStartTime } = useAudioStore();
 
-  const { currentIndex } = useSearchStore();
-  const resultRefs = useRef([]);
+  const { currentIndex, setSearchResults } = useSearchStore();
+  const resultRefs = useRef([]); // 전체 세그먼트 참조 저장
+  const highlightRefs = useRef([]); // 하이라이트 텍스트의 참조 저장
 
   // 컴포넌트 마운트 시 API 데이터 가져오기
   useEffect(() => {
@@ -37,18 +38,44 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     fetchData();
   }, [id]);
 
-  // 검색어를 포함한 부분 강조
-  const highlightText = (text) => {
+  useEffect(() => {
+    if (searchTerm) {
+      const results = [];
+      sttData.forEach((segment, index) => {
+        if (segment.text.toLowerCase().includes(searchTerm.toLowerCase())) {
+          results.push({ index, ref: resultRefs.current[index] });
+        }
+      });
+      setSearchResults(results); // 검색 결과 저장
+    }
+  }, [searchTerm, sttData, setSearchResults]);
+
+  // 검색어를 포함한 부분 강조 및 참조 저장
+  const highlightText = (text, index) => {
     if (!searchTerm) return text;
+
     const parts = text.split(new RegExp(`(${searchTerm})`, "gi"));
-    return parts.map((part, index) =>
-      part.toLowerCase() === searchTerm.toLowerCase() ? (
-        <span key={index} style={{ backgroundColor: "yellow" }}>
-          {part}
-        </span>
-      ) : (
-        part
-      )
+    return (
+      <span>
+        {parts.map((part, i) => (
+          <span
+            key={i}
+            ref={(el) => {
+              // 검색어가 포함된 부분만 참조를 저장
+              if (part.toLowerCase() === searchTerm.toLowerCase()) {
+                highlightRefs.current[index] = el; // 하이라이트 부분에 대한 참조 저장
+              }
+            }}
+            style={
+              part.toLowerCase() === searchTerm.toLowerCase()
+                ? { backgroundColor: "yellow" }
+                : {}
+            }
+          >
+            {part}
+          </span>
+        ))}
+      </span>
     );
   };
 
@@ -72,9 +99,16 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     }
   }, [modifiedTexts, onSubmit]);
 
+  // 하이라이트된 텍스트로 스크롤
   useEffect(() => {
-    if (resultRefs.current[currentIndex]) {
-      resultRefs.current[currentIndex].scrollIntoView({ behavior: "smooth" });
+    if (highlightRefs.current[currentIndex]) {
+      console.log("Scrolling to element:", highlightRefs.current[currentIndex]); // 디버깅을 위한 로그
+      highlightRefs.current[currentIndex].scrollIntoView({
+        behavior: "smooth", // 부드러운 스크롤
+        block: "center", // 뷰포트 중앙으로 이동
+      });
+    } else {
+      console.log("No element found for currentIndex:", currentIndex);
     }
   }, [currentIndex]);
 
@@ -82,10 +116,10 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     <STTContainer>
       {sttData && sttData.length > 0 ? (
         <STTResultList>
-          {sttData.map((segment) => (
+          {sttData.map((segment, index) => (
             <STTResultItem
               key={segment.id}
-              ref={(el) => (resultRefs.current[segment.id] = el)}
+              ref={(el) => (resultRefs.current[index] = el)} // 각 세그먼트 참조 저장
             >
               <ResultLink
                 onClick={() => setStartTime(Number(segment.start).toFixed(6))}
@@ -99,7 +133,7 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
                 suppressContentEditableWarning={true} // Prevent warning
                 $isEditMode={isEditMode}
               >
-                {highlightText(segment.text)}
+                {highlightText(segment.text, index)} {/* 검색어 하이라이트 */}
               </ResultText>
             </STTResultItem>
           ))}

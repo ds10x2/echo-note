@@ -17,7 +17,8 @@ const SearchBar = ({ onSearch }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // 입력된 검색어 상태
   const searchRef = useRef(null);
-  const { currentIndex, setCurrentIndex, searchResults } = useSearchStore();
+  const { currentIndex, setCurrentIndex, searchResults, setSearchResults } =
+    useSearchStore();
 
   const handleSearchClick = () => {
     setIsOpen(true);
@@ -25,7 +26,10 @@ const SearchBar = ({ onSearch }) => {
 
   const handleClickOutside = (event) => {
     if (searchRef.current && !searchRef.current.contains(event.target)) {
-      setIsOpen(false);
+      if (!searchTerm) {
+        // searchTerm에 값이 없을 때만 닫기
+        setIsOpen(false);
+      }
     }
   };
 
@@ -36,15 +40,22 @@ const SearchBar = ({ onSearch }) => {
 
   const handleArrowNavigation = (direction) => {
     if (direction === "up") {
-      setCurrentIndex(Math.max(currentIndex - 1, 0));
+      setCurrentIndex(
+        currentIndex - 1 <= 0 ? searchResults.length : currentIndex - 1
+      );
     } else if (direction === "down") {
-      setCurrentIndex(Math.min(currentIndex + 1, searchResults.length - 1));
+      setCurrentIndex((currentIndex % searchResults.length) + 1);
     }
   };
 
   const handleClearSearch = () => {
-    setSearchTerm("");
-    setIsOpen(false);
+    if (!searchTerm) {
+      setIsOpen(false);
+    } else {
+      setSearchTerm("");
+      setCurrentIndex(0);
+      setSearchResults([]);
+    }
   };
 
   useEffect(() => {
@@ -57,7 +68,7 @@ const SearchBar = ({ onSearch }) => {
     return () => {
       document.removeEventListener("click", handleClickOutside, true);
     };
-  }, [isOpen]);
+  }, [isOpen, searchTerm]);
 
   return (
     <SearchContainer ref={searchRef} isOpen={isOpen}>

@@ -54,8 +54,7 @@ export const SearchResultCount = styled.span`
   font-size: 12px;
   color: #888;
   position: absolute;
-  right: 10px;
-  top: 12px;
+  right: 7px;
   display: flex;
   align-items: center;
 `;
@@ -85,11 +84,7 @@ export const SearchCloseIcon = styled.div`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 18px;
   color: #888;
   margin-left: 4px;
-
-  &:hover {
-    color: #ff4d4d;
-  }
 `;
