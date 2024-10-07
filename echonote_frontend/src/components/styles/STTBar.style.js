@@ -46,11 +46,6 @@ export const IconButton = styled.button`
   align-items: center;
 `;
 
-export const Divider = styled.div`
-  height: 1px;
-  background-color: #ccc;
-`;
-
 export const STTBarContent = styled.div.withConfig({
   shouldForwardProp: shouldNotForwardPropsWithKeys(["isOpened"]),
 })`

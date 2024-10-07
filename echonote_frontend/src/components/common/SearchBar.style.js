@@ -15,6 +15,7 @@ export const SearchContainer = styled.div.withConfig({
   padding-right: ${({ isOpen }) => (isOpen ? "5px" : "0")};
   transition: width 0.4s ease, justify-content 0.3s ease;
   box-shadow: 0 2px 5px rgba(83, 83, 83, 0.1);
+  position: relative;
 `;
 
 export const SearchInput = styled.input`
@@ -47,4 +48,48 @@ export const SearchIconContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+export const SearchResultCount = styled.span`
+  font-size: 12px;
+  color: #888;
+  position: absolute;
+  right: 10px;
+  top: 12px;
+  display: flex;
+  align-items: center;
+`;
+
+export const SearchControlIcons = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+`;
+
+export const SearchArrowIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #888;
+  margin: 0 2px;
+
+  &:hover {
+    color: #333;
+  }
+`;
+
+export const SearchCloseIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #888;
+  margin-left: 4px;
+
+  &:hover {
+    color: #ff4d4d;
+  }
 `;
