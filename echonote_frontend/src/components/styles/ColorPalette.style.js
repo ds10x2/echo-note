@@ -20,7 +20,7 @@ export const ColorPalette = styled.div`
   bottom: 70px;
   left: 0;
   background-color: #fff;
-  padding:20px;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);
   display: flex;

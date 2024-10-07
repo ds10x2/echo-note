@@ -1,6 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as St from "@components/styles/DrawingEditor.style";
-import { FaEraser, FaUndo, FaRedo, FaTrash, FaSync, FaRulerVertical, FaPen } from "react-icons/fa";
+import {
+  FaEraser,
+  FaUndo,
+  FaRedo,
+  FaTrash,
+  FaSync,
+  FaRulerVertical,
+  FaPen,
+} from "react-icons/fa";
 import ColorPalette from "@components/ColorPalette";
 
 const DrawingToolBar = ({
@@ -17,7 +25,7 @@ const DrawingToolBar = ({
   onRedoChange,
   onClearChange,
   onResetChange,
-  onReadOnlyChange
+  onReadOnlyChange,
 }) => {
   const [activeTool, setActiveTool] = useState(null);
   const [showSlider, setShowSlider] = useState(false);
@@ -48,11 +56,11 @@ const DrawingToolBar = ({
 
   // 펜 클릭 핸들러
   const handlePenClick = () => {
-    if (activeTool === 'pen') {
+    if (activeTool === "pen") {
       setShowSlider(true);
       onReadOnlyChange(true);
     } else {
-      setActiveTool('pen');
+      setActiveTool("pen");
       setShowSlider(false);
       onReadOnlyChange(false);
       onPenClick();
@@ -61,17 +69,17 @@ const DrawingToolBar = ({
 
   // 지우개 클릭 핸들러
   const handleEraserClick = () => {
-    if (activeTool === 'eraser') {
+    if (activeTool === "eraser") {
       setShowSlider(true);
       onReadOnlyChange(true);
     } else {
-      setActiveTool('eraser');
+      setActiveTool("eraser");
       setShowSlider(false);
       onReadOnlyChange(false);
       onEraserClick();
     }
   };
-  
+
   return (
     <St.DrawingToolContainer>
       <ColorPalette value={strokeColor} onChange={onStrokeColorChange} />
@@ -81,7 +89,7 @@ const DrawingToolBar = ({
         <FaPen />
       </St.IconButton>
 
-      {showSlider && activeTool === 'pen' && (
+      {showSlider && activeTool === "pen" && (
         <St.PenSliderPopup ref={strokeWidthRef}>
           <label>Pen Thickness</label>
           <input
@@ -100,7 +108,7 @@ const DrawingToolBar = ({
       <St.IconButton onClick={handleEraserClick}>
         <FaEraser />
       </St.IconButton>
-      {showSlider && activeTool === 'eraser' && (
+      {showSlider && activeTool === "eraser" && (
         <St.EraserSliderPopup ref={strokeWidthRef}>
           <label>Eraser Thickness</label>
           <input
