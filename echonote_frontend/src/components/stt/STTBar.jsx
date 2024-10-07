@@ -1,4 +1,4 @@
-import useSidebarStore from "@stores/sideBarStore";
+import { useSidebarStore, useSearchStore } from "@stores/sideBarStore";
 import { useState } from "react";
 import {
   STTBarContainer,
@@ -17,10 +17,13 @@ const STTBar = () => {
   const [isEditMode, setIsEditMode] = useState(false); // 수정 모드 상태 추가
   const [modifiedTexts, setModifiedTexts] = useState([]); // 상위에서 수정된 텍스트를 관리하는 상태
 
+  const { setCurrentIndex } = useSearchStore();
+
   const noteId = 1;
 
   const handleSearch = (term) => {
     setSearchTerm(term); // 검색어 상태 업데이트
+    setCurrentIndex(0);
   };
 
   const handleSubmit = async (modifiedData) => {

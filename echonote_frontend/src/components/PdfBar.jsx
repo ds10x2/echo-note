@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import useSidebarStore from "@stores/sideBarStore";
+import { useSidebarStore } from "@stores/sideBarStore";
 import {
   SidebarContainer,
   ImageContainer,

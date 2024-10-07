@@ -10,7 +10,7 @@ import {
   IoChevronForwardOutline,
 } from "react-icons/io5";
 import { LuZoomIn, LuZoomOut } from "react-icons/lu";
-import useSidebarStore from "@stores/sideBarStore";
+import { useSidebarStore } from "@stores/sideBarStore";
 import drawingTypeStore from "@stores/drawingTypeStore";
 import pageStore from "@stores/pageStore";
 import {

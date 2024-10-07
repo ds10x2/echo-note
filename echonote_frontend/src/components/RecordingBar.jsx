@@ -1,4 +1,4 @@
-import useSidebarStore from "@stores/sideBarStore";
+import { useSidebarStore } from "@stores/sideBarStore";
 import { RecordingBarContainer } from "@components/styles/RecordingBar.style";
 import AudioWave from "@components/AudioWave";
 

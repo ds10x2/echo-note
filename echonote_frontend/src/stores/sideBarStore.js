@@ -15,4 +15,11 @@ const useSidebarStore = create((set) => ({
     set((state) => ({ isRecordingBarOpened: !state.isRecordingBarOpened })),
 }));
 
-export default useSidebarStore;
+const useSearchStore = create((set) => ({
+  currentIndex: 0,
+  setCurrentIndex: (index) => set({ currentIndex: index }),
+  searchResults: [],
+  setSearchResults: (results) => set({ searchResults: results }),
+}));
+
+export { useSidebarStore, useSearchStore };

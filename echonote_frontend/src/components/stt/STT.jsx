@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   STTContainer,
   STTResultList,
@@ -9,6 +9,7 @@ import {
 } from "@/components/styles/STT.style";
 import { useAudioStore } from "@stores/recordStore";
 import { getSTTResult } from "@services/sttApi";
+import { useSearchStore } from "@stores/sideBarStore";
 
 // 시간 포맷팅 함수 (초를 분:초로 변환)
 const formatTime = (seconds) => {
@@ -21,6 +22,9 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
   const [sttData, setSttData] = useState([]);
   const [modifiedTexts, setModifiedTexts] = useState([]);
   const { setStartTime } = useAudioStore();
+
+  const { currentIndex } = useSearchStore();
+  const resultRefs = useRef([]);
 
   // 컴포넌트 마운트 시 API 데이터 가져오기
   useEffect(() => {
@@ -68,12 +72,21 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     }
   }, [modifiedTexts, onSubmit]);
 
+  useEffect(() => {
+    if (resultRefs.current[currentIndex]) {
+      resultRefs.current[currentIndex].scrollIntoView({ behavior: "smooth" });
+    }
+  }, [currentIndex]);
+
   return (
     <STTContainer>
       {sttData && sttData.length > 0 ? (
         <STTResultList>
           {sttData.map((segment) => (
-            <STTResultItem key={segment.id}>
+            <STTResultItem
+              key={segment.id}
+              ref={(el) => (resultRefs.current[segment.id] = el)}
+            >
               <ResultLink
                 onClick={() => setStartTime(Number(segment.start).toFixed(6))}
               >
