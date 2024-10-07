@@ -99,6 +99,52 @@ const shapeStore = create((set, get) => ({
   },
 
   setCurrentPageForShape: (page) => set(() => ({ currentPage: page })),
+
+  // Individual property setters
+  setFill: (fill) => {
+    set((state) => ({
+      property: {
+        ...state.property,
+        fill: fill,
+      },
+    }));
+  },
+
+  setFillColor: (fillColor) => {
+    set((state) => ({
+      property: {
+        ...state.property,
+        fillColor: fillColor,
+      },
+    }));
+  },
+
+  setStroke: (stroke) => {
+    set((state) => ({
+      property: {
+        ...state.property,
+        stroke: stroke,
+      },
+    }));
+  },
+
+  setStrokeColor: (strokeColor) => {
+    set((state) => ({
+      property: {
+        ...state.property,
+        strokeColor: strokeColor,
+      },
+    }));
+  },
+
+  setStrokeWidth: (strokeWidth) => {
+    set((state) => ({
+      property: {
+        ...state.property,
+        strokeWidth: strokeWidth,
+      },
+    }));
+  },
 }));
 
 export default shapeStore;
