@@ -15,6 +15,7 @@ import java.util.List;
 @ToString
 @Document(collection = "STT")
 public class STT {
+    private String processId;
     private long id;
     private List<STTRequest> result;
 }

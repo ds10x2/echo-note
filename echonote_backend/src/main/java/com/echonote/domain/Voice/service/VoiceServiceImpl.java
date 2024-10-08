@@ -69,9 +69,10 @@ public class VoiceServiceImpl implements VoiceService {
 		calendar.add(Calendar.MINUTE, 10); //validfy of 10 minutes
 
 		UrlResponse res = new UrlResponse();
+		String fullPath = "wav/" + filePath;
 		res.setPresignedUrl(
-			amazonS3.generatePresignedUrl(bucketName, filePath, calendar.getTime(), httpMethod).toString());
-		res.setObjectUrl("https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/" + filePath);
+			amazonS3.generatePresignedUrl(bucketName, fullPath, calendar.getTime(), httpMethod).toString());
+		res.setObjectUrl("https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/" + fullPath);
 		return res;
 	}
 
@@ -97,9 +98,10 @@ public class VoiceServiceImpl implements VoiceService {
 		// sendAnalysisFlask(flaskSendRequest); // 음성 분석 모델에 요청 보내기
 	}
 
-	public STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
-		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
-
+	private STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
+//		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
+//		String flaskUrl = "http://localhost:5000/stt";
+		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
@@ -122,7 +124,7 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 	// 음성 분석 모델에 보내기
-	public void sendAnalysisFlask(FlaskSendRequest flaskSendRequest) {
+	private void sendAnalysisFlask(FlaskSendRequest flaskSendRequest) {
 		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/";  // 음성 분석 모델 API URL
 
 		// HTTP 헤더 설정

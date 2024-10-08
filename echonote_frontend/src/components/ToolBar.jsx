@@ -2,7 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import AnalyzeModal from "@components/AnalyzeModal";
 import PdfSettingModal from "@components/PdfSettingModal";
 import { RiSpeakLine } from "react-icons/ri";
-import { FaPen, FaTextHeight, FaImage, FaShapes, FaStar } from "react-icons/fa";
+import {
+  FaPen,
+  FaTextHeight,
+  FaImage,
+  FaShapes,
+  FaStar,
+  FaRegCircle,
+  FaRegSquare,
+  FaCaretDown,
+  FaPalette,
+} from "react-icons/fa";
 import { BiWindowAlt, BiChevronsDown, BiChevronsUp } from "react-icons/bi";
 import {
   IoMicSharp,
@@ -25,10 +35,15 @@ import {
   ToolBarContent,
   ToolBarHeader,
   ToolBarIcon,
+  ToolBarIconDetail,
+  FontSizeText,
+  FontSizeButton,
+  ToolBarIconContainer,
 } from "@components/styles/ToolBar.style";
 import { VscSettings } from "react-icons/vsc";
+import textStore from "@/stores/textStore";
 
-const ToolBar = () => {
+const ToolBar = ({ onToggleDrawingEditor }) => {
   const {
     isPdfBarOpened,
     isSTTBarOpened,
@@ -38,15 +53,36 @@ const ToolBar = () => {
     toggleRecordingBar,
   } = useSidebarStore();
 
-  const { mode, setTextMode, setShapeMode } = drawingTypeStore();
+  const {
+    mode,
+    setTextMode,
+    setShapeMode,
+    shapeMode,
+    setRectangleMode,
+    setCircleMode,
+  } = drawingTypeStore();
 
-  const { nextPage, prevPage, zoomIn, zoomOut } = pageStore();
+  const { nextPage, prevPage, zoomIn, zoomOut, currentPage } = pageStore();
+  const { fontProperty, setFontSize } = textStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPdfSettingModalOpen, setIsPdfSettingModalOpen] = useState(false);
   const [isAnalyzeModalOpen, setIsAnalyzeModalOpen] = useState(false);
   const [modalType, setModalType] = useState("");
   const [buttonPosition, setButtonPosition] = useState(null);
   const settingButtonRef = useRef(null);
+  const [isPenActive, setIsPenActive] = useState(false);
+
+  //도형모드 off -> 사각형 모드 -> 원 모드 -> 도형모드 off
+  const handleShapeMode = () => {
+    if (!mode.shape) {
+      setShapeMode();
+      setRectangleMode();
+    } else if (shapeMode.rectangle) {
+      setCircleMode();
+    } else if (shapeMode.circle) {
+      setShapeMode();
+    }
+  };
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -93,6 +129,11 @@ const ToolBar = () => {
     }
   }, [buttonPosition]);
 
+  const handlePenClick = () => {
+    setIsPenActive(!isPenActive);
+    onToggleDrawingEditor();
+  };
+
   return (
     <ToolBarContainer>
       <AnimatedToolBarContent collapsed={isCollapsed}>
@@ -115,16 +156,32 @@ const ToolBar = () => {
             isActive={isRecordingBarOpened}
           />
           <Divider />
-          <ToolBarIcon as={FaPen} />
-          <ToolBarIcon
-            as={FaTextHeight}
-            onClick={setTextMode}
-            isActive={mode.text}
+          <IconButton
+            as={FaPen}
+            onClick={handlePenClick}
+            isActive={isPenActive}
           />
+          <ToolBarIconContainer>
+            <ToolBarIcon
+              as={FaTextHeight}
+              onClick={setTextMode}
+              isActive={mode.text}
+            />
+            <ToolBarIconDetail isOpen={mode.text}>
+              <FontSizeText>{fontProperty.fontSize}px</FontSizeText>
+              <FontSizeButton as={FaCaretDown} />
+            </ToolBarIconDetail>
+          </ToolBarIconContainer>
           <ToolBarIcon as={FaImage} />
           <ToolBarIcon
-            as={FaShapes}
-            onClick={setShapeMode}
+            as={
+              !mode.shape
+                ? FaShapes
+                : shapeMode.rectangle
+                ? FaRegSquare
+                : FaRegCircle
+            }
+            onClick={handleShapeMode}
             isActive={mode.shape}
           />
           <Divider />

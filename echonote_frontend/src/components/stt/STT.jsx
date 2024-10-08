@@ -1,4 +1,4 @@
-import "@services/STTservice/styles.css";
+import "@components/stt/styles.css";
 import { useEffect, useState } from "react";
 import {
   STTContainer,
@@ -6,7 +6,7 @@ import {
   STTResultItem,
   ResultLink,
   ResultText,
-} from "@services/STTservice/STT.style";
+} from "@/components/styles/STT.style";
 import { useAudioStore } from "@stores/recordStore";
 
 // API 호출 함수

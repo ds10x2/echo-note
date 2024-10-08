@@ -99,6 +99,52 @@ const shapeStore = create((set, get) => ({
   },
 
   setCurrentPageForShape: (page) => set(() => ({ currentPage: page })),
+
+  // Individual property setters
+  setFill: () => {
+    set((state) => ({
+      property: {
+        ...state.property,
+        fill: !state.property.fill, // 현재 fill 상태를 반전
+      },
+    }));
+  },
+
+  setFillColor: (fillColor) => {
+    set((state) => ({
+      property: {
+        ...state.property,
+        fillColor: fillColor,
+      },
+    }));
+  },
+
+  setStroke: () => {
+    set((state) => ({
+      property: {
+        ...state.property,
+        stroke: !state.property.stroke, // 현재 stroke 상태를 반전
+      },
+    }));
+  },
+
+  setStrokeColor: (strokeColor) => {
+    set((state) => ({
+      property: {
+        ...state.property,
+        strokeColor: strokeColor,
+      },
+    }));
+  },
+
+  setStrokeWidth: (strokeWidth) => {
+    set((state) => ({
+      property: {
+        ...state.property,
+        strokeWidth: strokeWidth,
+      },
+    }));
+  },
 }));
 
 export default shapeStore;

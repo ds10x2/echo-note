@@ -8,7 +8,7 @@ import drawingTypeStore from "@/stores/drawingTypeStore";
 const TextBox = React.memo(
   ({
     item,
-    handleMouseDown,
+    handleTouchStart,
     handleKeyDown,
     updateCurTextItem,
     handleBlur,
@@ -25,8 +25,7 @@ const TextBox = React.memo(
         isEditing={item.isEditing}
         isDragging={item.isDragging}
         className="text-box"
-        onMouseDown={(e) => handleMouseDown(e, item.id)}
-        onTouchStart={(e) => handleMouseDown(e, item.id)}
+        onTouchStart={(e) => handleTouchStart(e, item.id)} // 터치 이벤트로 변경
         style={{
           fontSize: `${item.fontSize}px`,
         }}
@@ -86,7 +85,6 @@ const TextEditor = ({
   // 현재 페이지 아이템이 변경되었을 때만 상태를 업데이트
   useEffect(() => {
     if (JSON.stringify(currentPageItems) !== JSON.stringify(curItems)) {
-      console.log("Updating current page items");
       setCurItems(currentPageItems);
     }
   }, [currentPageItems]);
@@ -95,8 +93,8 @@ const TextEditor = ({
     (e) => {
       if (isDraggingRef.current || hasDraggedRef.current) return;
 
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const clientX = e.touches[0].clientX; // 터치 이벤트로 변경
+      const clientY = e.touches[0].clientY; // 터치 이벤트로 변경
 
       const containerRect = containerRef.current.getBoundingClientRect();
       const parentScrollLeft = parentContainerRef.current.scrollLeft;
@@ -104,8 +102,6 @@ const TextEditor = ({
 
       const x = (clientX + parentScrollLeft - containerRect.left) / scale;
       const y = (clientY + parentScrollTop - containerRect.top) / scale;
-
-      console.log("Adding new text box at:", x, y);
 
       addTextItem({
         id: Date.now(),
@@ -116,7 +112,7 @@ const TextEditor = ({
         isDragging: false,
         offsetX: 0,
         offsetY: 0,
-        fontSize: 16,
+        fontSize: textStore.getState().fontProperty.fontSize,
       });
 
       setSelectedItemId(null);
@@ -124,12 +120,11 @@ const TextEditor = ({
     [addTextItem, isDraggingRef, hasDraggedRef, scale, parentContainerRef]
   );
 
-  const handleClickEvent = useCallback(
+  const handleTouchEvent = useCallback(
     (e) => {
       if (mode.text) {
         // 수정 중인 텍스트 박스에서 추가 클릭 이벤트를 막음
         if (e.target.closest(".edit-button-container")) {
-          console.log("Clicked on edit button container, ignoring event");
           return;
         }
 
@@ -140,10 +135,8 @@ const TextEditor = ({
           if (
             curItems.some((item) => item.id === clickedItemId && item.isEditing)
           ) {
-            console.log("Clicked on editing text box, ignoring event");
             return; // 수정 중인 텍스트 박스 클릭 무시
           }
-          console.log("Selecting text box with id:", clickedItemId);
           setSelectedItemId(clickedItemId);
         } else {
           handleAddTextBox(e); // 새로운 텍스트 박스 추가
@@ -157,24 +150,22 @@ const TextEditor = ({
     const container = containerRef.current;
 
     if (mode.text) {
-      container.addEventListener("mousedown", handleClickEvent);
-      console.log("Added mouse down event listener");
+      container.addEventListener("touchstart", handleTouchEvent); // 터치 이벤트로 변경
     }
 
     return () => {
-      container.removeEventListener("mousedown", handleClickEvent);
-      console.log("Removed mouse down event listener");
+      container.removeEventListener("touchstart", handleTouchEvent); // 터치 이벤트로 변경
     };
-  }, [handleClickEvent, mode.text]);
+  }, [handleTouchEvent, mode.text]);
 
-  const handleMouseDown = (e, id) => {
+  const handleTouchStart = (e, id) => {
     e.stopPropagation();
     isDraggingRef.current = true;
     hasDraggedRef.current = false;
     setSelectedItemId(id);
 
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const clientX = e.touches[0].clientX; // 터치 이벤트로 변경
+    const clientY = e.touches[0].clientY; // 터치 이벤트로 변경
 
     const parentScrollLeft = parentContainerRef.current.scrollLeft;
     const parentScrollTop = parentContainerRef.current.scrollTop;
@@ -188,8 +179,6 @@ const TextEditor = ({
       clientY +
       parentScrollTop -
       (item.y * scale + containerRef.current.offsetTop);
-
-    console.log("Mouse down on item:", id, "Offset:", offsetX, offsetY);
 
     setCurItems((items) =>
       items.map((item) =>
@@ -207,12 +196,10 @@ const TextEditor = ({
     document.body.style.userSelect = "none";
   };
 
-  const handleMouseMove = (e) => {
+  const handleTouchMove = (e) => {
     if (isDraggingRef.current) {
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-      console.log("Mouse moving while dragging");
+      const clientX = e.touches[0].clientX; // 터치 이벤트로 변경
+      const clientY = e.touches[0].clientY; // 터치 이벤트로 변경
 
       setCurItems((items) =>
         items.map((item) => {
@@ -249,11 +236,9 @@ const TextEditor = ({
     }
   };
 
-  const handleMouseUp = () => {
+  const handleTouchEnd = () => {
     if (isDraggingRef.current) {
       isDraggingRef.current = false;
-
-      console.log("Mouse up, stopping drag");
 
       setCurItems((items) => {
         return items.map((item) => {
@@ -283,7 +268,6 @@ const TextEditor = ({
   // 상태 업데이트 최적화: 업데이트가 있을 때만 실행되도록 설정
   useEffect(() => {
     if (updatedItems.length > 0) {
-      console.log("Updating text item positions", updatedItems);
       updatedItems.forEach(({ id, x, y }) => {
         updateTextItemPosition(id, x, y);
       });
@@ -293,16 +277,12 @@ const TextEditor = ({
 
   useEffect(() => {
     const container = containerRef.current;
-    container.addEventListener("mousemove", handleMouseMove);
-    container.addEventListener("mouseup", handleMouseUp);
-    container.addEventListener("touchmove", handleMouseMove);
-    container.addEventListener("touchend", handleMouseUp);
+    container.addEventListener("touchmove", handleTouchMove); // 터치 이벤트로 변경
+    container.addEventListener("touchend", handleTouchEnd); // 터치 이벤트로 변경
 
     return () => {
-      container.removeEventListener("mousemove", handleMouseMove);
-      container.removeEventListener("mouseup", handleMouseUp);
-      container.removeEventListener("touchmove", handleMouseMove);
-      container.removeEventListener("touchend", handleMouseUp);
+      container.removeEventListener("touchmove", handleTouchMove); // 터치 이벤트로 변경
+      container.removeEventListener("touchend", handleTouchEnd); // 터치 이벤트로 변경
     };
   }, []);
 
@@ -324,7 +304,6 @@ const TextEditor = ({
 
   const handleDelete = () => {
     if (selectedItemId !== null) {
-      console.log("Deleting item:", selectedItemId);
       setCurItems(curItems.filter((item) => item.id !== selectedItemId));
       deleteTextItem(selectedItemId);
       setSelectedItemId(null);
@@ -332,7 +311,6 @@ const TextEditor = ({
   };
 
   const handleEdit = () => {
-    console.log("Editing item:", selectedItemId);
     setCurItems((items) =>
       items.map((item) =>
         item.id === selectedItemId ? { ...item, isEditing: true } : item
@@ -341,7 +319,6 @@ const TextEditor = ({
   };
 
   const updateCurTextItem = (id, newText) => {
-    console.log("Updating text item:", id, "New text:", newText);
     setCurItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id ? { ...item, text: newText } : item
@@ -352,11 +329,9 @@ const TextEditor = ({
   const handleBlur = (id) => {
     const currentItem = curItems.find((item) => item.id === id);
     if (!currentItem.text.trim()) {
-      console.log("Blurred item is empty, deleting:", id);
       setCurItems(curItems.filter((item) => item.id !== id));
       deleteTextItem(id);
     } else {
-      console.log("Finishing editing item:", id);
       updateTextItem(id, currentItem.text);
       finishEditing(id);
     }
@@ -369,7 +344,7 @@ const TextEditor = ({
         <TextBox
           key={item.id}
           item={item}
-          handleMouseDown={handleMouseDown}
+          handleTouchStart={handleTouchStart}
           handleKeyDown={handleKeyDown}
           updateCurTextItem={updateCurTextItem}
           handleBlur={handleBlur}
