@@ -9,49 +9,80 @@ export const StyledSVG = styled.svg`
 `;
 
 // 사각형 스타일
-export const StyledRectangle = styled.rect.attrs((props) => ({
-  style: {
-    x: props.x,
-    y: props.y,
-    width: props.width,
-    height: props.height,
-    fill: props.fill || "#348fc3",
-    stroke: props.stroke || "#000",
-    strokeWidth: props.strokeWidth || 2,
-  },
-}))`
-  cursor: move;
-  transition: transform 0.2s, fill 0.2s;
+export const StyledRectangle = styled.rect
+  .withConfig({
+    shouldForwardProp: shouldNotForwardPropsWithKeys(["isSelected"]),
+  })
+  .attrs((props) => ({
+    style: {
+      x: props.x,
+      y: props.y,
+      width: props.width,
+      height: props.height,
+      fill: props.fill || "#348fc3",
+      stroke: props.stroke || "none", // 기본적으로 선이 없는 경우 처리
+      strokeWidth: props.strokeWidth || 0, // 선이 없을 경우 기본값
+    },
+  }))`
+    cursor: move;
+    transition: transform 0.2s, fill 0.2s;
+  
+    &:hover {
+      fill: ${({ hoverFillColor }) => hoverFillColor || "#1e6b91"};
+      cursor: grab;
+    }
+  
+    ${({ isSelected }) =>
+      isSelected &&
+      `
+      stroke: #000;  // 선택 시 항상 검정색 외곽선을 보여줌
+      stroke-width: 2;
+      stroke-dasharray: 4;
+      stroke-linecap: round;
+      transform: translate(-2px, -2px);
+      width: calc(100% + 4px);
+      height: calc(100% + 4px);
+    `}
+  `;
 
-  &:hover {
-    fill: ${({ hoverFillColor }) => hoverFillColor || "#1e6b91"};
-    cursor: grab;
-  }
-`;
+// 원 스타일
+export const StyledCircle = styled.circle
+  .withConfig({
+    shouldForwardProp: shouldNotForwardPropsWithKeys(["isSelected"]),
+  })
+  .attrs((props) => ({
+    style: {
+      cx: props.cx,
+      cy: props.cy,
+      r: props.r,
+      fill: props.fill || theme.colors.shapeFillDefaultColor,
+      stroke: props.stroke || "none", // 기본적으로 선이 없는 경우 처리
+      strokeWidth: props.strokeWidth || 0, // 선이 없는 경우 기본값
+    },
+  }))`
+    cursor: move;
+    transition: transform 0.2s, fill 0.2s;
+  
+    &:hover {
+      fill: ${({ hoverFillColor }) => hoverFillColor || "#1e6b91"};
+      cursor: grab;
+    }
+  
+    ${({ isSelected }) =>
+      isSelected &&
+      `
+      stroke: #000;  // 선택 시 검정색 외곽선 추가
+      stroke-width: 2;
+      stroke-dasharray: 4;
+      stroke-linecap: round;
+      transform: translate(-2px, -2px);
+      r: calc(${(props) => props.r}px + 2px);  // 원의 반지름을 2px 늘림
+    `}
+  `;
 
 // 현재 그리는 사각형 스타일
 export const CurrentRectangle = styled(StyledRectangle)`
   opacity: 0.5;
-`;
-
-// 원 스타일 추가
-export const StyledCircle = styled.circle.attrs((props) => ({
-  style: {
-    cx: props.cx,
-    cy: props.cy,
-    r: props.r,
-    fill: props.fill || theme.colors.shapeFillDefaultColor,
-    stroke: props.stroke || "#000",
-    strokeWidth: props.strokeWidth || 2,
-  },
-}))`
-  cursor: move;
-  transition: transform 0.2s, fill 0.2s;
-
-  &:hover {
-    fill: ${({ hoverFillColor }) => hoverFillColor || "#1e6b91"};
-    cursor: grab;
-  }
 `;
 
 // 현재 그리는 원 스타일
