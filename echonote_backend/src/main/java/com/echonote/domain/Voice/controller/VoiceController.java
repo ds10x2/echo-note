@@ -81,7 +81,6 @@ public class VoiceController {
 	public ResponseEntity<String> receiveSTTResult(@RequestBody STTResultRequest sttResultRequest) {
 		voiceService.saveSTTResult(sttResultRequest);
 
-
 		SseEmitter emitter = emitters.get(sttResultRequest.getId());
 
 		try {

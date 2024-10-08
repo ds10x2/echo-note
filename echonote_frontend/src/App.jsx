@@ -66,7 +66,6 @@ class App extends Component {
               </MainContent>
 
               <STTBar />
-              {/* <PdfButton /> */}
             </Layout>
           </ThemeProvider>
         </div>
