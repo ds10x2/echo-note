@@ -4,6 +4,18 @@ const textStore = create((set, get) => ({
   textItems: {}, // 페이지별로 textItems를 관리하기 위해 객체로 변경
   currentPage: 1, // 현재 페이지 상태 추가
   isTextMode: false,
+  fontProperty: {
+    fontSize: 10,
+  },
+
+  setFontSize: (newFontSize) => {
+    set((state) => ({
+      fontProperty: {
+        ...state.fontProperty,
+        fontSize: newFontSize, // fontSize만 업데이트
+      },
+    }));
+  },
 
   addTextItem: (item) => {
     const currentPage = get().currentPage;

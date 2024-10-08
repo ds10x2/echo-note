@@ -64,8 +64,8 @@ class App extends Component {
                   savedImage={savedImage}
                 />
               </MainContent>
+
               <STTBar />
-              {/* <PdfButton /> */}
             </Layout>
           </ThemeProvider>
         </div>
