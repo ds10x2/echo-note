@@ -22,7 +22,7 @@ export const DrawingCanvasContainer = styled.div`
 export const DrawingToolContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-evenly;
   width: 100%;
   height: 30px;
   max-width: 500px;
@@ -57,22 +57,50 @@ export const IconButton = styled.button`
   }
 `;
 
-// 공통 슬라이더 스타일 적용
-const CommonSliderPopup = styled.div`
+export const SliderContainer = styled.div`
   position: absolute;
   z-index: 9999;
   bottom: 60px;
-  background-color: white;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
 
-  label {
-    margin-bottom: 5px;
-  }
+export const SliderIndicator = styled.div`
+  width: ${({ activeTool, strokeWidth, eraserWidth }) =>
+    activeTool === "pen" ? `${strokeWidth + 10}px` : `${eraserWidth + 10}px`};
+  height: ${({ activeTool, strokeWidth, eraserWidth }) =>
+    activeTool === "pen" ? `${strokeWidth + 10}px` : `${eraserWidth + 10}px`};
+  background-color: ${({ activeTool, strokeColor }) =>
+    activeTool === "pen" ? strokeColor : "#ffffff"};
+  border: ${({ activeTool }) =>
+    activeTool === "pen" ? "none" : "1px solid #ccc"};
+  color: ${({ activeTool, strokeColor }) =>
+    activeTool === "eraser" || strokeColor === "#ffffff" ? "black" : "white"};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 100%;
+  transform: translateY(-20px);
+  border-radius: 50%;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  font-weight: bold;
+  transform: translateX(-25px);
+  margin-bottom: 5px;
+`;
+
+export const SliderPopup = styled.div`
+  background-color: #ffffff;
+  padding: 2px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  transform: translateX(-25px);
 
   input[type="range"] {
     -webkit-appearance: none;
@@ -81,8 +109,9 @@ const CommonSliderPopup = styled.div`
     height: 6px;
     background: #ddd;
     outline: none;
-    opacity: 0.7;
+    opacity: 0.8;
     transition: opacity 0.2s;
+    border-radius: 5px;
 
     &:hover {
       opacity: 1;
@@ -91,38 +120,45 @@ const CommonSliderPopup = styled.div`
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
       background: black;
       cursor: pointer;
-      margin-top: -5px;
       transition: background 0.2s;
     }
 
     &::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
       background: black;
       cursor: pointer;
       transition: background 0.2s;
     }
-
-    &::-webkit-slider-runnable-track {
-      background: linear-gradient(black, black) no-repeat center;
-      height: 6px;
-      border-radius: 3px;
-    }
   }
 `;
 
-// 펜 슬라이더 팝업
-export const PenSliderPopup = styled(CommonSliderPopup)`
-  left: 35px;
+export const SliderButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  margin: 0 5px;
+  color: black;
+
+  &:hover {
+    color: gray;
+  }
 `;
 
-// 지우개 슬라이더 팝업
-export const EraserSliderPopup = styled(CommonSliderPopup)`
-  left: 100px;
+export const Divider = styled.div`
+  width: 1px;
+  height: 24px;
+  background-color: #d3d3d3;
+  margin: 0 10px;
 `;

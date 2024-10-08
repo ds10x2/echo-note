@@ -4,7 +4,7 @@ import * as St from "@components/styles/PdfViewer.style";
 import ShapeToolBar from "./ShapeToolBar";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 
-const PdfViewer = ({ isDrawingEditorOpened, savedImage }) => {
+const PdfViewer = ({ isDrawingEditorOpened }) => {
   const containerRef = useRef();
   const { mode } = drawingTypeStore();
 
@@ -16,7 +16,6 @@ const PdfViewer = ({ isDrawingEditorOpened, savedImage }) => {
       <PdfCanvas
         containerRef={containerRef}
         isDrawingEditorOpened={isDrawingEditorOpened}
-        savedImage={savedImage}
       />
     </St.PdfContainer>
   );

@@ -6,8 +6,8 @@ export const ColorPaletteContainer = styled.div`
 `;
 
 export const ColorSelectionBtn = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background-color: ${(props) => props.color};
   border: none;

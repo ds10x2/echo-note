@@ -4,9 +4,8 @@ import DrawingToolBar from "@components/DrawingToolBar";
 import DrawingCanvas from "@components/DrawingCanvas";
 import canvasStore from "@/stores/canvasStore";
 
-const DrawingEditor = ({ scale }) => {
-  const { getCanvasPath } = canvasStore.getState();
-  const canvasRef = useRef(getCanvasPath());
+const DrawingEditor = ({ scale, page }) => {
+  const canvasRef = useRef();
   const [eraseMode, setEraseMode] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(5);
   const [eraserWidth, setEraserWidth] = useState(10);
@@ -47,10 +46,6 @@ const DrawingEditor = ({ scale }) => {
     canvasRef.current?.clearCanvas();
   };
 
-  const handleResetClick = () => {
-    canvasRef.current?.resetCanvas();
-  };
-
   const handleReadOnlyChange = (isReadOnly) => {
     setReadOnly(isReadOnly);
   };
@@ -70,17 +65,17 @@ const DrawingEditor = ({ scale }) => {
         onUndoChange={handleUndoClick}
         onRedoChange={handleRedoClick}
         onClearChange={handleClearClick}
-        onResetChange={handleResetClick}
         onReadOnlyChange={handleReadOnlyChange}
       />
       <DrawingCanvas
         ref={canvasRef}
-        strokeWidth={strokeWidth}
-        eraserWidth={eraserWidth}
+        strokeWidth={strokeWidth * scale}
+        eraserWidth={eraserWidth * scale}
         strokeColor={strokeColor}
         eraseMode={eraseMode}
         readOnly={readOnly}
         scale={scale}
+        page={page}
       />
     </St.DrawingEditorContainer>
   );
