@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { ToggleContainer, Toggle } from "./ToggleButton.style";
 
-const ToggleButton = () => {
-  const [isOn, setIsOn] = useState(false);
-
+const ToggleButton = ({ isOn, onChange }) => {
   const handleToggle = () => {
-    setIsOn(!isOn);
+    onChange();
   };
 
   return (
