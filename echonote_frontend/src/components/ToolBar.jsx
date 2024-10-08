@@ -1,5 +1,18 @@
+import { useEffect, useRef, useState } from "react";
 import AnalyzeModal from "@components/AnalyzeModal";
 import PdfSettingModal from "@components/PdfSettingModal";
+import { RiSpeakLine } from "react-icons/ri";
+import { FaPen, FaTextHeight, FaImage, FaShapes, FaStar } from "react-icons/fa";
+import { BiWindowAlt, BiChevronsDown, BiChevronsUp } from "react-icons/bi";
+import {
+  IoMicSharp,
+  IoChevronBackOutline,
+  IoChevronForwardOutline,
+} from "react-icons/io5";
+import { LuZoomIn, LuZoomOut } from "react-icons/lu";
+import useSidebarStore from "@stores/sideBarStore";
+import drawingTypeStore from "@stores/drawingTypeStore";
+import pageStore from "@stores/pageStore";
 import {
   AnimatedToolBarContent,
   Divider,
@@ -13,12 +26,6 @@ import {
   ToolBarHeader,
   ToolBarIcon,
 } from "@components/styles/ToolBar.style";
-import useSidebarStore from "@stores/sideBarStore";
-import { useEffect, useRef, useState } from "react";
-import { BiChevronsDown, BiChevronsUp, BiWindowAlt } from "react-icons/bi";
-import { FaImage, FaPen, FaShapes, FaStar, FaTextHeight } from "react-icons/fa";
-import { IoMicSharp } from "react-icons/io5";
-import { RiSpeakLine } from "react-icons/ri";
 import { VscSettings } from "react-icons/vsc";
 
 const ToolBar = () => {
@@ -31,6 +38,9 @@ const ToolBar = () => {
     toggleRecordingBar,
   } = useSidebarStore();
 
+  const { mode, setTextMode, setShapeMode } = drawingTypeStore();
+
+  const { nextPage, prevPage, zoomIn, zoomOut } = pageStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPdfSettingModalOpen, setIsPdfSettingModalOpen] = useState(false);
   const [isAnalyzeModalOpen, setIsAnalyzeModalOpen] = useState(false);
@@ -63,17 +73,17 @@ const ToolBar = () => {
     setIsPdfSettingModalOpen(false);
     setModalType(ModalType);
 
-    const modalWidth = 300; 
+    const modalWidth = 300;
     const adjustedLeft = buttonPosition.left - modalWidth;
 
     setButtonPosition((prevPosition) => ({
-      ...prevPosition, 
-      left: adjustedLeft, 
+      ...prevPosition,
+      left: adjustedLeft,
     }));
 
     setTimeout(() => {
       setIsAnalyzeModalOpen(true);
-    }, 200); 
+    }, 200);
   };
 
   useEffect(() => {
@@ -106,9 +116,23 @@ const ToolBar = () => {
           />
           <Divider />
           <ToolBarIcon as={FaPen} />
-          <ToolBarIcon as={FaTextHeight} />
+          <ToolBarIcon
+            as={FaTextHeight}
+            onClick={setTextMode}
+            isActive={mode.text}
+          />
           <ToolBarIcon as={FaImage} />
-          <ToolBarIcon as={FaShapes} />
+          <ToolBarIcon
+            as={FaShapes}
+            onClick={setShapeMode}
+            isActive={mode.shape}
+          />
+          <Divider />
+          <IconButton as={LuZoomOut} onClick={zoomOut} />
+          <IconButton as={LuZoomIn} onClick={zoomIn} />
+          <Divider />
+          <IconButton as={IoChevronBackOutline} onClick={prevPage} />
+          <IconButton as={IoChevronForwardOutline} onClick={nextPage} />
         </ToolBarButton>
         <SideBarButton>
           <IconButton
@@ -141,7 +165,7 @@ const ToolBar = () => {
         isOpen={isPdfSettingModalOpen}
         onClose={togglePdfModal}
         position={buttonPosition}
-        toggleAnalyzeModal={handleAnalyzeModalOpen} 
+        toggleAnalyzeModal={handleAnalyzeModalOpen}
       />
 
       <AnalyzeModal

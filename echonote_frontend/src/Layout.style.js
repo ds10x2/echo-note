@@ -12,7 +12,7 @@ export const MainContent = styled.main`
   flex-grow: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
+  /* align-items: center; */
   background-color: ${(props) => props.theme.colors.backgroundColor};
 `;
 

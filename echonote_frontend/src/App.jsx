@@ -7,7 +7,8 @@ import PdfBar from "@components/PdfBar";
 import RecordingBar from "@components/RecordingBar";
 import { Layout, MainContent, rootStyle, appStyle } from "@/Layout.style";
 import STTBar from "@components/STTBar";
-import PdfButton from "@services/PDFupload/PdfUpdate"
+import PdfViewer from "@components/PdfViewer";
+import PdfButton from "@services/PDFupload/PdfUpdate";
 
 class App extends Component {
   state = {
@@ -38,17 +39,13 @@ class App extends Component {
               <RecordingBar />
               <PdfBar />
               <MainContent>
-
-
                 <PdfButton />
+                <PdfViewer />
               </MainContent>
-
               <STTBar />
-
             </Layout>
           </ThemeProvider>
         </div>
-
       </div>
     );
   }
