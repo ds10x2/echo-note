@@ -107,7 +107,7 @@ public class VoiceController {
 //				emitters.remove(sttResultRequest.getId());
 //				emitter = null;  // 참조를 제거
 //			}
-		}
+//		}
 
 		// voiceService.checkAndProcessVoice(sttResultRequest.getProcessId());
 		return ResponseEntity.ok("STT 완료");
