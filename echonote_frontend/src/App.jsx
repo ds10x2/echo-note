@@ -64,6 +64,7 @@ class App extends Component {
                   savedImage={savedImage}
                 />
               </MainContent>
+
               <STTBar />
             </Layout>
           </ThemeProvider>

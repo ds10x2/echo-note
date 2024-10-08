@@ -18,9 +18,11 @@ export const theme = {
     editButtonColor: "#FFFFFF",
     editButtonBorderColor: "#cecece",
     modalBackground: "#414141",
-    shapeFillDefaultColor: "#ffffff00",
+    shapeFillDefaultColor: "#e2e2e2ff",
     shapeStrokeDefaultColor: "#000000",
     textEditBackground: "#ffffff00",
     textSelectedStrokeColor: "#94acd8",
+    selectedIconBackground: "#ebebeb",
+    toggleButtonOff: "#cccccc",
   },
 };
