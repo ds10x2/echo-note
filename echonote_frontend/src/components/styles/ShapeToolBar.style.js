@@ -145,7 +145,7 @@ export const ToolBarIconContainer = styled.div`
 
 // 폰트, 도형 애니메이션
 export const ToolBarIconDetail = styled.div.withConfig({
-  shouldForwardProp: (prop) => !["isOpen"].includes(prop), // isOpen만 필터링
+  shouldForwardProp: (prop) => !["isOpen"].includes(prop),
 })`
   max-width: ${(props) => (props.isOpen ? "80px" : "0")};
   opacity: ${(props) => (props.isOpen ? "1" : "0")};
@@ -160,7 +160,7 @@ export const ToolBarIconDetail = styled.div.withConfig({
 
 export const ColorPalette = styled.div`
   position: absolute;
-  z-index: 2;
+  z-index: 100;
   bottom: 70px;
   left: 50%;
   transform: translateX(-50%);
@@ -171,10 +171,45 @@ export const ColorPalette = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
 `;
 
 export const ColorPaletteContainer = styled.div`
   position: relative;
   display: inline-block;
+`;
+
+export const PropertyContainer = styled.div`
+  width: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+`;
+
+export const PropertyTitle = styled.h1`
+  font-size: 16px;
+  padding: 0;
+  margin: 0;
+`;
+
+export const PropertyText = styled.h5`
+  font-size: 12px;
+  padding: 0;
+  margin: 0;
+`;
+
+export const AnimatedContainer = styled.div.withConfig({
+  shouldForwardProp: shouldNotForwardPropsWithKeys(["isVisible"]),
+})`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: ${({ isVisible }) => (isVisible ? "none" : "hidden")};
+  position: relative;
+  max-height: ${({ isVisible }) =>
+    isVisible ? "500px" : "0"}; /* 높이 애니메이션 */
+  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)}; /* 투명도 애니메이션 */
+  transition: max-height 0.4s ease, opacity 0.4s ease; /* 부드러운 애니메이션 적용 */
+  transform-origin: top;
 `;

@@ -1,20 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as St from "@components/styles/ShapeToolBar.style";
-import {
-  FaTrash,
-  FaCircle,
-  FaSquare,
-  FaRegCheckCircle,
-  FaRegCircle,
-} from "react-icons/fa";
+import { FaTrash, FaCircle, FaSquare } from "react-icons/fa";
 import { FaXmark, FaRegCircleXmark } from "react-icons/fa6";
 import { MdOutlineFormatColorFill, MdOutlineLineWeight } from "react-icons/md";
 import shapeStore from "@/stores/shapeStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 import { Colorful } from "@uiw/react-color";
+import ToggleButton from "./common/ToggleButton";
 
 const ShapeToolBar = ({}) => {
-  const { property, setFillColor, setStrokeColor } = shapeStore();
+  const { property, setFillColor, setStrokeColor, setFill, setStroke } =
+    shapeStore();
   const { mode, shapeMode, setRectangleMode, setCircleMode, setShapeMode } =
     drawingTypeStore();
   const [showFillPalette, setShowFillPalette] = useState(false);
@@ -72,13 +68,18 @@ const ShapeToolBar = ({}) => {
             />
             {showFillPalette && (
               <St.ColorPalette ref={fillPaletteRef}>
-                <Colorful
-                  color={property.fillColor}
-                  onChange={(newColor) => {
-                    setFillColor(newColor.hexa);
-                  }}
-                />
-                <div>칠 유/무 여부가 들어갑니다</div>
+                <St.PropertyContainer>
+                  <St.PropertyTitle>칠</St.PropertyTitle>
+                  <ToggleButton isOn={property.fill} onChange={setFill} />
+                </St.PropertyContainer>
+                <St.AnimatedContainer isVisible={property.fill}>
+                  <Colorful
+                    color={property.fillColor}
+                    onChange={(newColor) => {
+                      setFillColor(newColor.hexa);
+                    }}
+                  />
+                </St.AnimatedContainer>
               </St.ColorPalette>
             )}
           </St.ColorPaletteContainer>
@@ -92,14 +93,21 @@ const ShapeToolBar = ({}) => {
             />
             {showStrokePalette && (
               <St.ColorPalette ref={strokePaletteRef}>
-                <Colorful
-                  color={property.strokeColor}
-                  onChange={(newColor) => {
-                    setStrokeColor(newColor.hexa);
-                  }}
-                />
-                <div>선 굵기가 들어갑니다</div>
-                <div>선 유/무 여부가 들어갑니다</div>
+                <St.PropertyContainer>
+                  <St.PropertyTitle>선</St.PropertyTitle>
+                  <ToggleButton isOn={property.stroke} onChange={setStroke} />
+                </St.PropertyContainer>
+                <St.AnimatedContainer isVisible={property.stroke}>
+                  <St.PropertyContainer>
+                    <St.PropertyText>두께</St.PropertyText>
+                  </St.PropertyContainer>
+                  <Colorful
+                    color={property.strokeColor}
+                    onChange={(newColor) => {
+                      setStrokeColor(newColor.hexa);
+                    }}
+                  />
+                </St.AnimatedContainer>
               </St.ColorPalette>
             )}
           </St.ColorPaletteContainer>
