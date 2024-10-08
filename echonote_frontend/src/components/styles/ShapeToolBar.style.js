@@ -34,28 +34,41 @@ export const IconContainer = styled.div`
   gap: 14px;
 `;
 
-export const IconButton = styled.div.withConfig({
-  shouldForwardProp: (prop) => !["isActive"].includes(prop), // isActive만 필터링
-})`
-  background-color: ${({ isActive, theme }) =>
-    isActive ? theme.colors.selectedIconBackground : "transparent"};
+export const IconButton = styled.div
+  .withConfig({
+    shouldForwardProp: (prop) => !["isActive"].includes(prop), // isActive만 필터링
+  })
+  .attrs((props) => ({
+    style: {
+      backgroundColor: props.isActive
+        ? theme.colors.selectedIconBackground
+        : "transparent",
+      color: props.color ? props.color : theme.colors.iconColor,
+    },
+  }))`
   border: none;
   border-radius: 15px;
-  color: ${({ color, theme }) => (color ? color : theme.colors.iconColor)};
   cursor: pointer;
   font-size: 18px;
   padding: 6px;
 `;
 
-export const ToggleButton = styled.div.withConfig({
-  shouldForwardProp: (prop) => !["isActive"].includes(prop), // isActive만 필터링
-})`
-  background-color: ${({ isActive, theme }) =>
-    isActive ? theme.colors.selectedIconBackground : "transparent"};
+export const ToggleButton = styled.div
+  .withConfig({
+    shouldForwardProp: (prop) => !["isActive"].includes(prop), // isActive만 필터링
+  })
+  .attrs((props) => ({
+    style: {
+      backgroundColor: props.isActive
+        ? theme.colors.selectedIconBackground
+        : "transparent",
+      color: props.isActive ? theme.colors.iconHover : theme.colors.iconColor,
+    },
+  }))`
+
   border: none;
   border-radius: 15px;
-  color: ${({ isActive, theme }) =>
-    isActive ? theme.colors.iconHover : theme.colors.iconColor};
+
   cursor: pointer;
   font-size: 18px;
   padding: 6px;
