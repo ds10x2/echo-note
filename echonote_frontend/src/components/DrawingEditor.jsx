@@ -5,13 +5,24 @@ import DrawingCanvas from "@components/DrawingCanvas";
 import canvasStore from "@/stores/canvasStore";
 
 const DrawingEditor = ({ scale, page }) => {
-  const { getCanvasPath } = canvasStore.getState();
-  const canvasRef = useRef(getCanvasPath());
+  const { getCanvasPath, undo, redo, clearCanvasPath, setCanvasPath } =
+    canvasStore.getState();
+  const canvasRef = useRef();
   const [eraseMode, setEraseMode] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(5);
   const [eraserWidth, setEraserWidth] = useState(10);
   const [strokeColor, setStrokeColor] = useState("#000000");
   const [readOnly, setReadOnly] = useState(false);
+
+  useEffect(() => {
+    const paths = getCanvasPath(page);
+    if (canvasRef.current) {
+      canvasRef.current.clearCanvas();
+      if (paths && paths.length > 0) {
+        canvasRef.current.loadPaths(paths);
+      }
+    }
+  }, [page]);
 
   const handleEraserClick = () => {
     setEraseMode(true);
@@ -36,19 +47,39 @@ const DrawingEditor = ({ scale, page }) => {
   };
 
   const handleUndoClick = () => {
-    canvasRef.current?.undo();
+    undo();
+    const paths = getCanvasPath(page);
+    if (canvasRef.current) {
+      canvasRef.current.clearCanvas();
+      if (paths && paths.length > 0) {
+        canvasRef.current.loadPaths(paths);
+      }
+    }
   };
 
   const handleRedoClick = () => {
-    canvasRef.current?.redo();
+    redo();
+    const paths = getCanvasPath(page);
+    if (canvasRef.current) {
+      canvasRef.current.clearCanvas();
+      if (paths && paths.length > 0) {
+        canvasRef.current.loadPaths(paths);
+      }
+    }
   };
 
   const handleClearClick = () => {
-    canvasRef.current?.clearCanvas();
+    clearCanvasPath(page);
+    if (canvasRef.current) {
+      canvasRef.current.clearCanvas();
+    }
   };
 
   const handleResetClick = () => {
-    canvasRef.current?.resetCanvas();
+    clearCanvasPath(page);
+    if (canvasRef.current) {
+      canvasRef.current.clearCanvas();
+    }
   };
 
   const handleReadOnlyChange = (isReadOnly) => {
