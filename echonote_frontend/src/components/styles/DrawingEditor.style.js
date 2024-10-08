@@ -119,3 +119,10 @@ export const SliderPopup = styled.div`
     }
   }
 `;
+
+export const Divider = styled.div`
+  width: 1px;
+  height: 24px;
+  background-color: #d3d3d3;
+  margin: 0 10px;
+`;

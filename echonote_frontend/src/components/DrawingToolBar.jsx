@@ -30,20 +30,24 @@ const DrawingToolBar = ({
   const [activeTool, setActiveTool] = useState("pen");
   const [showSlider, setShowSlider] = useState(false);
   const strokeWidthRef = useRef(null);
+  const buttonRefs = {
+    pen: useRef(null),
+    eraser: useRef(null),
+    wave: useRef(null),
+  };
 
   // 외부 클릭 감지 핸들러
   const handleClickOutside = (event) => {
+    // 슬라이더와 관련된 버튼이 아닌 경우만 슬라이더를 닫음
     if (
       strokeWidthRef.current &&
-      !strokeWidthRef.current.contains(event.target)
+      !strokeWidthRef.current.contains(event.target) &&
+      !Object.values(buttonRefs).some((ref) =>
+        ref.current.contains(event.target)
+      )
     ) {
       setShowSlider(false);
-      onReadOnlyChange(false);
     }
-
-    // event가 캔버스로 전달되지 않도록 중단
-    event.preventDefault();
-    event.stopPropagation();
   };
 
   useEffect(() => {
@@ -53,11 +57,14 @@ const DrawingToolBar = ({
     };
   }, []);
 
+  useEffect(() => {
+    onReadOnlyChange(showSlider);
+  }, [showSlider, onReadOnlyChange]);
+
   // 펜 클릭 핸들러
   const handlePenClick = () => {
     setActiveTool("pen");
     setShowSlider(false);
-    onReadOnlyChange(false);
     onPenClick();
   };
 
@@ -65,15 +72,14 @@ const DrawingToolBar = ({
   const handleEraserClick = () => {
     setActiveTool("eraser");
     setShowSlider(false);
-    onReadOnlyChange(false);
     onEraserClick();
   };
 
   const handleWaveClick = () => {
-    if (activeTool === "pen" || activeTool === "eraser") {
-      setShowSlider(!showSlider);
-      onReadOnlyChange(!showSlider);
-    }
+    setShowSlider((prevShowSlider) => {
+      const newShowSlider = !prevShowSlider;
+      return newShowSlider;
+    });
   };
 
   return (
@@ -81,16 +87,16 @@ const DrawingToolBar = ({
       <ColorPalette value={strokeColor} onChange={onStrokeColorChange} />
 
       {/* 펜 아이콘 */}
-      <St.IconButton onClick={handlePenClick}>
+      <St.IconButton onClick={handlePenClick} ref={buttonRefs.pen}>
         <FaPen color={activeTool === "pen" ? "gray" : "black"} />
       </St.IconButton>
 
       {/* 지우개 아이콘 */}
-      <St.IconButton onClick={handleEraserClick}>
+      <St.IconButton onClick={handleEraserClick} ref={buttonRefs.eraser}>
         <FaEraser color={activeTool === "eraser" ? "gray" : "black"} />
       </St.IconButton>
 
-      <St.IconButton onClick={handleWaveClick}>
+      <St.IconButton onClick={handleWaveClick} ref={buttonRefs.wave}>
         <MdOutlineLineWeight color={showSlider ? "gray" : "black"} />
       </St.IconButton>
 
@@ -123,6 +129,7 @@ const DrawingToolBar = ({
           />
         </St.SliderPopup>
       )}
+      <St.Divider />
 
       {/* undo, redo, clear, reset */}
       <St.IconButton onClick={onUndoChange}>
