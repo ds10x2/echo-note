@@ -23,5 +23,6 @@ export const theme = {
     textEditBackground: "#ffffff00",
     textSelectedStrokeColor: "#94acd8",
     selectedIconBackground: "#ebebeb",
+    toggleButtonOff: "#cccccc",
   },
 };
