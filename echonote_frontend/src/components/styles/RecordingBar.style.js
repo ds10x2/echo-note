@@ -18,7 +18,7 @@ export const RecordingBarContainer = styled.div.withConfig({
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10;
+  z-index: 5;
 
   opacity: ${(props) => (props.isOpened ? "1" : "0")};
   transform: ${(props) =>

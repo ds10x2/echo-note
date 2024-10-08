@@ -4,12 +4,18 @@ import { shouldNotForwardPropsWithKeys } from "@shared/utils/shouldForwardProp";
 export const SidebarContainer = styled.div.withConfig({
   shouldForwardProp: shouldNotForwardPropsWithKeys(["isOpened"]),
 })`
+  position: absolute;
+  left: 0;
+  top: 0;
   width: ${(props) => (props.isOpened ? "135px" : "0")};
+  height: 100%;
   transition: width 0.3s ease;
+  background-color: white;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   overflow-x: hidden;
   white-space: nowrap;
+  z-index: 3;
 
   /* 커스텀 스크롤바 */
   &::-webkit-scrollbar {
@@ -17,15 +23,11 @@ export const SidebarContainer = styled.div.withConfig({
   }
   &::-webkit-scrollbar-track {
     background-color: transparent;
-    border-radius: 5px;
+    border-radius: 4px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: ${(props) => props.theme.colors.iconHover};
-    border-radius: 5px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background-color: ${(props) => props.theme.colors.iconActive};
-    transition: background-color 0.2s ease;
+    background-color: ${(props) => props.theme.colors.textSelectedStrokeColor};
+    border-radius: 4px;
   }
   &::-webkit-scrollbar-button {
     display: none;
