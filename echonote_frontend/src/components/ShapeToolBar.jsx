@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as St from "@components/styles/ShapeToolBar.style";
+import { PiWaveSineBold } from "react-icons/pi";
 import { FaTrash, FaCircle, FaSquare } from "react-icons/fa";
 import { FaXmark, FaRegCircleXmark } from "react-icons/fa6";
 import { MdOutlineFormatColorFill, MdOutlineLineWeight } from "react-icons/md";
@@ -107,7 +108,7 @@ const ShapeToolBar = ({}) => {
           {/* 선색 고르기 */}
           <St.ColorPaletteContainer>
             <St.IconButton
-              as={MdOutlineLineWeight}
+              as={PiWaveSineBold}
               onClick={toggleStrokePalette}
               color={property.strokeColor}
               isActive={showStrokePalette}
