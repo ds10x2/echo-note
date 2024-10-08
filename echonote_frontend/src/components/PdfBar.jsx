@@ -71,6 +71,27 @@ const PdfBar = () => {
     setIsDragEnabled(false);
   };
 
+  // PDF 페이지 순서를 변경하고 새 PDF를 만드는 함수
+  // const reorderPdf = async () => {
+  //   if (!pdfDoc) return;
+
+  //   // 새로운 PDF 문서 생성
+  //   const newPdf = await PDFDocument.create();
+
+  //   // 기존 순서대로 페이지를 가져오고 새로운 PDF에 추가
+  //   for (let i = 0; i < pageOrder.length; i++) {
+  //     const [oldPage] = await newPdf.copyPages(pdfDoc, [pageOrder[i] - 1]); // 페이지 인덱스는 0부터 시작하므로 -1
+  //     newPdf.addPage(oldPage);
+  //   }
+
+  //   // 새로 만든 PDF를 Blob 형태로 저장
+  //   const pdfBytes = await newPdf.save();
+  //   const blob = new Blob([pdfBytes], { type: "application/pdf" });
+
+  //   // 파일 다운로드 또는 서버에 업로드
+  //   saveAs(blob, "reordered.pdf"); // 파일을 사용자에게 다운로드합니다.
+  // };
+
   return (
     <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
       <SidebarContainer isOpened={isPdfBarOpened}>

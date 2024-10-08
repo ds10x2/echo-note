@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import AnalyzeModal from "@components/AnalyzeModal";
-import PdfSettingModal from "@components/PdfSettingModal";
+import AnalyzeModal from "@components/modal/AnalyzeModal";
+import PdfSettingModal from "@components/modal/PdfSettingModal";
 import { RiSpeakLine } from "react-icons/ri";
 import {
   FaPen,
