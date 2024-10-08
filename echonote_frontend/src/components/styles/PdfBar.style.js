@@ -8,7 +8,7 @@ export const SidebarContainer = styled.div.withConfig({
   left: 0;
   top: 0;
   width: ${(props) => (props.isOpened ? "135px" : "0")};
-  height: 100%;
+  height: 100vh;
   transition: width 0.3s ease;
   background-color: white;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -36,20 +36,30 @@ export const SidebarContainer = styled.div.withConfig({
 
 export const ImageContainer = styled.div`
   padding: 10px;
-  display: flex;
   flex-direction: column;
   gap: 10px;
+  justify-content: center;
+  align-items: center;
 `;
 
-export const DraggableImage = styled.div`
+export const PageNumber = styled.p`
+  text-align: center;
+  font-size: 12px;
+  color: ${(props) => (props.isSelected ? "#0070f3" : "#000")};
+  margin-top: 5px;
+`;
+
+export const DraggableImage = styled.div.withConfig({
+  shouldForwardProp: shouldNotForwardPropsWithKeys(["isDragging", "isPressed"]),
+})`
   position: relative;
   width: 100px;
   height: 150px;
   border-radius: 7px;
-  border: 2px solid ${(props) => (props.isSelected ? "#0070f3" : "#ccc")};
+  border: 2px solid
+    ${(props) => (props.isDragging || props.isPressed ? "#3700ff" : "#ccc")}; // 드래그 중이거나 꾹 눌렀을 때 테두리 색 변경
   box-shadow: ${(props) =>
-    props.isSelected ? "0 0 10px rgba(0, 0, 0, 0.2)" : "none"};
-  cursor: move;
+    props.isDragging ? "0 0 10px rgba(0, 0, 0, 0.2)" : "none"};
   transition: border 0.2s ease, box-shadow 0.2s ease;
   background-color: transparent;
   display: flex;
@@ -62,11 +72,4 @@ export const DraggableImage = styled.div`
     width: 100%;
     height: auto;
   }
-`;
-
-export const PageNumber = styled.p`
-  text-align: center;
-  font-size: 12px;
-  color: ${(props) => (props.isSelected ? "#0070f3" : "#000")};
-  margin-top: 5px;
 `;
