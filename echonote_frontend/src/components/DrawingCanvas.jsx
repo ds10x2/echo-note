@@ -31,35 +31,48 @@ const DrawingCanvas = forwardRef(
       ref.current.eraseMode(eraseMode);
     }, [eraseMode, scale, page]);
 
-    const handleTouchEnd = async () => {
-      if (!ref.current) return;
+    const handleCanvasChange = () => {
       const { setCanvasPath, setCanvasImage } = canvasStore.getState();
 
-      try {
-        const data = await ref.current.exportPaths();
-        if (data.length === 0) return;
+      if (ref.current) {
+        // Path 저장
+        ref.current
+          .exportPaths()
+          .then((data) => {
+            if (data.length === 0) {
+              return;
+            }
 
-        const unscaledPaths = data.map((path) => ({
-          ...path,
-          strokeWidth: path.strokeWidth / scale,
-          paths: path.paths.map((point) => ({
-            x: point.x / scale,
-            y: point.y / scale,
-          })),
-        }));
+            const unscaledPaths = data.map((path) => ({
+              ...path,
+              strokeWidth: path.strokeWidth / scale,
+              paths: path.paths.map((point) => ({
+                x: point.x / scale,
+                y: point.y / scale,
+              })),
+            }));
 
-        setCanvasPath(page, unscaledPaths);
+            setCanvasPath(page, unscaledPaths);
+          })
+          .catch((e) => {
+            console.log("Error exporting paths:", e);
+          });
 
-        const svgData = await ref.current.exportSvg();
-        const svgDataUrl = "data:image/svg+xml;base64," + btoa(svgData);
-        setCanvasImage(page, svgDataUrl);
-      } catch (error) {
-        console.error("Error exporting paths or SVG:", error);
+        // Svg 저장
+        ref.current
+          .exportSvg()
+          .then((data) => {
+            const svgDataUrl = "data:image/svg+xml;base64," + btoa(data);
+            setCanvasImage(page, svgDataUrl);
+          })
+          .catch((error) => {
+            console.error("Error exporting SVG:", error);
+          });
       }
     };
 
     return (
-      <St.DrawingCanvasContainer onTouchEnd={handleTouchEnd}>
+      <St.DrawingCanvasContainer>
         <div
           style={{
             width: "100%",
@@ -77,6 +90,7 @@ const DrawingCanvas = forwardRef(
             canvasColor="transparent"
             readOnly={readOnly}
             style={{ border: 0, borderRadius: 0 }}
+            onChange={handleCanvasChange}
           />
         </div>
       </St.DrawingCanvasContainer>

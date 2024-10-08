@@ -5,36 +5,13 @@ import DrawingCanvas from "@components/DrawingCanvas";
 import canvasStore from "@/stores/canvasStore";
 
 const DrawingEditor = ({ scale, page }) => {
-  const { getCanvasPath, undo, redo, clearCanvasPath, setCanvasPath } =
-    canvasStore.getState();
   const canvasRef = useRef();
   const [eraseMode, setEraseMode] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(5);
   const [eraserWidth, setEraserWidth] = useState(10);
   const [strokeColor, setStrokeColor] = useState("#000000");
   const [readOnly, setReadOnly] = useState(false);
-
-  const scalePaths = (paths, scale) => {
-    return paths.map((path) => ({
-      ...path,
-      strokeWidth: path.strokeWidth * scale,
-      paths: path.paths.map((point) => ({
-        x: point.x * scale,
-        y: point.y * scale,
-      })),
-    }));
-  };
-
-  useEffect(() => {
-    const paths = getCanvasPath(page);
-    if (canvasRef.current) {
-      canvasRef.current.clearCanvas();
-      if (paths && paths.length > 0) {
-        const scaledPaths = scalePaths(paths, scale);
-        canvasRef.current.loadPaths(scaledPaths);
-      }
-    }
-  }, [page, scale]);
+  const { reset } = canvasStore.getState();
 
   const handleEraserClick = () => {
     setEraseMode(true);
@@ -71,6 +48,7 @@ const DrawingEditor = ({ scale, page }) => {
   };
 
   const handleResetClick = () => {
+    reset(page);
     canvasRef.current?.resetCanvas();
   };
 
