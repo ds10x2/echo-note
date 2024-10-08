@@ -1,7 +1,10 @@
 import styled from "styled-components";
 import { theme } from "@/shared/styles/theme";
+import { shouldNotForwardPropsWithKeys } from "@shared/utils/shouldForwardProp";
 
-export const ToggleContainer = styled.div`
+export const ToggleContainer = styled.div.withConfig({
+  shouldForwardProp: shouldNotForwardPropsWithKeys(["isOn"]),
+})`
   position: relative;
   width: 44px;
   height: 18px;
@@ -13,7 +16,9 @@ export const ToggleContainer = styled.div`
   transition: background-color 0.3s;
 `;
 
-export const Toggle = styled.div`
+export const Toggle = styled.div.withConfig({
+  shouldForwardProp: shouldNotForwardPropsWithKeys(["isOn"]),
+})`
   position: absolute;
   top: 50%; /* 상단에서 50% 위치 */
   left: ${({ isOn }) =>
