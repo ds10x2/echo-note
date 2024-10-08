@@ -18,12 +18,19 @@ const formatTime = (seconds) => {
   return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
 };
 
-const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
+const STTComponent = ({
+  id,
+  searchTerm,
+  isEditMode,
+  onSubmit,
+  handleArrowNavigation,
+}) => {
   const [sttData, setSttData] = useState([]);
   const [modifiedTexts, setModifiedTexts] = useState([]);
   const { setStartTime } = useAudioStore();
 
-  const { currentIndex, setSearchResults } = useSearchStore();
+  const { currentIndex, setCurrentIndex, searchResults, setSearchResults } =
+    useSearchStore();
   const resultRefs = useRef([]); // 전체 세그먼트 참조 저장
   const highlightRefs = useRef([]); // 하이라이트 텍스트의 참조 저장
   const containerRef = useRef(null); // STTContainer 참조 저장
@@ -67,27 +74,42 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     );
   };
 
+  useEffect(() => {
+    if (highlightRefs.current[currentIndex]) {
+      const highlightElement = highlightRefs.current[currentIndex];
+
+      // 해당 하이라이트된 요소가 존재하면 스크롤을 해당 위치로 이동
+      highlightElement.scrollIntoView({
+        behavior: "smooth", // 부드럽게 스크롤
+        block: "center", // 화면 중앙에 위치하도록 설정
+      });
+    }
+  }, [currentIndex]);
+
   // 텍스트 수정 시 호출되는 함수
   const handleTextChange = (segmentId, newText) => {
-    const exists = modifiedTexts.find((item) => item.id === segmentId);
-    if (exists) {
-      setModifiedTexts((prev) =>
-        prev.map((item) =>
-          item.id === segmentId ? { id: segmentId, text: newText } : item
-        )
-      );
-    } else {
-      setModifiedTexts((prev) => [...prev, { id: segmentId, text: newText }]);
+    const segment = sttData.find((item) => item.id === segmentId);
+
+    if (segment) {
+      const modifiedSegment = {
+        id: segmentId,
+        start: segment.start,
+        end: segment.end,
+        text: newText,
+      };
+
+      // 기존에 수정된 텍스트가 있는 경우 업데이트, 없는 경우 새로 추가
+      const exists = modifiedTexts.find((item) => item.id === segmentId);
+      if (exists) {
+        setModifiedTexts((prev) =>
+          prev.map((item) => (item.id === segmentId ? modifiedSegment : item))
+        );
+      } else {
+        setModifiedTexts((prev) => [...prev, modifiedSegment]);
+      }
     }
   };
 
-  useEffect(() => {
-    if (onSubmit) {
-      onSubmit(modifiedTexts);
-    }
-  }, [modifiedTexts, onSubmit]);
-
-  // 검색 결과 저장 및 참조 설정
   useEffect(() => {
     if (searchTerm) {
       const results = [];
@@ -100,58 +122,14 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     }
   }, [searchTerm, sttData, setSearchResults]);
 
-  // 하이라이트된 텍스트로 스크롤
   useEffect(() => {
-    if (highlightRefs.current[currentIndex] && containerRef.current) {
-      const highlightElement = highlightRefs.current[currentIndex];
-      const containerElement = containerRef.current;
-
-      // 하이라이트된 요소가 존재하는지 확인
-      if (highlightElement && highlightElement.offsetTop) {
-        const highlightPosition = highlightElement.offsetTop;
-        const containerScrollTop = containerElement.scrollTop;
-        const containerHeight = containerElement.offsetHeight;
-
-        // 스크롤 이동 거리 계산
-        let targetScrollTop = highlightPosition - containerHeight / 2;
-
-        // 스크롤이 음수로 설정되지 않도록 보정
-        if (targetScrollTop < 0) {
-          targetScrollTop = 0;
-        }
-
-        // 컨테이너의 최대 스크롤 범위 제한
-        const maxScrollTop =
-          containerElement.scrollHeight - containerElement.offsetHeight;
-
-        console.log("highlightPosition:", highlightPosition);
-        console.log("containerScrollTop:", containerScrollTop);
-        console.log("targetScrollTop:", targetScrollTop);
-
-        // 스크롤을 target 위치로 이동 (최대 범위를 넘지 않도록)
-        containerElement.scrollTo({
-          top: Math.min(targetScrollTop, maxScrollTop),
-          behavior: "smooth", // 부드러운 스크롤
-        });
-
-        console.log(
-          "Scrolling to element:",
-          highlightRefs.current[currentIndex]
-        );
-      } else {
-        console.log(
-          `No element or invalid offsetTop for currentIndex: ${currentIndex}`
-        );
-      }
-    } else {
-      console.log("No element found for currentIndex:", currentIndex);
+    if (onSubmit) {
+      onSubmit(modifiedTexts);
     }
-  }, [currentIndex]);
+  }, [modifiedTexts, onSubmit]);
 
   return (
     <STTContainer ref={containerRef}>
-      {" "}
-      {/* STTContainer에 대한 참조 추가 */}
       {sttData && sttData.length > 0 ? (
         <STTResultList>
           {sttData.map((segment, index) => (

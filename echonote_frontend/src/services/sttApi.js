@@ -16,3 +16,24 @@ export const getSTTResult = async (id) => {
     throw error;
   }
 };
+
+// STT 업데이트 함수
+export const modifySTTResult = async (id, modifiedData) => {
+  try {
+    const payload = {
+      id,
+      result: modifiedData,
+    };
+
+    const response = await apiClient.put("/voice/stt", payload);
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      console.error("Failed to update STT result");
+      throw new Error("Failed to update STT result");
+    }
+  } catch (error) {
+    console.error("Error updating STT result:", error);
+    throw error;
+  }
+};

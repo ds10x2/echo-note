@@ -10,6 +10,7 @@ import {
 import { FaPen } from "react-icons/fa";
 import SearchBar from "@components/common/SearchBar";
 import STTResult from "@components/stt/STT";
+import { modifySTTResult } from "@services/sttApi";
 
 const STTBar = () => {
   const { isSTTBarOpened } = useSidebarStore();
@@ -17,12 +18,12 @@ const STTBar = () => {
   const [isEditMode, setIsEditMode] = useState(false); // 수정 모드 상태 추가
   const [modifiedTexts, setModifiedTexts] = useState([]); // 상위에서 수정된 텍스트를 관리하는 상태
 
-  const { setCurrentIndex } = useSearchStore();
+  const { currentIndex, setCurrentIndex, searchResults } = useSearchStore();
 
   const noteId = 1;
 
   const handleSearch = (term) => {
-    setSearchTerm(term); // 검색어 상태 업데이트
+    setSearchTerm(term);
     setCurrentIndex(0);
   };
 
@@ -30,31 +31,9 @@ const STTBar = () => {
     // 수정된 텍스트가 있다면 서버로 전송
     if (modifiedData.length > 0) {
       try {
-        const payload = {
-          id: noteId, // note_id는 필요에 맞게 설정
-          result: modifiedData,
-        };
-
-        console.log(payload);
-
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}voice/stt`,
-          {
-            method: "PUT",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          }
-        );
-
-        if (!response.ok) {
-          console.error("Failed to update STT data");
-        } else {
-          console.log("STT data updated successfully");
-          setModifiedTexts([]); // 전송 완료 후 수정된 텍스트 초기화
-        }
+        await modifySTTResult(noteId, modifiedData); // API 함수 호출로 변경
+        console.log("STT data updated successfully");
+        setModifiedTexts([]); // 전송 완료 후 수정된 텍스트 초기화
       } catch (error) {
         console.error("Error updating STT data:", error);
       }
@@ -63,16 +42,29 @@ const STTBar = () => {
 
   const toggleEditMode = () => {
     // 수정 모드 토글
-    if (isEditMode) {
-      handleSubmit(modifiedTexts); // 수정 모드가 해제되면 수정된 데이터 전송
+    if (isEditMode && modifiedTexts.length > 0) {
+      handleSubmit(modifiedTexts);
     }
     setIsEditMode(!isEditMode);
+  };
+
+  const handleArrowNavigation = (direction) => {
+    if (direction === "up") {
+      setCurrentIndex(
+        currentIndex - 1 < 0 ? searchResults.length - 1 : currentIndex - 1
+      );
+    } else if (direction === "down") {
+      setCurrentIndex((currentIndex + 1) % searchResults.length);
+    }
   };
 
   return (
     <STTBarContainer isOpened={isSTTBarOpened}>
       <STTBarSearchRow>
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar
+          onSearch={handleSearch}
+          handleArrowNavigation={handleArrowNavigation}
+        />
       </STTBarSearchRow>
       <STTBarHeader>
         <IconButton onClick={toggleEditMode}>
@@ -84,7 +76,8 @@ const STTBar = () => {
           id={noteId}
           searchTerm={searchTerm}
           isEditMode={isEditMode}
-          onSubmit={setModifiedTexts} // 수정된 텍스트 저장
+          onSubmit={setModifiedTexts}
+          handleArrowNavigation={handleArrowNavigation}
         />
       </STTBarContent>
     </STTBarContainer>
