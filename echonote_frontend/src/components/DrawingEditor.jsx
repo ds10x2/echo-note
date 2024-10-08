@@ -14,15 +14,27 @@ const DrawingEditor = ({ scale, page }) => {
   const [strokeColor, setStrokeColor] = useState("#000000");
   const [readOnly, setReadOnly] = useState(false);
 
+  const scalePaths = (paths, scale) => {
+    return paths.map((path) => ({
+      ...path,
+      strokeWidth: path.strokeWidth * scale,
+      paths: path.paths.map((point) => ({
+        x: point.x * scale,
+        y: point.y * scale,
+      })),
+    }));
+  };
+
   useEffect(() => {
     const paths = getCanvasPath(page);
     if (canvasRef.current) {
       canvasRef.current.clearCanvas();
       if (paths && paths.length > 0) {
-        canvasRef.current.loadPaths(paths);
+        const scaledPaths = scalePaths(paths, scale);
+        canvasRef.current.loadPaths(scaledPaths);
       }
     }
-  }, [page]);
+  }, [page, scale]);
 
   const handleEraserClick = () => {
     setEraseMode(true);

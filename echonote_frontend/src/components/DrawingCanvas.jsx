@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect } from "react";
+import React, { forwardRef, useEffect, useRef } from "react";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 import * as St from "@components/styles/DrawingEditor.style";
 import canvasStore from "@stores/canvasStore";
@@ -12,66 +12,54 @@ const DrawingCanvas = forwardRef(
       const { getCanvasPath } = canvasStore.getState();
       const savedPaths = getCanvasPath(page);
 
-      if (ref.current) {
-        ref.current.clearCanvas();
-        if (savedPaths && savedPaths.length > 0) {
-          const scaledPaths = savedPaths.map((path) => ({
-            ...path,
-            strokeWidth: path.strokeWidth * scale,
-            paths: path.paths.map((point) => ({
-              x: point.x * scale,
-              y: point.y * scale,
-            })),
-          }));
+      if (!ref.current) return;
 
-          ref.current.loadPaths(scaledPaths);
-        }
-        ref.current.eraseMode(eraseMode);
+      ref.current.clearCanvas();
+      if (savedPaths && savedPaths.length > 0) {
+        const scaledPaths = savedPaths.map((path) => ({
+          ...path,
+          strokeWidth: path.strokeWidth * scale,
+          paths: path.paths.map((point) => ({
+            x: point.x * scale,
+            y: point.y * scale,
+          })),
+        }));
+
+        ref.current.loadPaths(scaledPaths);
       }
+
+      ref.current.eraseMode(eraseMode);
     }, [eraseMode, scale, page]);
 
-    const handleCanvasChange = () => {
+    const handleTouchEnd = async () => {
+      if (!ref.current) return;
       const { setCanvasPath, setCanvasImage } = canvasStore.getState();
 
-      if (ref.current) {
-        // Path 저장
-        ref.current
-          .exportPaths()
-          .then((data) => {
-            if (data.length === 0) {
-              return;
-            }
+      try {
+        const data = await ref.current.exportPaths();
+        if (data.length === 0) return;
 
-            const unscaledPaths = data.map((path) => ({
-              ...path,
-              strokeWidth: path.strokeWidth / scale,
-              paths: path.paths.map((point) => ({
-                x: point.x / scale,
-                y: point.y / scale,
-              })),
-            }));
+        const unscaledPaths = data.map((path) => ({
+          ...path,
+          strokeWidth: path.strokeWidth / scale,
+          paths: path.paths.map((point) => ({
+            x: point.x / scale,
+            y: point.y / scale,
+          })),
+        }));
 
-            setCanvasPath(page, unscaledPaths);
-          })
-          .catch((e) => {
-            console.log("Error exporting paths:", e);
-          });
+        setCanvasPath(page, unscaledPaths);
 
-        // Svg 저장
-        ref.current
-          .exportSvg()
-          .then((data) => {
-            const svgDataUrl = "data:image/svg+xml;base64," + btoa(data);
-            setCanvasImage(page, svgDataUrl);
-          })
-          .catch((error) => {
-            console.error("Error exporting SVG:", error);
-          });
+        const svgData = await ref.current.exportSvg();
+        const svgDataUrl = "data:image/svg+xml;base64," + btoa(svgData);
+        setCanvasImage(page, svgDataUrl);
+      } catch (error) {
+        console.error("Error exporting paths or SVG:", error);
       }
     };
 
     return (
-      <St.DrawingCanvasContainer>
+      <St.DrawingCanvasContainer onTouchEnd={handleTouchEnd}>
         <div
           style={{
             width: "100%",
@@ -87,7 +75,6 @@ const DrawingCanvas = forwardRef(
             width="100%"
             height="100%"
             canvasColor="transparent"
-            onChange={handleCanvasChange}
             readOnly={readOnly}
             style={{ border: 0, borderRadius: 0 }}
           />
