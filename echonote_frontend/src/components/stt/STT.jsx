@@ -45,11 +45,14 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
   const [sttData, setSttData] = useState([]);
   const [modifiedTexts, setModifiedTexts] = useState([]);
   const { setStartTime } = useAudioStore();
-  const [eventMessage, setEventMessage] = useState('');
+  const [eventMessage, setEventMessage] = useState("");
+  const [eventMessage, setEventMessage] = useState("");
 
-// 컴포넌트 마운트 시 API 데이터 가져오기
+  // 컴포넌트 마운트 시 API 데이터 가져오기
   useEffect(() => {
-    const eventSource = new EventSource(' http://localhost:8080/voice/sse?note_id=1');
+    const eventSource = new EventSource(
+      " http://localhost:8080/voice/sse?note_id=1"
+    );
 
     console.log("SSE 연결 시도 중...");
 
@@ -59,9 +62,9 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     };
 
     // STT 완료 이벤트 처리
-    eventSource.addEventListener('stt_complete', (event) => {
+    eventSource.addEventListener("stt_complete", (event) => {
       console.log("STT 완료: ", event.data);
-      setEventMessage('STT 정보 수신 완료');
+      setEventMessage("STT 정보 수신 완료");
 
       alert("STT 완료!");
     });
@@ -75,7 +78,7 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     eventSource.onerror = (event) => {
       console.error("SSE 오류 발생:", event);
       console.error("readyState:", eventSource.readyState); // 상태 로그
-      eventSource.close();  // 연결 종료
+      eventSource.close(); // 연결 종료
     };
 
     // 컴포넌트 언마운트 시 SSE 연결 닫기
@@ -84,9 +87,6 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
       console.log("SSE 연결 종료");
     };
   }, []);
-
-
-
 
   // 검색어를 포함한 부분 강조
   const highlightText = (text) => {
