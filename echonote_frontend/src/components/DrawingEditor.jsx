@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import * as St from "@components/styles/DrawingEditor.style";
 import DrawingToolBar from "@components/DrawingToolBar";
 import DrawingCanvas from "@components/DrawingCanvas";
-import canvasStore from "@/stores/canvasStore";
+import canvasStore from "@stores/canvasStore";
 
 const DrawingEditor = ({ scale, page, readOnly }) => {
   const canvasRef = useRef();
@@ -11,6 +11,8 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
   const [eraserWidth, setEraserWidth] = useState(10);
   const [strokeColor, setStrokeColor] = useState("#000000");
   const [noEdit, setNoEdit] = useState(false);
+
+  const { undo, redo, clearCanvasPath, getCanvasPath } = canvasStore.getState();
 
   const handleEraserClick = () => {
     setEraseMode(true);
@@ -34,21 +36,47 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
     setStrokeColor(color);
   };
 
+  const loadCanvasPaths = () => {
+    const savedPaths = getCanvasPath(page);
+    if (canvasRef.current && savedPaths) {
+      canvasRef.current.clearCanvas();
+      const scaledPaths = savedPaths.map((path) => ({
+        ...path,
+        strokeWidth: path.strokeWidth * scale,
+        paths: path.paths.map((point) => ({
+          x: point.x * scale,
+          y: point.y * scale,
+        })),
+      }));
+
+      canvasRef.current.loadPaths(scaledPaths);
+    }
+  };
+
   const handleUndoClick = () => {
-    canvasRef.current?.undo();
+    undo(page);
+    loadCanvasPaths();
   };
 
   const handleRedoClick = () => {
-    canvasRef.current?.redo();
+    redo(page);
+    loadCanvasPaths();
   };
 
   const handleClearClick = () => {
-    canvasRef.current?.clearCanvas();
+    if (canvasRef.current) {
+      canvasRef.current.clearCanvas();
+    }
+    clearCanvasPath(page);
   };
 
   const handleNoEditChange = (isNoEdit) => {
     setNoEdit(isNoEdit);
   };
+
+  useEffect(() => {
+    loadCanvasPaths();
+  }, [page, scale]);
 
   return (
     <St.DrawingEditorContainer>

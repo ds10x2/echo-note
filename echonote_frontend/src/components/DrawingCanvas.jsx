@@ -68,6 +68,7 @@ const DrawingCanvas = forwardRef(
             height: "100%",
             pointerEvents: readOnly ? "none" : "auto",
           }}
+          onTouchEnd={handleEndStroke}
         >
           <ReactSketchCanvas
             ref={ref}
@@ -79,7 +80,6 @@ const DrawingCanvas = forwardRef(
             canvasColor="transparent"
             readOnly={readOnly}
             style={{ border: 0, borderRadius: 0 }}
-            onStroke={handleEndStroke}
           />
         </div>
       </St.DrawingCanvasContainer>
