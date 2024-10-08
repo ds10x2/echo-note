@@ -101,11 +101,11 @@ const shapeStore = create((set, get) => ({
   setCurrentPageForShape: (page) => set(() => ({ currentPage: page })),
 
   // Individual property setters
-  setFill: (fill) => {
+  setFill: () => {
     set((state) => ({
       property: {
         ...state.property,
-        fill: fill,
+        fill: !state.property.fill, // 현재 fill 상태를 반전
       },
     }));
   },
@@ -119,11 +119,11 @@ const shapeStore = create((set, get) => ({
     }));
   },
 
-  setStroke: (stroke) => {
+  setStroke: () => {
     set((state) => ({
       property: {
         ...state.property,
-        stroke: stroke,
+        stroke: !state.property.stroke, // 현재 stroke 상태를 반전
       },
     }));
   },
