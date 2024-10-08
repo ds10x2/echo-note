@@ -4,13 +4,13 @@ import DrawingToolBar from "@components/DrawingToolBar";
 import DrawingCanvas from "@components/DrawingCanvas";
 import canvasStore from "@/stores/canvasStore";
 
-const DrawingEditor = ({ scale, page }) => {
+const DrawingEditor = ({ scale, page, readOnly }) => {
   const canvasRef = useRef();
   const [eraseMode, setEraseMode] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(5);
   const [eraserWidth, setEraserWidth] = useState(10);
   const [strokeColor, setStrokeColor] = useState("#000000");
-  const [readOnly, setReadOnly] = useState(false);
+  const [noEdit, setNoEdit] = useState(false);
 
   const handleEraserClick = () => {
     setEraseMode(true);
@@ -46,34 +46,37 @@ const DrawingEditor = ({ scale, page }) => {
     canvasRef.current?.clearCanvas();
   };
 
-  const handleReadOnlyChange = (isReadOnly) => {
-    setReadOnly(isReadOnly);
+  const handleNoEditChange = (isNoEdit) => {
+    setNoEdit(isNoEdit);
   };
 
   return (
     <St.DrawingEditorContainer>
-      <DrawingToolBar
-        eraseMode={eraseMode}
-        strokeWidth={strokeWidth}
-        eraserWidth={eraserWidth}
-        strokeColor={strokeColor}
-        onPenClick={handlePenClick}
-        onEraserClick={handleEraserClick}
-        onStrokeWidthChange={handleStrokeWidthChange}
-        onEraserWidthChange={handleEraserWidthChange}
-        onStrokeColorChange={handleStrokeColorChange}
-        onUndoChange={handleUndoClick}
-        onRedoChange={handleRedoClick}
-        onClearChange={handleClearClick}
-        onReadOnlyChange={handleReadOnlyChange}
-      />
+      {!readOnly && (
+        <DrawingToolBar
+          eraseMode={eraseMode}
+          strokeWidth={strokeWidth}
+          eraserWidth={eraserWidth}
+          strokeColor={strokeColor}
+          onPenClick={handlePenClick}
+          onEraserClick={handleEraserClick}
+          onStrokeWidthChange={handleStrokeWidthChange}
+          onEraserWidthChange={handleEraserWidthChange}
+          onStrokeColorChange={handleStrokeColorChange}
+          onUndoChange={handleUndoClick}
+          onRedoChange={handleRedoClick}
+          onClearChange={handleClearClick}
+          onNoEditChange={handleNoEditChange}
+        />
+      )}
+
       <DrawingCanvas
         ref={canvasRef}
         strokeWidth={strokeWidth * scale}
         eraserWidth={eraserWidth * scale}
         strokeColor={strokeColor}
         eraseMode={eraseMode}
-        readOnly={readOnly}
+        readOnly={readOnly | noEdit}
         scale={scale}
         page={page}
       />

@@ -32,7 +32,7 @@ const DrawingCanvas = forwardRef(
     }, [eraseMode, scale, page]);
 
     const handleCanvasChange = () => {
-      const { setCanvasPath, setCanvasImage } = canvasStore.getState();
+      const { setCanvasPath } = canvasStore.getState();
 
       if (ref.current) {
         // Path 저장
@@ -56,17 +56,6 @@ const DrawingCanvas = forwardRef(
           })
           .catch((e) => {
             console.log("Error exporting paths:", e);
-          });
-
-        // Svg 저장
-        ref.current
-          .exportSvg()
-          .then((data) => {
-            const svgDataUrl = "data:image/svg+xml;base64," + btoa(data);
-            setCanvasImage(page, svgDataUrl);
-          })
-          .catch((error) => {
-            console.error("Error exporting SVG:", error);
           });
       }
     };

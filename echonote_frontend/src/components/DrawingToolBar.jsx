@@ -24,7 +24,7 @@ const DrawingToolBar = ({
   onUndoChange,
   onRedoChange,
   onClearChange,
-  onReadOnlyChange,
+  onNoEditChange,
 }) => {
   const [activeTool, setActiveTool] = useState("pen");
   const [showSlider, setShowSlider] = useState(false);
@@ -57,8 +57,8 @@ const DrawingToolBar = ({
   }, []);
 
   useEffect(() => {
-    onReadOnlyChange(showSlider);
-  }, [showSlider, onReadOnlyChange]);
+    onNoEditChange(showSlider);
+  }, [showSlider, onNoEditChange]);
 
   // 펜 클릭 핸들러
   const handlePenClick = () => {
@@ -118,10 +118,22 @@ const DrawingToolBar = ({
       {showSlider && (
         <St.SliderContainer>
           <St.SliderIndicator
-            activeTool={activeTool}
-            strokeWidth={strokeWidth}
-            eraserWidth={eraserWidth}
-            strokeColor={strokeColor}
+            style={{
+              width:
+                activeTool === "pen"
+                  ? `${strokeWidth + 10}px`
+                  : `${eraserWidth + 10}px`,
+              height:
+                activeTool === "pen"
+                  ? `${strokeWidth + 10}px`
+                  : `${eraserWidth + 10}px`,
+              backgroundColor: activeTool === "pen" ? strokeColor : "#ffffff",
+              border: activeTool === "pen" ? "none" : "1px solid #ccc",
+              color:
+                activeTool === "eraser" || strokeColor === "#ffffff"
+                  ? "black"
+                  : "white",
+            }}
           >
             {activeTool === "pen" ? strokeWidth : eraserWidth}
           </St.SliderIndicator>

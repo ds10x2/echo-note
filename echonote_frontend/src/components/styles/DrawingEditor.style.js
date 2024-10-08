@@ -69,16 +69,6 @@ export const SliderContainer = styled.div`
 `;
 
 export const SliderIndicator = styled.div`
-  width: ${({ activeTool, strokeWidth, eraserWidth }) =>
-    activeTool === "pen" ? `${strokeWidth + 10}px` : `${eraserWidth + 10}px`};
-  height: ${({ activeTool, strokeWidth, eraserWidth }) =>
-    activeTool === "pen" ? `${strokeWidth + 10}px` : `${eraserWidth + 10}px`};
-  background-color: ${({ activeTool, strokeColor }) =>
-    activeTool === "pen" ? strokeColor : "#ffffff"};
-  border: ${({ activeTool }) =>
-    activeTool === "pen" ? "none" : "1px solid #ccc"};
-  color: ${({ activeTool, strokeColor }) =>
-    activeTool === "eraser" || strokeColor === "#ffffff" ? "black" : "white"};
   display: flex;
   align-items: center;
   justify-content: center;
