@@ -1,5 +1,6 @@
 package com.echonote.domain.Voice.service;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +8,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -101,26 +109,48 @@ public class VoiceServiceImpl implements VoiceService {
 	private STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
 //		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
 //		String flaskUrl = "http://localhost:5000/stt";
+//		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
+//		// HTTP 헤더 설정
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
+//
+//		// 요청에 데이터 추가
+//		HttpEntity<FlaskSendRequest> entity = new HttpEntity<>(flaskSendRequest, headers);
+//
+//		// Flask 서버로 POST 요청 보내기
+//		ResponseEntity<STTResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
+//			STTResponse.class);
+//
+//		// 응답 처리 (필요에 따라)
+//		if (response.getStatusCode().is2xxSuccessful()) {
+//			System.out.println("성공적으로 Flask 서버에 전송되었습니다: " + response.getBody());
+//		} else {
+//			System.err.println("Flask 서버 요청 실패: " + response.getStatusCode());
+//		}
+//
+//		return response.getBody();
+
 		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
-		// HTTP 헤더 설정
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
+		try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+			HttpPost postRequest = new HttpPost(flaskUrl);
+			postRequest.setHeader("Content-Type", "application/json");
 
-		// 요청에 데이터 추가
-		HttpEntity<FlaskSendRequest> entity = new HttpEntity<>(flaskSendRequest, headers);
+			String json = new ObjectMapper().writeValueAsString(flaskSendRequest);
+			postRequest.setEntity(new StringEntity(json));
 
-		// Flask 서버로 POST 요청 보내기
-		ResponseEntity<STTResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
-			STTResponse.class);
-
-		// 응답 처리 (필요에 따라)
-		if (response.getStatusCode().is2xxSuccessful()) {
-			System.out.println("성공적으로 Flask 서버에 전송되었습니다: " + response.getBody());
-		} else {
-			System.err.println("Flask 서버 요청 실패: " + response.getStatusCode());
+			try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
+				if (response.getStatusLine().getStatusCode() == 202) {
+					String jsonResponse = EntityUtils.toString(response.getEntity());
+					return new ObjectMapper().readValue(jsonResponse, STTResponse.class);
+				} else {
+					throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		return null;
 
-		return response.getBody();
 	}
 
 	// 음성 분석 모델에 보내기
