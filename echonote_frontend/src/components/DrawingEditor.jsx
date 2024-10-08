@@ -4,7 +4,7 @@ import DrawingToolBar from "@components/DrawingToolBar";
 import DrawingCanvas from "@components/DrawingCanvas";
 import canvasStore from "@/stores/canvasStore";
 
-const DrawingEditor = ({ scale, page }) => {
+const DrawingEditor = ({ scale, page, parentContainerRef }) => {
   const canvasRef = useRef();
   const [eraseMode, setEraseMode] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(5);
