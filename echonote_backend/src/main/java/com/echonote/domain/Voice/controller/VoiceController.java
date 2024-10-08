@@ -81,6 +81,14 @@ public class VoiceController {
 	public ResponseEntity<String> receiveSTTResult(@RequestBody STTResultRequest sttResultRequest) {
 		voiceService.saveSTTResult(sttResultRequest);
 
+		STT stt = new STT().builder()
+				.id(sttResultRequest.getId())
+				.result(sttResultRequest.getResult())
+				.processId(sttResultRequest.getProcessId())
+				.build();
+
+		voiceService.insertSTT(stt);
+
 		if(emitters.get(sttResultRequest.getId()) != null){
 			SseEmitter emitter = emitters.get(sttResultRequest.getId());
 			try {
@@ -121,13 +129,13 @@ public class VoiceController {
 		return new ResponseEntity<>(stt, HttpStatus.OK);
 	}
 
-	@PostMapping("/stt")
-	@Operation(summary = "stt 저장", description = "stt를 저장하는 API. flask 서버와 연동된다.")
-	public ResponseEntity<STT> saveSTT(@RequestBody STT result) {
-		voiceService.insertSTT(result);
-
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
+//	@PostMapping("/stt")
+//	@Operation(summary = "stt 저장", description = "stt를 저장하는 API. flask 서버와 연동된다.")
+//	public ResponseEntity<STT> saveSTT(@RequestBody STT result) {
+//		voiceService.insertSTT(result);
+//
+//		return new ResponseEntity<>(HttpStatus.OK);
+//	}
 
 //	@CrossOrigin(origins = "*", allowedHeaders = "*") // 특정 출처 허용
 	@GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
