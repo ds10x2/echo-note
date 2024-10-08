@@ -78,7 +78,6 @@ const DrawingCanvas = forwardRef(
             width: "100%",
             height: "100%",
             pointerEvents: readOnly ? "none" : "auto",
-            zIndex: 9,
           }}
         >
           <ReactSketchCanvas

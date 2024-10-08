@@ -3,6 +3,9 @@ import * as St from "./styles/PdfCanvas.style";
 import * as pdfjsLib from "pdfjs-dist";
 import PdfEditor from "@components/PdfEditor";
 import pageStore from "@/stores/pageStore"; // zustand 스토어 가져오기
+import DrawingEditor from "@components/DrawingEditor";
+import { DrawingEditorContainer } from "@components/styles/DrawingEditor.style";
+import canvasStore from "@stores/canvasStore";
 
 const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
   const canvasRef = useRef();
@@ -13,6 +16,9 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
+
+  const { getCanvasImage } = canvasStore.getState(); // 이미지 데이터를 가져오는 함수 호출
+  const savedImage = getCanvasImage(currentPage);
 
   const sampleUrl =
     "https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf";
@@ -106,6 +112,13 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
         containerRef={containerRef}
         isDrawingEditorOpened={isDrawingEditorOpened}
       />
+      {isDrawingEditorOpened ? (
+        <DrawingEditor scale={scale} page={currentPage} />
+      ) : (
+        <DrawingEditorContainer>
+          {savedImage && <img src={savedImage} alt="Saved Canvas" />}
+        </DrawingEditorContainer>
+      )}
     </St.PdfCanvasContainer>
   );
 };

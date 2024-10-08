@@ -7,25 +7,14 @@ import ShapeEditor from "@components/ShapeEditor";
 import shapeStore from "@/stores/shapeStore";
 import pageStore from "@/stores/pageStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
-import canvasStore from "@stores/canvasStore";
-import DrawingEditor from "@components/DrawingEditor";
-import { DrawingEditorContainer } from "@components/styles/DrawingEditor.style";
 
-const PdfEditor = ({
-  scale,
-  containerRef,
-  originalSize,
-  isDrawingEditorOpened,
-}) => {
+const PdfEditor = ({ scale, containerRef, originalSize }) => {
   const { getCurrentPageItems, setCurrentPageForText } = textStore();
   const { getRectangles, getCircles, setCurrentPageForShape } = shapeStore();
   const { currentPage, setCurrentPage } = pageStore();
   const { mode } = drawingTypeStore();
   const isDraggingRef = useRef(false);
   const hasDraggedRef = useRef(false);
-
-  const { getCanvasImage } = canvasStore.getState();
-  const savedImage = getCanvasImage(currentPage);
 
   useEffect(() => {
     if (pageStore.getState().currentPage !== currentPage) {
@@ -50,18 +39,6 @@ const PdfEditor = ({
         scale={scale}
         parentContainerRef={containerRef}
       />
-
-      {isDrawingEditorOpened ? (
-        <DrawingEditor
-          scale={scale}
-          page={currentPage}
-          parentContainerRef={containerRef}
-        />
-      ) : (
-        <DrawingEditorContainer>
-          {savedImage && <img src={savedImage} alt="Saved Canvas" />}
-        </DrawingEditorContainer>
-      )}
     </St.PdfEditorContainer>
   );
 };
