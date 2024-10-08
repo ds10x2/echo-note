@@ -1,29 +1,58 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useSidebarStore } from "@stores/sideBarStore";
+// import { pageStore } from "@stores/pageStore";
 import {
   SidebarContainer,
   ImageContainer,
   DraggableImage,
   PageNumber,
 } from "@components/styles/PdfBar.style";
+import * as pdfjsLib from "pdfjs-dist";
+
+// PDF.js에서 사용될 워커 설정 (필요에 따라 경로를 지정)
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`;
 
 const PdfBar = () => {
   const { isPdfBarOpened } = useSidebarStore();
+  const [images, setImages] = useState([]);
 
-  const [images, setImages] = useState([
-    { id: 1, name: "page 1", src: "https://via.placeholder.com/100x150" },
-    { id: 2, name: "page 2", src: "https://via.placeholder.com/100x150" },
-    { id: 3, name: "page 3", src: "https://via.placeholder.com/100x150" },
-    { id: 4, name: "page 4", src: "https://via.placeholder.com/100x150" },
-    { id: 5, name: "page 5", src: "https://via.placeholder.com/100x150" },
-    { id: 6, name: "page 6", src: "https://via.placeholder.com/100x150" },
-    { id: 7, name: "page 7", src: "https://via.placeholder.com/100x150" },
-    { id: 8, name: "page 8", src: "https://via.placeholder.com/100x150" },
-    { id: 9, name: "page 9", src: "https://via.placeholder.com/100x150" },
-    { id: 10, name: "page 10", src: "https://via.placeholder.com/100x150" },
-  ]);
+  const pdfUrl =
+    "https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf";
+
+  // PDF 파일에서 각 페이지를 이미지로 변환
+  useEffect(() => {
+    const loadPdf = async () => {
+      const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+      const numPages = pdf.numPages;
+      const imageArray = [];
+
+      for (let i = 1; i <= numPages; i++) {
+        const page = await pdf.getPage(i);
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
+        const viewport = page.getViewport({ scale: 1.5 }); // 페이지의 스케일 설정
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        // 페이지를 캔버스에 렌더링
+        await page.render({
+          canvasContext: context,
+          viewport: viewport,
+        }).promise;
+
+        // 캔버스를 이미지 데이터 URL로 변환
+        const imgSrc = canvas.toDataURL();
+        imageArray.push({ id: i, name: `page ${i}`, src: imgSrc });
+      }
+
+      setImages(imageArray); // 이미지 배열로 업데이트
+    };
+
+    loadPdf();
+  }, [pdfUrl]);
 
   const moveImage = (dragIndex, hoverIndex) => {
     const draggedImage = images[dragIndex];
