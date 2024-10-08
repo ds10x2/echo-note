@@ -107,49 +107,28 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 	private STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
-//		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
+		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
 //		String flaskUrl = "http://localhost:5000/stt";
 //		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
-//		// HTTP 헤더 설정
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
-//
-//		// 요청에 데이터 추가
-//		HttpEntity<FlaskSendRequest> entity = new HttpEntity<>(flaskSendRequest, headers);
-//
-//		// Flask 서버로 POST 요청 보내기
-//		ResponseEntity<STTResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
-//			STTResponse.class);
-//
-//		// 응답 처리 (필요에 따라)
-//		if (response.getStatusCode().is2xxSuccessful()) {
-//			System.out.println("성공적으로 Flask 서버에 전송되었습니다: " + response.getBody());
-//		} else {
-//			System.err.println("Flask 서버 요청 실패: " + response.getStatusCode());
-//		}
-//
-//		return response.getBody();
+		// HTTP 헤더 설정
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
 
-		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
-		try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-			HttpPost postRequest = new HttpPost(flaskUrl);
-			postRequest.setHeader("Content-Type", "application/json");
+		// 요청에 데이터 추가
+		HttpEntity<FlaskSendRequest> entity = new HttpEntity<>(flaskSendRequest, headers);
 
-			String json = new ObjectMapper().writeValueAsString(flaskSendRequest);
-			postRequest.setEntity(new StringEntity(json));
+		// Flask 서버로 POST 요청 보내기
+		ResponseEntity<STTResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
+			STTResponse.class);
 
-			try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
-				if (response.getStatusLine().getStatusCode() == 202) {
-					String jsonResponse = EntityUtils.toString(response.getEntity());
-					return new ObjectMapper().readValue(jsonResponse, STTResponse.class);
-				} else {
-					throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		// 응답 처리 (필요에 따라)
+		if (response.getStatusCode().is2xxSuccessful()) {
+			System.out.println("성공적으로 Flask 서버에 전송되었습니다: " + response.getBody());
+		} else {
+			System.err.println("Flask 서버 요청 실패: " + response.getStatusCode());
 		}
-		return null;
+
+		return response.getBody();
 
 	}
 
