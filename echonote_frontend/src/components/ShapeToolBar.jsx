@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as St from "@components/styles/ShapeToolBar.style";
-import { PiWaveSineBold } from "react-icons/pi";
+import { PiWaveSineBold, PiFileAudio } from "react-icons/pi";
 import { FaTrash, FaCircle, FaSquare } from "react-icons/fa";
 import { FaXmark, FaRegCircleXmark } from "react-icons/fa6";
 import { MdOutlineFormatColorFill, MdOutlineLineWeight } from "react-icons/md";
@@ -19,26 +19,26 @@ const ShapeToolBar = ({}) => {
   const fillPaletteRef = useRef(null);
   const strokePaletteRef = useRef(null);
 
-  const handleClickOutside = (e) => {
-    if (fillPaletteRef.current && !fillPaletteRef.current.contains(e.target)) {
-      setShowFillPalette(false);
-    } else if (
-      strokePaletteRef.current &&
-      !strokePaletteRef.current.contains(e.target)
-    ) {
-      setShowStrokePalette(false);
-    }
+  // const handleClickOutside = (e) => {
+  //   if (fillPaletteRef.current && !fillPaletteRef.current.contains(e.target)) {
+  //     setShowFillPalette(false);
+  //   } else if (
+  //     strokePaletteRef.current &&
+  //     !strokePaletteRef.current.contains(e.target)
+  //   ) {
+  //     setShowStrokePalette(false);
+  //   }
 
-    e.preventDefault();
-    e.stopPropagation();
-  };
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  // };
 
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  // useEffect(() => {
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
 
   const toggleFillPalette = () => {
     if (showStrokePalette) setShowStrokePalette(!showStrokePalette);
@@ -147,3 +147,8 @@ const ShapeToolBar = ({}) => {
 };
 
 export default ShapeToolBar;
+
+// <St.IconContainer>
+// <St.IconButton as={PiFileAudio} />
+// </St.IconContainer>
+// <St.Divider />
