@@ -50,7 +50,7 @@ public class VoiceController {
 	@Value("${amazon.aws.bucket}")
 	private String bucketName;
 
-	private final Map<Long, SseEmitter> emitters = new HashMap<>();
+//	private final Map<Long, SseEmitter> emitters = new HashMap<>();
 
 
 	// 확장자명에 따라 presigned url 반환
@@ -81,24 +81,33 @@ public class VoiceController {
 	public ResponseEntity<String> receiveSTTResult(@RequestBody STTResultRequest sttResultRequest) {
 		voiceService.saveSTTResult(sttResultRequest);
 
-		SseEmitter emitter = emitters.get(sttResultRequest.getId());
+		STT stt = new STT().builder()
+				.id(sttResultRequest.getId())
+				.result(sttResultRequest.getResult())
+				.processId(sttResultRequest.getProcessId())
+				.build();
 
-		try {
-			emitter.send(
-					SseEmitter
-							.event()
-							.name("stt_complete")
-							.data("STT 정보 수신 완료"));
+		voiceService.insertSTT(stt);
 
-			emitter.complete(); // 이미터 kill
-
-		} catch (IOException e) {
-			emitter.completeWithError(e);
-		}finally {
-			// 이미터를 null로 설정 (선택 사항)
-			emitters.remove(sttResultRequest.getId());
-			emitter = null;  // 참조를 제거
-		}
+//		if(emitters.get(sttResultRequest.getId()) != null){
+//			SseEmitter emitter = emitters.get(sttResultRequest.getId());
+//			try {
+//				emitter.send(
+//						SseEmitter
+//								.event()
+//								.name("stt_complete")
+//								.data("STT 정보 수신 완료"));
+//
+//				emitter.complete(); // 이미터 kill
+//
+//			} catch (IOException e) {
+//				emitter.completeWithError(e);
+//			}finally {
+//				// 이미터를 null로 설정 (선택 사항)
+//				emitters.remove(sttResultRequest.getId());
+//				emitter = null;  // 참조를 제거
+//			}
+//		}
 
 		// voiceService.checkAndProcessVoice(sttResultRequest.getProcessId());
 		return ResponseEntity.ok("STT 완료");
@@ -120,32 +129,46 @@ public class VoiceController {
 		return new ResponseEntity<>(stt, HttpStatus.OK);
 	}
 
-	@PostMapping("/stt")
-	@Operation(summary = "stt 저장", description = "stt를 저장하는 API. flask 서버와 연동된다.")
-	public ResponseEntity<STT> saveSTT(@RequestBody STT result) {
-		voiceService.insertSTT(result);
-
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
+//	@PostMapping("/stt")
+//	@Operation(summary = "stt 저장", description = "stt를 저장하는 API. flask 서버와 연동된다.")
+//	public ResponseEntity<STT> saveSTT(@RequestBody STT result) {
+//		voiceService.insertSTT(result);
+//
+//		return new ResponseEntity<>(HttpStatus.OK);
+//	}
 
 //	@CrossOrigin(origins = "*", allowedHeaders = "*") // 특정 출처 허용
-	@GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public SseEmitter streamSTT(@RequestParam("note_id") long noteId) {
-		SseEmitter emitter = new SseEmitter(30*60000L);
-		emitters.put(noteId, emitter);
-
-		emitter.onCompletion(() -> emitters.remove(emitter));
-		emitter.onTimeout(() -> emitters.remove(emitter));
-
-		try {
-			emitter.send(SseEmitter.event().name("")
-					);
-		} catch (IOException e) {
-			emitter.completeWithError(e);
-		}
-
-		return emitter;
-	}
+//	@GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+//	public SseEmitter streamSTT(@RequestParam("note_id") long noteId) {
+//
+//		if(emitters.get(noteId) == null){
+//			SseEmitter emitter = new SseEmitter(30*60000L);
+//			emitters.put(noteId, emitter);
+//
+//			emitter.onCompletion(() -> emitters.remove(emitter));
+//			emitter.onTimeout(() -> emitters.remove(emitter));
+//
+//			try {
+//				emitter.send(SseEmitter.event().name("")
+//				);
+//			} catch (IOException e) {
+//				emitter.completeWithError(e);
+//			}
+//
+//
+//			return emitter;
+//		}
+//		// 중복 요청에 대한 처리
+//		SseEmitter emitter = new SseEmitter(1L);
+//		try {
+//			emitter.send(SseEmitter.event().data("중복된 요청입니다. 이미 생성된 emitter가 존재합니다.").id("duplicate-request"));
+//			emitter.complete(); // 요청을 완료하여 클라이언트가 더 이상 기다리지 않도록 함
+//		} catch (IOException e) {
+//			emitter.completeWithError(e);
+//		}
+//
+//		return emitter;
+//	}
 
 
 	@PutMapping("/stt")
