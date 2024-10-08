@@ -59,39 +59,19 @@ const DrawingEditor = ({ scale, page }) => {
   };
 
   const handleUndoClick = () => {
-    undo();
-    const paths = getCanvasPath(page);
-    if (canvasRef.current) {
-      canvasRef.current.clearCanvas();
-      if (paths && paths.length > 0) {
-        canvasRef.current.loadPaths(paths);
-      }
-    }
+    canvasRef.current?.undo();
   };
 
   const handleRedoClick = () => {
-    redo();
-    const paths = getCanvasPath(page);
-    if (canvasRef.current) {
-      canvasRef.current.clearCanvas();
-      if (paths && paths.length > 0) {
-        canvasRef.current.loadPaths(paths);
-      }
-    }
+    canvasRef.current?.redo();
   };
 
   const handleClearClick = () => {
-    clearCanvasPath(page);
-    if (canvasRef.current) {
-      canvasRef.current.clearCanvas();
-    }
+    canvasRef.current?.clearCanvas();
   };
 
   const handleResetClick = () => {
-    clearCanvasPath(page);
-    if (canvasRef.current) {
-      canvasRef.current.clearCanvas();
-    }
+    canvasRef.current?.resetCanvas();
   };
 
   const handleReadOnlyChange = (isReadOnly) => {
