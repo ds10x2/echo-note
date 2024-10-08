@@ -58,10 +58,12 @@ export const IconButton = styled.button`
 `;
 
 // 공통 슬라이더 스타일 적용
-const CommonSliderPopup = styled.div`
+export const SliderPopup = styled.div`
   position: absolute;
   z-index: 9999;
   bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: white;
   padding: 10px;
   border-radius: 8px;
@@ -116,14 +118,4 @@ const CommonSliderPopup = styled.div`
       border-radius: 3px;
     }
   }
-`;
-
-// 펜 슬라이더 팝업
-export const PenSliderPopup = styled(CommonSliderPopup)`
-  left: 35px;
-`;
-
-// 지우개 슬라이더 팝업
-export const EraserSliderPopup = styled(CommonSliderPopup)`
-  left: 100px;
 `;

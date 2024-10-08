@@ -8,6 +8,7 @@ import {
   FaSync,
   FaPen,
 } from "react-icons/fa";
+import { MdOutlineLineWeight } from "react-icons/md";
 import ColorPalette from "@components/ColorPalette";
 
 const DrawingToolBar = ({
@@ -26,10 +27,9 @@ const DrawingToolBar = ({
   onResetChange,
   onReadOnlyChange,
 }) => {
-  const [activeTool, setActiveTool] = useState(null);
+  const [activeTool, setActiveTool] = useState("pen");
   const [showSlider, setShowSlider] = useState(false);
   const strokeWidthRef = useRef(null);
-  const eraserWidthRef = useRef(null);
 
   // 외부 클릭 감지 핸들러
   const handleClickOutside = (event) => {
@@ -55,27 +55,24 @@ const DrawingToolBar = ({
 
   // 펜 클릭 핸들러
   const handlePenClick = () => {
-    if (activeTool === "pen") {
-      setShowSlider(true);
-      onReadOnlyChange(true);
-    } else {
-      setActiveTool("pen");
-      setShowSlider(false);
-      onReadOnlyChange(false);
-      onPenClick();
-    }
+    setActiveTool("pen");
+    setShowSlider(false);
+    onReadOnlyChange(false);
+    onPenClick();
   };
 
   // 지우개 클릭 핸들러
   const handleEraserClick = () => {
-    if (activeTool === "eraser") {
-      setShowSlider(true);
-      onReadOnlyChange(true);
-    } else {
-      setActiveTool("eraser");
-      setShowSlider(false);
-      onReadOnlyChange(false);
-      onEraserClick();
+    setActiveTool("eraser");
+    setShowSlider(false);
+    onReadOnlyChange(false);
+    onEraserClick();
+  };
+
+  const handleWaveClick = () => {
+    if (activeTool === "pen" || activeTool === "eraser") {
+      setShowSlider(!showSlider);
+      onReadOnlyChange(!showSlider);
     }
   };
 
@@ -88,38 +85,27 @@ const DrawingToolBar = ({
         <FaPen color={activeTool === "pen" ? "gray" : "black"} />
       </St.IconButton>
 
-      {showSlider && activeTool === "pen" && (
-        <St.PenSliderPopup
-          ref={strokeWidthRef}
-          style={{
-            "--thumb-size": `${Math.min(
-              Math.max(Math.pow(strokeWidth, 1.2) * 1.15, 10),
-              28
-            )}px`,
-          }}
-        >
-          <input
-            type="range"
-            className="form-range"
-            min="1"
-            max="20"
-            step="1"
-            value={strokeWidth}
-            onChange={onStrokeWidthChange}
-          />
-        </St.PenSliderPopup>
-      )}
-
       {/* 지우개 아이콘 */}
       <St.IconButton onClick={handleEraserClick}>
         <FaEraser color={activeTool === "eraser" ? "gray" : "black"} />
       </St.IconButton>
-      {showSlider && activeTool === "eraser" && (
-        <St.EraserSliderPopup
+
+      <St.IconButton onClick={handleWaveClick}>
+        <MdOutlineLineWeight color={showSlider ? "gray" : "black"} />
+      </St.IconButton>
+
+      {showSlider && (
+        <St.SliderPopup
           ref={strokeWidthRef}
           style={{
             "--thumb-size": `${Math.min(
-              Math.max(Math.pow(eraserWidth, 1.2) * 1.15, 10),
+              Math.max(
+                Math.pow(
+                  activeTool === "pen" ? strokeWidth : eraserWidth,
+                  1.2
+                ) * 1.15,
+                10
+              ),
               28
             )}px`,
           }}
@@ -130,10 +116,12 @@ const DrawingToolBar = ({
             min="1"
             max="20"
             step="1"
-            value={eraserWidth}
-            onChange={onEraserWidthChange}
+            value={activeTool === "pen" ? strokeWidth : eraserWidth}
+            onChange={
+              activeTool === "pen" ? onStrokeWidthChange : onEraserWidthChange
+            }
           />
-        </St.EraserSliderPopup>
+        </St.SliderPopup>
       )}
 
       {/* undo, redo, clear, reset */}
