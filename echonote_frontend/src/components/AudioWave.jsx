@@ -37,7 +37,12 @@ const AudioWave = () => {
   const [recordTime, setRecordTime] = useState(0);
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
   const [objectUrl, setObjectUrl] = useState(null); // presigned URL 저장
-  const { startTime, setCreatetime, setStartTime } = useAudioStore();
+  const {
+    startTime,
+    setCreatetime,
+    setIsRecording: checkRecording,
+    setStartTime,
+  } = useAudioStore();
 
   const [fileId, setFileId] = useState(2);
 
@@ -82,6 +87,7 @@ const AudioWave = () => {
         const recordedUrl = URL.createObjectURL(blob);
         setAudioUrl(recordedUrl); // audioUrl에 저장
         setIsRecording(false);
+        checkRecording(false);
 
         try {
           const data = await getPresignedUrl();
@@ -101,6 +107,7 @@ const AudioWave = () => {
         } catch (error) {
           console.error("Error during recording process:", error);
           setIsRecording(false);
+          checkRecording(false);
           return;
         }
       });
@@ -146,6 +153,7 @@ const AudioWave = () => {
       handleStartStopRecording();
     }
 
+    checkRecording(!isRecording);
     setIsRecording(!isRecording);
   };
 
