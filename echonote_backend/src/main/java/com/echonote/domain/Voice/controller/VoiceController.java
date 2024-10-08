@@ -81,23 +81,24 @@ public class VoiceController {
 	public ResponseEntity<String> receiveSTTResult(@RequestBody STTResultRequest sttResultRequest) {
 		voiceService.saveSTTResult(sttResultRequest);
 
-		SseEmitter emitter = emitters.get(sttResultRequest.getId());
+		if(emitters.get(sttResultRequest.getId()) != null){
+			SseEmitter emitter = emitters.get(sttResultRequest.getId());
+			try {
+				emitter.send(
+						SseEmitter
+								.event()
+								.name("stt_complete")
+								.data("STT 정보 수신 완료"));
 
-		try {
-			emitter.send(
-					SseEmitter
-							.event()
-							.name("stt_complete")
-							.data("STT 정보 수신 완료"));
+				emitter.complete(); // 이미터 kill
 
-			emitter.complete(); // 이미터 kill
-
-		} catch (IOException e) {
-			emitter.completeWithError(e);
-		}finally {
-			// 이미터를 null로 설정 (선택 사항)
-			emitters.remove(sttResultRequest.getId());
-			emitter = null;  // 참조를 제거
+			} catch (IOException e) {
+				emitter.completeWithError(e);
+			}finally {
+				// 이미터를 null로 설정 (선택 사항)
+				emitters.remove(sttResultRequest.getId());
+				emitter = null;  // 참조를 제거
+			}
 		}
 
 		// voiceService.checkAndProcessVoice(sttResultRequest.getProcessId());
@@ -131,15 +132,29 @@ public class VoiceController {
 //	@CrossOrigin(origins = "*", allowedHeaders = "*") // 특정 출처 허용
 	@GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public SseEmitter streamSTT(@RequestParam("note_id") long noteId) {
-		SseEmitter emitter = new SseEmitter(30*60000L);
-		emitters.put(noteId, emitter);
 
-		emitter.onCompletion(() -> emitters.remove(emitter));
-		emitter.onTimeout(() -> emitters.remove(emitter));
+		if(emitters.get(noteId) == null){
+			SseEmitter emitter = new SseEmitter(30*60000L);
+			emitters.put(noteId, emitter);
 
+			emitter.onCompletion(() -> emitters.remove(emitter));
+			emitter.onTimeout(() -> emitters.remove(emitter));
+
+			try {
+				emitter.send(SseEmitter.event().name("")
+				);
+			} catch (IOException e) {
+				emitter.completeWithError(e);
+			}
+
+
+			return emitter;
+		}
+		// 중복 요청에 대한 처리
+		SseEmitter emitter = new SseEmitter(1L);
 		try {
-			emitter.send(SseEmitter.event().name("")
-					);
+			emitter.send(SseEmitter.event().data("중복된 요청입니다. 이미 생성된 emitter가 존재합니다.").id("duplicate-request"));
+			emitter.complete(); // 요청을 완료하여 클라이언트가 더 이상 기다리지 않도록 함
 		} catch (IOException e) {
 			emitter.completeWithError(e);
 		}
