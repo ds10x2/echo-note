@@ -16,7 +16,7 @@ spring:
         format_sql: true
         show_sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     open-in-view: true
   jwt:
     secret: ${JWT_KEY}
