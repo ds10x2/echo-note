@@ -145,6 +145,34 @@ const shapeStore = create((set, get) => ({
       },
     }));
   },
+
+  resetTimestamps: (page) => {
+    set((state) => ({
+      rectangles: {
+        ...state.rectangles,
+        [page]: state.rectangles[page]?.map((rect) => ({
+          ...rect,
+          detail: {
+            ...rect.detail,
+            timestamp: null, // 타임스탬프를 null로 초기화
+          },
+        })),
+      },
+    }));
+
+    set((state) => ({
+      circles: {
+        ...state.circles,
+        [page]: state.circles[page]?.map((circle) => ({
+          ...circle,
+          detail: {
+            ...circle.detail,
+            timestamp: null, // 타임스탬프를 null로 초기화
+          },
+        })),
+      },
+    }));
+  },
 }));
 
 export default shapeStore;
