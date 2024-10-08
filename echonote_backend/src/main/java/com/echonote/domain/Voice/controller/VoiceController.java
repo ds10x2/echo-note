@@ -1,10 +1,16 @@
 package com.echonote.domain.Voice.controller;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +37,8 @@ import com.echonote.domain.note.dto.NoteCreateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,6 +49,9 @@ public class VoiceController {
 
 	@Value("${amazon.aws.bucket}")
 	private String bucketName;
+
+	private final Map<Long, SseEmitter> emitters = new HashMap<>();
+
 
 	// 확장자명에 따라 presigned url 반환
 	@GetMapping
@@ -69,6 +80,27 @@ public class VoiceController {
 	@Operation(summary = "STT 모델 결과 받기", description = "Flask STT 모델에서 처리된 결과를 받습니다.")
 	public ResponseEntity<String> receiveSTTResult(@RequestBody STTResultRequest sttResultRequest) {
 		voiceService.saveSTTResult(sttResultRequest);
+
+		if(emitters.get(sttResultRequest.getId()) != null){
+			SseEmitter emitter = emitters.get(sttResultRequest.getId());
+			try {
+				emitter.send(
+						SseEmitter
+								.event()
+								.name("stt_complete")
+								.data("STT 정보 수신 완료"));
+
+				emitter.complete(); // 이미터 kill
+
+			} catch (IOException e) {
+				emitter.completeWithError(e);
+			}finally {
+				// 이미터를 null로 설정 (선택 사항)
+				emitters.remove(sttResultRequest.getId());
+				emitter = null;  // 참조를 제거
+			}
+		}
+
 		// voiceService.checkAndProcessVoice(sttResultRequest.getProcessId());
 		return ResponseEntity.ok("STT 완료");
 	}
@@ -96,6 +128,40 @@ public class VoiceController {
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+
+//	@CrossOrigin(origins = "*", allowedHeaders = "*") // 특정 출처 허용
+	@GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public SseEmitter streamSTT(@RequestParam("note_id") long noteId) {
+
+		if(emitters.get(noteId) == null){
+			SseEmitter emitter = new SseEmitter(30*60000L);
+			emitters.put(noteId, emitter);
+
+			emitter.onCompletion(() -> emitters.remove(emitter));
+			emitter.onTimeout(() -> emitters.remove(emitter));
+
+			try {
+				emitter.send(SseEmitter.event().name("")
+				);
+			} catch (IOException e) {
+				emitter.completeWithError(e);
+			}
+
+
+			return emitter;
+		}
+		// 중복 요청에 대한 처리
+		SseEmitter emitter = new SseEmitter(1L);
+		try {
+			emitter.send(SseEmitter.event().data("중복된 요청입니다. 이미 생성된 emitter가 존재합니다.").id("duplicate-request"));
+			emitter.complete(); // 요청을 완료하여 클라이언트가 더 이상 기다리지 않도록 함
+		} catch (IOException e) {
+			emitter.completeWithError(e);
+		}
+
+		return emitter;
+	}
+
 
 	@PutMapping("/stt")
 	@Operation(summary = "stt 업데이트", description = "note_id와 stt 정보를 보내주면 mongoDB에서 업데이트 할 수 있다.")

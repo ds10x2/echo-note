@@ -60,8 +60,8 @@ class App extends Component {
                   isDrawingEditorOpened={this.state.isDrawingEditorOpened}
                 />
               </MainContent>
+
               <STTBar />
-              {/* <PdfButton /> */}
             </Layout>
           </ThemeProvider>
         </div>

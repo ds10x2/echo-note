@@ -1,26 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import PdfCanvas from "@components/PdfCanvas";
 import * as St from "@components/styles/PdfViewer.style";
+import ShapeToolBar from "./ShapeToolBar";
 import drawingTypeStore from "@/stores/drawingTypeStore";
-import PropertyEditor from "@/components/TmpShapeProperty";
 
 const PdfViewer = ({ isDrawingEditorOpened }) => {
   const containerRef = useRef();
-
-  const { setCircleMode, shapeMode, setRectangleMode } = drawingTypeStore();
+  const { mode } = drawingTypeStore();
 
   return (
     <St.PdfContainer ref={containerRef}>
       <St.ButtonContainer>
-        <div>
-          <button onClick={() => setCircleMode()}>
-            {shapeMode.circle ? "Circle mode on" : "off"}
-          </button>
-          <button onClick={() => setRectangleMode()}>
-            {shapeMode.rectangle ? "rec mode on" : "off"}
-          </button>
-        </div>
-        <PropertyEditor />
+        {mode.shape ? <ShapeToolBar /> : null}
       </St.ButtonContainer>
       <PdfCanvas
         containerRef={containerRef}
