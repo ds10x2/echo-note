@@ -81,6 +81,22 @@ const DrawingToolBar = ({
     });
   };
 
+  const handleIncrease = () => {
+    if (activeTool === "pen") {
+      onStrokeWidthChange({ target: { value: strokeWidth + 1 } });
+    } else {
+      onEraserWidthChange({ target: { value: eraserWidth + 1 } });
+    }
+  };
+
+  const handleDecrease = () => {
+    if (activeTool === "pen") {
+      onStrokeWidthChange({ target: { value: strokeWidth - 1 } });
+    } else {
+      onEraserWidthChange({ target: { value: eraserWidth - 1 } });
+    }
+  };
+
   return (
     <St.DrawingToolContainer>
       <ColorPalette value={strokeColor} onChange={onStrokeColorChange} />
@@ -100,33 +116,31 @@ const DrawingToolBar = ({
       </St.IconButton>
 
       {showSlider && (
-        <St.SliderPopup
-          ref={strokeWidthRef}
-          style={{
-            "--thumb-size": `${Math.min(
-              Math.max(
-                Math.pow(
-                  activeTool === "pen" ? strokeWidth : eraserWidth,
-                  1.2
-                ) * 1.15,
-                10
-              ),
-              28
-            )}px`,
-          }}
-        >
-          <input
-            type="range"
-            className="form-range"
-            min="1"
-            max="20"
-            step="1"
-            value={activeTool === "pen" ? strokeWidth : eraserWidth}
-            onChange={
-              activeTool === "pen" ? onStrokeWidthChange : onEraserWidthChange
-            }
-          />
-        </St.SliderPopup>
+        <St.SliderContainer>
+          <St.SliderIndicator
+            activeTool={activeTool}
+            strokeWidth={strokeWidth}
+            eraserWidth={eraserWidth}
+            strokeColor={strokeColor}
+          >
+            {activeTool === "pen" ? strokeWidth : eraserWidth}
+          </St.SliderIndicator>
+
+          <St.SliderPopup ref={strokeWidthRef}>
+            <St.SliderButton onClick={handleDecrease}>-</St.SliderButton>
+            <input
+              type="range"
+              min="1"
+              max="100"
+              step="1"
+              value={activeTool === "pen" ? strokeWidth : eraserWidth}
+              onChange={
+                activeTool === "pen" ? onStrokeWidthChange : onEraserWidthChange
+              }
+            />
+            <St.SliderButton onClick={handleIncrease}>+</St.SliderButton>
+          </St.SliderPopup>
+        </St.SliderContainer>
       )}
 
       <St.Divider />
