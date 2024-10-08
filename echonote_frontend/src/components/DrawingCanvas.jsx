@@ -31,7 +31,7 @@ const DrawingCanvas = forwardRef(
       ref.current.eraseMode(eraseMode);
     }, [eraseMode, scale, page]);
 
-    const handleCanvasChange = () => {
+    const handleEndStroke = () => {
       const { setCanvasPath } = canvasStore.getState();
 
       if (ref.current) {
@@ -79,7 +79,7 @@ const DrawingCanvas = forwardRef(
             canvasColor="transparent"
             readOnly={readOnly}
             style={{ border: 0, borderRadius: 0 }}
-            onChange={handleCanvasChange}
+            onStroke={handleEndStroke}
           />
         </div>
       </St.DrawingCanvasContainer>
