@@ -89,6 +89,8 @@ export const SliderIndicator = styled.div`
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   font-size: 14px;
   font-weight: bold;
+  transform: translateX(-25px);
+  margin-bottom: 5px;
 `;
 
 export const SliderPopup = styled.div`
@@ -98,6 +100,7 @@ export const SliderPopup = styled.div`
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
+  transform: translateX(-25px);
 
   input[type="range"] {
     -webkit-appearance: none;
