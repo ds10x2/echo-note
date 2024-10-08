@@ -142,12 +142,12 @@ export const ToggleContainer = styled.div`
   }
 `;
 
-export const TagButton = styled.button.withConfig({
-  shouldForwardProp: shouldNotForwardPropsWithKeys(["collapsed"]),
-})`
+export const TagButton = styled.button`
   border: 2px solid ${(props) => props.theme.colors.recordInActive};
-  background-color: transparent;
-  color: ${(props) => props.theme.colors.recordInActive};
+  background-color: ${({ isSelected, theme }) =>
+    isSelected ? theme.colors.recordActive : "transparent"};
+  color: ${({ isSelected, theme }) =>
+    isSelected ? theme.colors.white : theme.colors.recordInActive};
   border-radius: 20px;
   padding: 5px 10px;
   font-size: 14px;

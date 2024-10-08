@@ -9,7 +9,7 @@ import {
 } from "@components/styles/AnalyzeModal.style";
 import Github, { GithubPlacement } from "@uiw/react-color-github";
 import PropTypes from "prop-types";
-import { useEffect, useState, CSSProperties } from "react";
+import { useEffect, useState } from "react";
 
 const CORLER_HEX = [
   "#B80000",
@@ -33,20 +33,28 @@ const CORLER_HEX = [
 const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
   const [isVisible, setIsVisible] = useState(isOpen);
   const [hex, setHex] = useState("#fff");
-
   const [isOn, setisOn] = useState(false);
+  const keywordArray = ["강남", "서초구", "종로구", "용산구"];
+  const [selectedTags, setSelectedTags] = useState([]);
 
   const toggleHandler = () => {
-    // isOn의 상태를 변경하는 메소드를 구현
     setisOn(!isOn);
+  };
+
+  const toggleTag = (tag) => {
+    setSelectedTags((prevSelectedTags) =>
+      prevSelectedTags.includes(tag)
+        ? prevSelectedTags.filter((item) => item !== tag)
+        : [...prevSelectedTags, tag]
+    );
   };
 
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true); // 모달이 열릴 때 visible 상태를 true로 설정
+      setIsVisible(true);
     } else {
       const timer = setTimeout(() => {
-        setIsVisible(false); // 닫기 애니메이션 후 visible을 false로 설정
+        setIsVisible(false);
       }, 200);
       return () => clearTimeout(timer);
     }
@@ -56,13 +64,13 @@ const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
 
   return (
     <ModalBackdrop
-      className={isOpen ? "modal open" : "modal"} // isOpen에 따라 열림/닫힘 애니메이션
+      className={isOpen ? "modal open" : "modal"}
       onClick={onClose}
     >
       <AnalyzeModalContainer
-        className={isOpen ? "modal open" : "modal"} // isOpen 상태에 따라 애니메이션 제어
+        className={isOpen ? "modal open" : "modal"}
         style={{ top: position?.top, left: position?.left }}
-        onClick={(e) => e.stopPropagation()} // 모달 외부 클릭 방지
+        onClick={(e) => e.stopPropagation()}
       >
         {modalType === "음성" ? (
           <ModalHeader>
@@ -94,10 +102,15 @@ const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
               </ToggleContainer>
             </ModalHeader>
             <AnalyzedSection>
-              <TagButton>강남 ✕</TagButton>
-              <TagButton>서초구 ✕</TagButton>
-              <TagButton>종로구 ✕</TagButton>
-              <TagButton>용산구 ✕</TagButton>
+              {keywordArray.map((keyword) => (
+                <TagButton
+                  key={keyword}
+                  onClick={() => toggleTag(keyword)}
+                  isSelected={selectedTags.includes(keyword)} // 선택 상태에 따라 스타일 변경
+                >
+                  {keyword}
+                </TagButton>
+              ))}
             </AnalyzedSection>
           </>
         )}

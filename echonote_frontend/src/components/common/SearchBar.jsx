@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import PropTypes from "prop-types";
 import {
   SearchContainer,
   SearchInput,
@@ -13,7 +14,7 @@ import { FaSearch } from "react-icons/fa";
 import { IoIosArrowUp, IoIosArrowDown, IoIosClose } from "react-icons/io";
 import { useSearchStore } from "@stores/sideBarStore";
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, handleArrowNavigation }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // 입력된 검색어 상태
   const searchRef = useRef(null);
@@ -36,16 +37,6 @@ const SearchBar = ({ onSearch }) => {
   const handleInputChange = (event) => {
     setSearchTerm(event.target.value); // 입력된 값 업데이트
     onSearch(event.target.value); // 상위 컴포넌트에 검색어 전달
-  };
-
-  const handleArrowNavigation = (direction) => {
-    if (direction === "up") {
-      setCurrentIndex(
-        currentIndex - 1 <= 0 ? searchResults.length : currentIndex - 1
-      );
-    } else if (direction === "down") {
-      setCurrentIndex((currentIndex % searchResults.length) + 1);
-    }
   };
 
   const handleClearSearch = () => {
@@ -105,6 +96,11 @@ const SearchBar = ({ onSearch }) => {
       )}
     </SearchContainer>
   );
+};
+
+SearchBar.propTypes = {
+  onSearch: PropTypes.func.isRequired,
+  handleArrowNavigation: PropTypes.func.isRequired,
 };
 
 export default SearchBar;
