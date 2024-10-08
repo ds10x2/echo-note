@@ -31,8 +31,8 @@ const AudioWave = () => {
   const [speedBarVisible, setSpeedBarVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  // const [audioUrl, setAudioUrl] = useState(null);
-  const [audioUrl, setAudioUrl] = useState("src/assets/hitsong.wav");
+  const [audioUrl, setAudioUrl] = useState(null);
+  // const [audioUrl, setAudioUrl] = useState("src/assets/hitsong.wav");
 
   const [recordTime, setRecordTime] = useState(0);
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
