@@ -98,8 +98,8 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 	private STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
-//		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
-		String flaskUrl = "http://localhost:5000/stt";
+		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
+//		String flaskUrl = "http://localhost:5000/stt";
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
