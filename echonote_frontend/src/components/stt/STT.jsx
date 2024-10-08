@@ -45,9 +45,9 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
   const [sttData, setSttData] = useState([]);
   const [modifiedTexts, setModifiedTexts] = useState([]);
   const { setStartTime } = useAudioStore();
-  const [eventMessage, setEventMessage] = useState("");
+  const [eventMessage, setEventMessage] = useState('');
 
-  // 컴포넌트 마운트 시 API 데이터 가져오기
+// 컴포넌트 마운트 시 API 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
       const data = await getSTTResult(id);
@@ -57,6 +57,8 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     };
     fetchData();
   }, [id]);
+
+
 
   // 검색어를 포함한 부분 강조
   const highlightText = (text) => {
