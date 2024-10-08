@@ -157,17 +157,10 @@ public class VoiceController {
 
 
 			return emitter;
+		}else{
+			SseEmitter emitter = emitters.get(noteId);
+			return emitter;
 		}
-		// 중복 요청에 대한 처리
-		SseEmitter emitter = new SseEmitter(1L);
-		try {
-			emitter.send(SseEmitter.event().data("중복된 요청입니다. 이미 생성된 emitter가 존재합니다.").id("duplicate-request"));
-			emitter.complete(); // 요청을 완료하여 클라이언트가 더 이상 기다리지 않도록 함
-		} catch (IOException e) {
-			emitter.completeWithError(e);
-		}
-
-		return emitter;
 	}
 
 
