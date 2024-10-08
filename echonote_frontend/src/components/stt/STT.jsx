@@ -48,7 +48,7 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
 
   // 컴포넌트 마운트 시 API 데이터 가져오기
   useEffect(() => {
-    const eventSource = new EventSource(' http://localhost:8080/voice/sse?note_id=1');
+    const eventSource = new EventSource(`${import.meta.env.VITE_API_URL}voice/sse?note_id=${id}`);
 
     console.log("SSE 연결 시도 중...");
 
