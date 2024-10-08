@@ -18,6 +18,27 @@ const ShapeToolBar = ({}) => {
   const fillPaletteRef = useRef(null);
   const strokePaletteRef = useRef(null);
 
+  const handleClickOutside = (e) => {
+    if (fillPaletteRef.current && !fillPaletteRef.current.contains(e.target)) {
+      setShowFillPalette(false);
+    } else if (
+      strokePaletteRef.current &&
+      !strokePaletteRef.current.contains(e.target)
+    ) {
+      setShowStrokePalette(false);
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const toggleFillPalette = () => {
     if (showStrokePalette) setShowStrokePalette(!showStrokePalette);
     setShowFillPalette(!showFillPalette);
