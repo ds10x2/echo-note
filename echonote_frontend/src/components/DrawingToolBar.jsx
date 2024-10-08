@@ -128,6 +128,7 @@ const DrawingToolBar = ({
           />
         </St.SliderPopup>
       )}
+
       <St.Divider />
 
       {/* undo, redo, clear */}
