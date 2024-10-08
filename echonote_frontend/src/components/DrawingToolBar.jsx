@@ -83,17 +83,17 @@ const DrawingToolBar = ({
 
   const handleIncrease = () => {
     if (activeTool === "pen") {
-      onStrokeWidthChange({ target: { value: strokeWidth + 1 } });
+      onStrokeWidthChange({ target: { value: strokeWidth + 0.5 } });
     } else {
-      onEraserWidthChange({ target: { value: eraserWidth + 1 } });
+      onEraserWidthChange({ target: { value: eraserWidth + 0.5 } });
     }
   };
 
   const handleDecrease = () => {
     if (activeTool === "pen") {
-      onStrokeWidthChange({ target: { value: strokeWidth - 1 } });
+      onStrokeWidthChange({ target: { value: strokeWidth - 0.5 } });
     } else {
-      onEraserWidthChange({ target: { value: eraserWidth - 1 } });
+      onEraserWidthChange({ target: { value: eraserWidth - 0.5 } });
     }
   };
 
@@ -135,7 +135,7 @@ const DrawingToolBar = ({
                   : "white",
             }}
           >
-            {activeTool === "pen" ? strokeWidth : eraserWidth}
+            {activeTool === "pen" ? strokeWidth * 2 : eraserWidth * 2}
           </St.SliderIndicator>
 
           <St.SliderPopup ref={strokeWidthRef}>
@@ -143,8 +143,8 @@ const DrawingToolBar = ({
             <input
               type="range"
               min="1"
-              max="100"
-              step="1"
+              max="50"
+              step="0.5"
               value={activeTool === "pen" ? strokeWidth : eraserWidth}
               onChange={
                 activeTool === "pen" ? onStrokeWidthChange : onEraserWidthChange
