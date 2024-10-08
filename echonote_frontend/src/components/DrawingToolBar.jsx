@@ -24,7 +24,6 @@ const DrawingToolBar = ({
   onUndoChange,
   onRedoChange,
   onClearChange,
-  onResetChange,
   onReadOnlyChange,
 }) => {
   const [activeTool, setActiveTool] = useState("pen");
@@ -131,7 +130,7 @@ const DrawingToolBar = ({
       )}
       <St.Divider />
 
-      {/* undo, redo, clear, reset */}
+      {/* undo, redo, clear */}
       <St.IconButton onClick={onUndoChange}>
         <FaUndo />
       </St.IconButton>
@@ -140,9 +139,6 @@ const DrawingToolBar = ({
       </St.IconButton>
       <St.IconButton onClick={onClearChange}>
         <FaTrash />
-      </St.IconButton>
-      <St.IconButton onClick={onResetChange}>
-        <FaSync />
       </St.IconButton>
     </St.DrawingToolContainer>
   );

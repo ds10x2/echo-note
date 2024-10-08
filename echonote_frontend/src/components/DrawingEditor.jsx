@@ -11,7 +11,6 @@ const DrawingEditor = ({ scale, page }) => {
   const [eraserWidth, setEraserWidth] = useState(10);
   const [strokeColor, setStrokeColor] = useState("#000000");
   const [readOnly, setReadOnly] = useState(false);
-  const { reset } = canvasStore.getState();
 
   const handleEraserClick = () => {
     setEraseMode(true);
@@ -47,11 +46,6 @@ const DrawingEditor = ({ scale, page }) => {
     canvasRef.current?.clearCanvas();
   };
 
-  const handleResetClick = () => {
-    reset(page);
-    canvasRef.current?.resetCanvas();
-  };
-
   const handleReadOnlyChange = (isReadOnly) => {
     setReadOnly(isReadOnly);
   };
@@ -71,7 +65,6 @@ const DrawingEditor = ({ scale, page }) => {
         onUndoChange={handleUndoClick}
         onRedoChange={handleRedoClick}
         onClearChange={handleClearClick}
-        onResetChange={handleResetClick}
         onReadOnlyChange={handleReadOnlyChange}
       />
       <DrawingCanvas

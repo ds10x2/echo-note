@@ -23,18 +23,6 @@ const canvasStore = create((set, get) => ({
   // 저장된 이미지 데이터를 불러오는 함수
   getCanvasImage: (page) => get().savedCanvasImages[page] || null,
 
-  reset: (page) => {
-    set((state) => {
-      const updatedPaths = { ...state.savedCanvasPaths, [page]: [] };
-      const updatedImages = { ...state.savedCanvasImages, [page]: null };
-
-      return {
-        savedCanvasPaths: updatedPaths,
-        savedCanvasImages: updatedImages,
-      };
-    });
-  },
-
   // 경로 데이터를 초기화하는 함수
   clearCanvasPath: (page) =>
     set((state) => {
