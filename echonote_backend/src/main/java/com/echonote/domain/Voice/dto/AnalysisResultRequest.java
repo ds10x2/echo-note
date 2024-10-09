@@ -8,5 +8,5 @@ import lombok.Data;
 public class AnalysisResultRequest {
 	private Long id;
 	private String processId;
-	private List<Float> anomalyTime;
+	private List<String> anomalyTime;
 }
