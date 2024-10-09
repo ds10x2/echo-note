@@ -54,7 +54,7 @@ public class VoiceController {
 
 
 	// 확장자명에 따라 presigned url 반환
-	@GetMapping
+	@GetMapping("/url")
 	@Operation(summary = "녹음본 Presigned url 요청", description = "녹음본 S3 업로드를 위한 presigned url과 객체 Url을 요청")
 	public ResponseEntity<UrlResponse> generatePresignedUrl() {
 
