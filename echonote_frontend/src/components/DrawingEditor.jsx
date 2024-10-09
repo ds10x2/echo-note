@@ -3,6 +3,7 @@ import * as St from "@components/styles/DrawingEditor.style";
 import DrawingToolBar from "@components/DrawingToolBar";
 import DrawingCanvas from "@components/DrawingCanvas";
 import canvasStore from "@stores/canvasStore";
+import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const DrawingEditor = ({ scale, page, readOnly }) => {
   const canvasRef = useRef();
@@ -11,6 +12,7 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
   const [eraserWidth, setEraserWidth] = useState(10);
   const [strokeColor, setStrokeColor] = useState("#000000");
   const [noEdit, setNoEdit] = useState(false);
+  const { mode } = drawingTypeStore();
 
   const { undo, redo, clearCanvasPath, getCanvasPath } = canvasStore.getState();
 
@@ -79,8 +81,8 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
   }, [page, scale]);
 
   return (
-    <St.DrawingEditorContainer>
-      {!readOnly && (
+    <St.DrawingEditorContainer mode={mode.pen}>
+      {mode.pen && (
         <DrawingToolBar
           eraseMode={eraseMode}
           strokeWidth={strokeWidth}

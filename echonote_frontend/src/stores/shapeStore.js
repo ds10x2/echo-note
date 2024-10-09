@@ -13,6 +13,18 @@ const shapeStore = create((set, get) => ({
     strokeWidth: 1,
   },
 
+  selectedShape: { id: null, type: null }, // detail 제거
+
+  // 선택된 도형 설정
+  setSelectedShape: (id, type) => {
+    const { selectedShape } = get();
+    if (selectedShape.id !== id || selectedShape.type !== type) {
+      set(() => ({
+        selectedShape: { id, type }, // id와 type만 저장
+      }));
+    }
+  },
+
   addRectangle: (rectangle) => {
     const currentPage = get().currentPage;
     set((state) => ({
@@ -142,6 +154,56 @@ const shapeStore = create((set, get) => ({
       property: {
         ...state.property,
         strokeWidth: strokeWidth,
+      },
+    }));
+  },
+
+  resetTimestamps: (page) => {
+    set((state) => ({
+      rectangles: {
+        ...state.rectangles,
+        [page]: state.rectangles[page]?.map((rect) => ({
+          ...rect,
+          detail: {
+            ...rect.detail,
+            timestamp: null, // 타임스탬프를 null로 초기화
+          },
+        })),
+      },
+    }));
+
+    set((state) => ({
+      circles: {
+        ...state.circles,
+        [page]: state.circles[page]?.map((circle) => ({
+          ...circle,
+          detail: {
+            ...circle.detail,
+            timestamp: null, // 타임스탬프를 null로 초기화
+          },
+        })),
+      },
+    }));
+  },
+
+  removeRectangle: (index) => {
+    const currentPage = get().currentPage;
+    set((state) => ({
+      rectangles: {
+        ...state.rectangles,
+        [currentPage]: state.rectangles[currentPage].filter(
+          (_, i) => i !== index
+        ),
+      },
+    }));
+  },
+
+  removeCircle: (index) => {
+    const currentPage = get().currentPage;
+    set((state) => ({
+      circles: {
+        ...state.circles,
+        [currentPage]: state.circles[currentPage].filter((_, i) => i !== index),
       },
     }));
   },

@@ -1,9 +1,13 @@
 import { create } from "zustand";
 
 const pageStore = create((set, get) => ({
+  url: "",
   currentPage: 1, // 현재 페이지 상태 추가
   pages: 1, // 최대 페이지 수 상태 추가
   scale: 1, // 줌 스케일 초기 상태
+
+  //PDF URL 업데이트
+  setUrl: (url) => set({ url: url }),
 
   // 페이지 상태 업데이트
   setCurrentPage: (page) => set({ currentPage: page }),

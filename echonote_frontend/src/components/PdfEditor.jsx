@@ -25,7 +25,11 @@ const PdfEditor = ({ scale, containerRef, originalSize }) => {
   }, [currentPage]);
 
   return (
-    <St.PdfEditorContainer originalSize={originalSize} scale={scale}>
+    <St.PdfEditorContainer
+      originalSize={originalSize}
+      scale={scale}
+      mode={mode.pen}
+    >
       <TextEditor
         scale={scale}
         hasDraggedRef={hasDraggedRef}

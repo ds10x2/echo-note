@@ -6,16 +6,18 @@ import pageStore from "@/stores/pageStore"; // zustand 스토어 가져오기
 import DrawingEditor from "@components/DrawingEditor";
 import { DrawingEditorContainer } from "@components/styles/DrawingEditor.style";
 import canvasStore from "@stores/canvasStore";
+import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
   const canvasRef = useRef();
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs`;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
   const [pdfRef, setPdfRef] = useState(null);
   const { currentPage, setPages, scale } = pageStore(); // zustand의 상태와 액션 가져오기
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
+  const { mode } = drawingTypeStore();
 
   const sampleUrl =
     "https://timeisnullnull.s3.ap-northeast-2.amazonaws.com/le_Petit_Prince_%EB%B3%B8%EB%AC%B8.pdf";
@@ -107,9 +109,8 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
         originalSize={originalSize}
         currentPage={currentPage}
         containerRef={containerRef}
-        isDrawingEditorOpened={isDrawingEditorOpened}
       />
-      {isDrawingEditorOpened ? (
+      {mode.pen ? (
         <DrawingEditor scale={scale} page={currentPage} readOnly={false} />
       ) : (
         <DrawingEditor scale={scale} page={currentPage} readOnly={true} />

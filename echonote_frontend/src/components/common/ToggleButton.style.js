@@ -9,7 +9,7 @@ export const ToggleContainer = styled.div.withConfig({
   width: 44px;
   height: 18px;
   border-radius: 15px;
-  background-color: ${({ isOn, theme }) =>
+  background-color: ${({ isOn }) =>
     isOn ? theme.colors.iconHover : theme.colors.toggleButtonOff};
   padding: 3px;
   cursor: pointer;
