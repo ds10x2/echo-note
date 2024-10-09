@@ -12,10 +12,15 @@ import { getNoteDetail } from "@services/noteApi";
 const NotePage = () => {
   const { id } = useParams();
   const [isDrawingEditorOpened, setIsDrawingEditorOpened] = useState(false);
+  const [isToolBarCollapsed, setIsToolBarCollapsed] = useState(false); // ToolBar 접힘 상태 관리
   const { setNoteDetail } = useNoteStore();
 
   const toggleDrawingEditor = () => {
     setIsDrawingEditorOpened(!isDrawingEditorOpened);
+  };
+
+  const handleToggleToolBar = (collapsed) => {
+    setIsToolBarCollapsed(collapsed); // ToolBar 접힘 상태 업데이트
   };
 
   useEffect(() => {
@@ -34,11 +39,14 @@ const NotePage = () => {
 
   return (
     <>
-      <ToolBar onToggleDrawingEditor={toggleDrawingEditor} />
+      <ToolBar
+        onToggleDrawingEditor={toggleDrawingEditor}
+        onToggleToolBar={handleToggleToolBar}
+      />
       <Layout>
         <RecordingBar />
         <PdfBar />
-        <MainContent>
+        <MainContent isCollapsed={isToolBarCollapsed}>
           <PdfViewer isDrawingEditorOpened={isDrawingEditorOpened} />
         </MainContent>
         <STTBar />

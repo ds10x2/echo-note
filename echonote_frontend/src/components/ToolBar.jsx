@@ -47,7 +47,7 @@ import { VscSettings, VscArrowLeft } from "react-icons/vsc";
 import textStore from "@/stores/textStore";
 import Dropdown from "@components/common/Dropdown";
 
-const ToolBar = ({ onToggleDrawingEditor }) => {
+const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar }) => {
   const {
     isPdfBarOpened,
     isSTTBarOpened,
@@ -102,6 +102,7 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
   };
 
   const toggleCollapse = () => {
+    onToggleToolBar(!isCollapsed); // 상태 변경 시 상위 컴포넌트에 전달
     setIsCollapsed(!isCollapsed);
   };
 

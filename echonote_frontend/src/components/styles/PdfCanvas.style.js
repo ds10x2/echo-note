@@ -12,4 +12,5 @@ export const PdfCanvasContainer = styled.div.attrs((props) => ({
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: auto;
 `;
