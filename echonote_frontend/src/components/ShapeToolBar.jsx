@@ -8,6 +8,7 @@ import shapeStore from "@/stores/shapeStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 import { Colorful } from "@uiw/react-color";
 import ToggleButton from "./common/ToggleButton";
+import { PiNotePencil } from "react-icons/pi";
 
 const ShapeToolBar = ({}) => {
   const {
@@ -21,33 +22,18 @@ const ShapeToolBar = ({}) => {
     removeCircle,
     removeRectangle,
   } = shapeStore();
-  const { mode, shapeMode, setRectangleMode, setCircleMode, setShapeMode } =
-    drawingTypeStore();
+  const {
+    mode,
+    shapeMode,
+    setRectangleMode,
+    setCircleMode,
+    setShapeMode,
+    setTextMode,
+  } = drawingTypeStore();
   const [showFillPalette, setShowFillPalette] = useState(false);
   const [showStrokePalette, setShowStrokePalette] = useState(false);
   const fillPaletteRef = useRef(null);
   const strokePaletteRef = useRef(null);
-
-  // const handleClickOutside = (e) => {
-  //   if (fillPaletteRef.current && !fillPaletteRef.current.contains(e.target)) {
-  //     setShowFillPalette(false);
-  //   } else if (
-  //     strokePaletteRef.current &&
-  //     !strokePaletteRef.current.contains(e.target)
-  //   ) {
-  //     setShowStrokePalette(false);
-  //   }
-
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  // };
-
-  // useEffect(() => {
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
 
   const toggleFillPalette = () => {
     if (showStrokePalette) setShowStrokePalette(!showStrokePalette);
@@ -80,9 +66,9 @@ const ShapeToolBar = ({}) => {
     setSelectedShape(null, null);
   };
 
-  if (selectedShape.id === null) {
+  if (mode.shape && selectedShape.id === null) {
     return (
-      <St.DrawingToolContainer isSelected={false}>
+      <St.ShapeToolContainer isSelected={false}>
         <St.ToolBarButton>
           <St.IconContainer>
             {/* 도형선택 */}
@@ -159,11 +145,11 @@ const ShapeToolBar = ({}) => {
             <St.IconButton as={FaRegCircleXmark} onClick={setShapeMode} />
           </St.IconContainer>
         </St.ToolBarButton>
-      </St.DrawingToolContainer>
+      </St.ShapeToolContainer>
     );
-  } else {
+  } else if (mode.shape && selectedShape.id !== null) {
     return (
-      <St.DrawingToolContainer isSelected={true}>
+      <St.ShapeToolContainer isSelected={true}>
         <St.ToolBarButton>
           <St.IconContainer>
             <St.IconButton as={PiFileAudio} />
@@ -175,9 +161,26 @@ const ShapeToolBar = ({}) => {
             <St.IconButton as={FaRegCircleXmark} onClick={setShapeMode} />
           </St.IconContainer>
         </St.ToolBarButton>
-      </St.DrawingToolContainer>
+      </St.ShapeToolContainer>
     );
-  }
+  } else if (mode.text) {
+    return (
+      <St.TextToolContainer>
+        <St.ToolBarButton>
+          <St.IconContainer>
+            <St.IconButton as={PiFileAudio} />
+            <St.IconButton as={PiNotePencil} />
+          </St.IconContainer>
+          <St.Divider />
+          <St.IconContainer>
+            {/* 텍스트 지우기, toolbar 닫기 */}
+            <St.IconButton as={FaTrash} onClick={deleteShape} />
+            <St.IconButton as={FaRegCircleXmark} onClick={setTextMode} />
+          </St.IconContainer>
+        </St.ToolBarButton>
+      </St.TextToolContainer>
+    );
+  } else return null;
 };
 
 export default ShapeToolBar;
