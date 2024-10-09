@@ -92,6 +92,41 @@ const canvasStore = create((set, get) => ({
       redoStacks: { ...state.redoStacks, [page]: [] },
     }));
   },
+
+  // api 요청 보낼 구조로 변경
+  drawings: () => {
+    const paths = get().savedCanvasPaths;
+    const records = get().savedCanvasRecords;
+
+    const result = {};
+
+    Object.keys(paths).forEach((page) => {
+      result[page] = paths[page].map((path, index) => ({
+        id: index,
+        detail: {
+          paths: path,
+          records: records[page] ? records[page][index] : null,
+        },
+      }));
+    });
+
+    return result;
+  },
+
+  loadDrawings: (data) => {
+    const newCanvasPaths = {};
+    const newCanvasRecords = {};
+
+    Object.keys(data).forEach((page) => {
+      newCanvasPaths[page] = data[page].map((item) => item.detail.paths);
+      newCanvasRecords[page] = data[page].map((item) => item.detail.records);
+    });
+
+    set(() => ({
+      savedCanvasPaths: newCanvasPaths,
+      savedCanvasRecords: newCanvasRecords,
+    }));
+  },
 }));
 
 export default canvasStore;
