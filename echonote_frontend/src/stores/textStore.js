@@ -7,6 +7,7 @@ const textStore = create((set, get) => ({
   fontProperty: {
     fontSize: 10,
   },
+  selectedText: { id: null },
 
   setFontSize: (newFontSize) => {
     set((state) => ({
@@ -130,6 +131,25 @@ const textStore = create((set, get) => ({
   },
 
   setCurrentPageForText: (page) => set(() => ({ currentPage: page })),
+
+  setSelectedText: (id) => {
+    set((state) => ({
+      selectedText: { id }, // 선택된 텍스트 상태 업데이트
+    }));
+  },
+
+  editTextItem: () => {
+    const { selectedText, currentPage, textItems } = get();
+    const items = textItems[currentPage] || [];
+    set((state) => ({
+      textItems: {
+        ...state.textItems,
+        [currentPage]: items.map((item) =>
+          item.id === selectedText.id ? { ...item, isEditing: true } : item
+        ),
+      },
+    }));
+  },
 }));
 
 export default textStore;

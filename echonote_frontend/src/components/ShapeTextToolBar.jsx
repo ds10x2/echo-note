@@ -9,6 +9,7 @@ import drawingTypeStore from "@/stores/drawingTypeStore";
 import { Colorful } from "@uiw/react-color";
 import ToggleButton from "./common/ToggleButton";
 import { PiNotePencil } from "react-icons/pi";
+import textStore from "@/stores/textStore";
 
 const ShapeTextToolBar = ({}) => {
   const {
@@ -22,6 +23,8 @@ const ShapeTextToolBar = ({}) => {
     removeCircle,
     removeRectangle,
   } = shapeStore();
+  const { deleteTextItem, selectedText, setSelectedText, editTextItem } =
+    textStore();
   const {
     mode,
     shapeMode,
@@ -64,6 +67,14 @@ const ShapeTextToolBar = ({}) => {
       removeCircle(selectedShape.id);
     }
     setSelectedShape(null, null);
+  };
+  const deleteText = () => {
+    deleteTextItem(selectedText.id);
+    setSelectedText(null);
+  };
+
+  const handleEdit = () => {
+    editTextItem(); // store에서 직접 수정
   };
 
   if (mode.shape && selectedShape.id === null) {
@@ -163,18 +174,18 @@ const ShapeTextToolBar = ({}) => {
         </St.ToolBarButton>
       </St.ShapeToolContainer>
     );
-  } else if (mode.text) {
+  } else if (mode.text && selectedText.id !== null) {
     return (
       <St.TextToolContainer>
         <St.ToolBarButton>
           <St.IconContainer>
             <St.IconButton as={PiFileAudio} />
-            <St.IconButton as={PiNotePencil} />
+            <St.IconButton as={PiNotePencil} onClick={handleEdit} />
           </St.IconContainer>
           <St.Divider />
           <St.IconContainer>
             {/* 텍스트 지우기, toolbar 닫기 */}
-            <St.IconButton as={FaTrash} onClick={deleteShape} />
+            <St.IconButton as={FaTrash} onClick={deleteText} />
             <St.IconButton as={FaRegCircleXmark} onClick={setTextMode} />
           </St.IconContainer>
         </St.ToolBarButton>
