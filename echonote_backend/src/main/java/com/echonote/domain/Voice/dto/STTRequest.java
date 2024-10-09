@@ -12,9 +12,9 @@ public class STTRequest {
     private String start;
     private String end;
     private String text;
-    private Boolean isAnomaly;
+    private boolean isAnomaly;
 
-    public void setAnomaly(Boolean status) {
+    public void setAnomaly(boolean status) {
         this.isAnomaly = status;
     }
 
