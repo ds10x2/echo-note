@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import * as St from "./styles/TextEditor.style";
 import textStore from "@stores/textStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
+import { useAudioStore } from "@/stores/recordStore";
 
 // 텍스트박스 컴포넌트를 메모이제이션
 const TextBox = React.memo(
@@ -17,28 +18,30 @@ const TextBox = React.memo(
       <St.TextBox
         key={item.id}
         data-id={item.id}
-        x={item.x}
-        y={item.y}
-        isEditing={item.isEditing}
-        isDragging={item.isDragging}
+        x={item.detail.x}
+        y={item.detail.y}
+        isEditing={item.detail.isEditing}
+        isDragging={item.detail.isDragging}
         className="text-box"
         onTouchStart={(e) => handleTouchStart(e, item.id)}
         isSelected={isSelected}
         style={{
-          fontSize: `${item.fontSize}px`,
+          fontSize: `${item.detail.fontSize}px`,
         }}
       >
-        {item.isEditing ? (
+        {item.detail.isEditing ? (
           <St.TextArea
-            value={item.text}
+            value={item.detail.text}
             autoFocus
             onChange={(e) => updateCurTextItem(item.id, e.target.value)}
             onBlur={() => handleBlur(item.id)}
             onKeyDown={(e) => handleKeyDown(e, item.id)}
-            style={{ fontSize: `${item.fontSize}px` }}
+            style={{ fontSize: `${item.detail.fontSize}px` }}
           />
         ) : (
-          <St.TextDetail fontSize={item.fontSize}>{item.text}</St.TextDetail>
+          <St.TextDetail fontSize={item.detail.fontSize}>
+            {item.detail.text}
+          </St.TextDetail>
         )}
       </St.TextBox>
     );
@@ -68,6 +71,7 @@ const TextEditor = ({
     setSelectedText,
     selectedText, // 전역에서 선택된 텍스트를 가져옴
   } = textStore();
+  const { createTime, isRecording } = useAudioStore();
 
   const { mode } = drawingTypeStore();
 
@@ -86,6 +90,10 @@ const TextEditor = ({
     if (!mode.text) setSelectedText(null); // 모드가 변경될 때 선택된 텍스트 해제
   }, [mode, setSelectedText]);
 
+  const getTimestamp = (recordStartTime, shapecreatedTime) => {
+    return Math.floor((shapecreatedTime - recordStartTime) / 1000);
+  };
+
   const handleAddTextBox = useCallback(
     (e) => {
       if (isDraggingRef.current || hasDraggedRef.current) return;
@@ -102,14 +110,17 @@ const TextEditor = ({
 
       addTextItem({
         id: Date.now(),
-        x,
-        y,
-        text: "",
-        isEditing: true,
-        isDragging: false,
-        offsetX: 0,
-        offsetY: 0,
-        fontSize: textStore.getState().fontProperty.fontSize,
+        detail: {
+          x,
+          y,
+          text: "",
+          isEditing: true,
+          isDragging: false,
+          offsetX: 0,
+          offsetY: 0,
+          fontSize: textStore.getState().fontProperty.fontSize,
+          timeStamp: isRecording ? getTimestamp(createTime, Date.now()) : null,
+        },
       });
 
       setSelectedText(null);
@@ -131,7 +142,9 @@ const TextEditor = ({
         if (clickedTextBox) {
           const clickedItemId = parseInt(clickedTextBox.dataset.id, 10);
           if (
-            curItems.some((item) => item.id === clickedItemId && item.isEditing)
+            curItems.some(
+              (item) => item.id === clickedItemId && item.detail.isEditing
+            )
           ) {
             return;
           }
@@ -161,7 +174,7 @@ const TextEditor = ({
 
     const nowItem = curItems.find((item) => item.id === id);
 
-    if (nowItem.isEditing && selectedText.id === id) {
+    if (nowItem.detail.isEditing && selectedText.id === id) {
       return;
     }
 
@@ -178,15 +191,20 @@ const TextEditor = ({
     const offsetX =
       clientX +
       parentScrollLeft -
-      (nowItem.x * scale + containerRef.current.offsetLeft);
+      (nowItem.detail.x * scale + containerRef.current.offsetLeft);
     const offsetY =
       clientY +
       parentScrollTop -
-      (nowItem.y * scale + containerRef.current.offsetTop);
+      (nowItem.detail.y * scale + containerRef.current.offsetTop);
 
     setCurItems((items) =>
       items.map((item) =>
-        item.id === id ? { ...item, isDragging: true, offsetX, offsetY } : item
+        item.id === id
+          ? {
+              ...item,
+              detail: { ...item.detail, isDragging: true, offsetX, offsetY },
+            }
+          : item
       )
     );
 
@@ -200,16 +218,16 @@ const TextEditor = ({
 
       setCurItems((items) =>
         items.map((item) => {
-          if (item.isDragging) {
-            let newX = (clientX - item.offsetX) / scale;
-            let newY = (clientY - item.offsetY) / scale;
+          if (item.detail.isDragging) {
+            let newX = (clientX - item.detail.offsetX) / scale;
+            let newY = (clientY - item.detail.offsetY) / scale;
 
             const containerRect = containerRef.current.getBoundingClientRect();
             const containerWidth = containerRect.width / scale;
             const containerHeight = containerRect.height / scale;
 
             const textBoxWidth = 100;
-            const textBoxHeight = item.fontSize;
+            const textBoxHeight = item.detail.fontSize;
 
             if (newX < 0) newX = 0;
             else if (newX + textBoxWidth > containerWidth)
@@ -221,8 +239,7 @@ const TextEditor = ({
 
             return {
               ...item,
-              x: newX,
-              y: newY,
+              detail: { ...item.detail, x: newX, y: newY },
             };
           }
           return item;
@@ -239,12 +256,12 @@ const TextEditor = ({
 
       setCurItems((items) => {
         return items.map((item) => {
-          if (item.isDragging) {
+          if (item.detail.isDragging) {
             setUpdatedItems((prevItems) => [
               ...prevItems,
-              { id: item.id, x: item.x, y: item.y },
+              { id: item.id, x: item.detail.x, y: item.detail.y },
             ]);
-            return { ...item, isDragging: false };
+            return { ...item, detail: { ...item.detail, isDragging: false } };
           }
           return item;
         });
@@ -289,11 +306,11 @@ const TextEditor = ({
         e.preventDefault();
         updateCurTextItem(
           id,
-          curItems.find((item) => item.id === id).text + "\n"
+          curItems.find((item) => item.id === id).detail.text + "\n"
         );
       } else {
         e.preventDefault();
-        updateTextItem(id, curItems.find((item) => item.id === id).text);
+        updateTextItem(id, curItems.find((item) => item.id === id).detail.text);
         finishEditing(id);
       }
     }
@@ -302,18 +319,20 @@ const TextEditor = ({
   const updateCurTextItem = (id, newText) => {
     setCurItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === id ? { ...item, text: newText } : item
+        item.id === id
+          ? { ...item, detail: { ...item.detail, text: newText } }
+          : item
       )
     );
   };
 
   const handleBlur = (id) => {
     const currentItem = curItems.find((item) => item.id === id);
-    if (!currentItem.text.trim()) {
+    if (!currentItem.detail.text.trim()) {
       setCurItems(curItems.filter((item) => item.id !== id));
       deleteTextItem(id);
     } else {
-      updateTextItem(id, currentItem.text);
+      updateTextItem(id, currentItem.detail.text);
       finishEditing(id);
     }
     setSelectedText(null);
