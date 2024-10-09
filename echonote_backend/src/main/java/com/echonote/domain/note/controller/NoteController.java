@@ -1,7 +1,9 @@
 package com.echonote.domain.note.controller;
 
+import java.util.List;
 import java.util.UUID;
 
+import com.echonote.domain.note.dto.NoteListResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +55,14 @@ public class NoteController {
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 
+	}
+
+	@GetMapping("/list")
+	@Operation()
+	public ResponseEntity<List<NoteListResponse>> listNotes() {
+		Long userId = 1L;
+		List<NoteListResponse> response = noteService.getNoteList(userId);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 }

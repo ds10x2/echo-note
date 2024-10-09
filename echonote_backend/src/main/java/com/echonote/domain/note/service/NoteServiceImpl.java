@@ -3,7 +3,10 @@ package com.echonote.domain.note.service;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.echonote.domain.note.dto.NoteListResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +66,16 @@ public class NoteServiceImpl implements NoteService {
 		res.setNoteId(noteRepository.save(note).getId());
 
 		return res;
+	}
+
+	@Override
+	public List<NoteListResponse> getNoteList(Long userId) {
+
+		List<Note> notes = noteRepository.findByUserId(userId);
+
+		return notes.stream()
+				.map(NoteListResponse::fromEntity)
+				.collect(Collectors.toList());
 	}
 
 }
