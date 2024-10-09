@@ -12,5 +12,10 @@ public class STTRequest {
     private String start;
     private String end;
     private String text;
+    private Boolean isAnomaly;
+
+    public void setAnomaly(Boolean status) {
+        this.isAnomaly = status;
+    }
 
 }

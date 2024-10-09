@@ -116,11 +116,13 @@ public class VoiceController {
 	@PostMapping("/analysisResult")
 	@Operation(summary = "음성 분석 모델 결과 받기", description = "Flask 음성 분석 모델에서 처리된 결과를 받습니다.")
 	public ResponseEntity<String> receiveSTTResult(@RequestBody AnalysisResultRequest analysisResultRequest) {
-		voiceService.saveAnalysisResult(analysisResultRequest);
-
 		System.out.println("=============");
 		System.out.println(analysisResultRequest);
 		System.out.println("=============");
+
+		// 결과가 들어오면 map에 임시로 저장한다.
+		voiceService.saveAnalysisResult(analysisResultRequest);
+
 		// voiceService.checkAndProcessVoice(analysisResultRequest.getProcessId());
 		return ResponseEntity.ok("음성 분석 완료");
 	}
