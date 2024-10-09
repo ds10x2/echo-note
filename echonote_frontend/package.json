@@ -14,6 +14,7 @@
     "@uiw/react-color-github": "^2.3.2",
     "@wavesurfer/react": "^1.0.7",
     "axios": "^1.7.7",
+    "fontkit": "^2.0.4",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.7.76",
     "prop-types": "^15.8.1",
