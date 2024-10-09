@@ -10,6 +10,7 @@ import { Colorful } from "@uiw/react-color";
 import ToggleButton from "./common/ToggleButton";
 import { PiNotePencil } from "react-icons/pi";
 import textStore from "@/stores/textStore";
+import { useAudioStore } from "@/stores/recordStore";
 
 const ShapeTextToolBar = ({}) => {
   const {
@@ -23,8 +24,13 @@ const ShapeTextToolBar = ({}) => {
     removeCircle,
     removeRectangle,
   } = shapeStore();
-  const { deleteTextItem, selectedText, setSelectedText, editTextItem } =
-    textStore();
+  const {
+    deleteTextItem,
+    selectedText,
+    setSelectedText,
+    editTextItem,
+    getTimestampForSelectedText,
+  } = textStore();
   const {
     mode,
     shapeMode,
@@ -33,6 +39,7 @@ const ShapeTextToolBar = ({}) => {
     setShapeMode,
     setTextMode,
   } = drawingTypeStore();
+  const { setStartTime } = useAudioStore();
   const [showFillPalette, setShowFillPalette] = useState(false);
   const [showStrokePalette, setShowStrokePalette] = useState(false);
   const fillPaletteRef = useRef(null);
@@ -75,6 +82,16 @@ const ShapeTextToolBar = ({}) => {
 
   const handleEdit = () => {
     editTextItem(); // store에서 직접 수정
+  };
+
+  const handleTextTimestamp = () => {
+    const timestamp = getTimestampForSelectedText();
+    if (timestamp !== null) {
+      console.log(timestamp);
+      setStartTime(timestamp);
+    } else {
+      console.log("타임스탬프가 존재하지 않음");
+    }
   };
 
   if (mode.shape && selectedShape.id === null) {
@@ -179,7 +196,7 @@ const ShapeTextToolBar = ({}) => {
       <St.TextToolContainer>
         <St.ToolBarButton>
           <St.IconContainer>
-            <St.IconButton as={PiFileAudio} />
+            <St.IconButton as={PiFileAudio} onClick={handleTextTimestamp} />
             <St.IconButton as={PiNotePencil} onClick={handleEdit} />
           </St.IconContainer>
           <St.Divider />
