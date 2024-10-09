@@ -40,10 +40,13 @@ export const StyledRectangle = styled.rect
       stroke-dasharray: 4 !important;
       stroke-linecap: round !important;
       transform: translate(-2px, -2px) !important;  // 살짝 이동
-      animation: dash 1s linear infinite !important;  // 애니메이션 추가
+      animation: dash 2s linear infinite !important;  // 애니메이션 추가
       `}
 
     @keyframes dash {
+      from {
+        stroke-dashoffset: 0;
+      }
       to {
         stroke-dashoffset: -16;  // 도트가 움직이는 애니메이션
       }
@@ -81,10 +84,13 @@ export const StyledCircle = styled.ellipse
       stroke-dasharray: 4 !important;
       stroke-linecap: round !important;
       transform: translate(-2px, -2px) !important;  // 살짝 이동
-      animation: dash 1s linear infinite !important;  // 외곽선 애니메이션
+      animation: dash 2s linear infinite !important;  // 외곽선 애니메이션
       `}
 
     @keyframes dash {
+      from {
+        stroke-dashoffset: 0;
+      }
       to {
         stroke-dashoffset: -16;  // 도트 외곽선이 움직이는 애니메이션
       }
