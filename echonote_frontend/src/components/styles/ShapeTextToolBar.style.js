@@ -248,3 +248,43 @@ export const AnimatedContainer = styled.div.withConfig({
   transition: max-height 0.4s ease, opacity 0.4s ease; /* 부드러운 애니메이션 적용 */
   transform-origin: top;
 `;
+export const SliderBox = styled.div`
+  display: flex;
+  align-items: center;
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 110px;
+    height: 6px;
+    background: #ddd;
+    outline: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    border-radius: 5px;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: black;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    &::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: black;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+  }
+`;
