@@ -33,16 +33,9 @@ const AudioWave = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // const [recordTime, setRecordTime] = useState(0);
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
-  const {
-    startTime,
-    setCreatetime,
-    setIsRecording: checkRecording,
-    setStartTime,
-    setRecordTime,
-    recordTime,
-  } = useAudioStore();
+  const { startTime, setStartTime, setRecordTime, recordTime } =
+    useAudioStore();
   const { note_id, record_path, setNoteDetail } = useNoteStore();
 
   const { wavesurfer, currentTime } = useWavesurfer({
@@ -79,19 +72,17 @@ const AudioWave = () => {
         if (blob.size === 0) {
           alert("녹음이 너무 짧습니다! 새로운 녹음이 진행됩니다.");
           record.startRecording();
-          setCreatetime(Date.now()); //녹음 시작 시각 기록
           return;
         }
         // 녹음된 Blob 객체로부터 오디오 URL을 생성하고 상태에 저장
         const recordedUrl = URL.createObjectURL(blob);
 
         setIsRecording(false);
-        checkRecording(false);
+        setRecordTime(null);
 
         try {
           const data = await getPresignedUrl();
           const objectUrl = data.object_url;
-          console.log("data: " + data);
           console.log("object URL: " + objectUrl);
 
           // Blob을 File 객체로 변환
@@ -113,7 +104,6 @@ const AudioWave = () => {
         } catch (error) {
           console.error("Error during recording process:", error);
           setIsRecording(false);
-          checkRecording(false);
           return;
         }
       });
@@ -159,7 +149,6 @@ const AudioWave = () => {
       handleStartStopRecording();
     }
 
-    checkRecording(!isRecording);
     setIsRecording(!isRecording);
   };
 
@@ -177,7 +166,6 @@ const AudioWave = () => {
         }));
         setRecordTime(0);
         record.startRecording({ deviceId }); // 녹음 시작
-        setCreatetime(Date.now()); //녹음 시작 시각 기록
       }
     } catch (error) {
       console.error("Error accessing microphone or starting recording", error);

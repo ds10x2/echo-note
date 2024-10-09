@@ -25,7 +25,9 @@ public class GetNoteResponse {
 
     private LocalDateTime update_at;
 
-    public static GetNoteResponse fromEntity(Note note) {
+    private String stt_status;
+
+    public static GetNoteResponse fromEntity(Note note, String stt_status) {
         return GetNoteResponse.builder()
                 .note_id(note.getId())
                 .note_name(note.getNote_name())
@@ -33,6 +35,7 @@ public class GetNoteResponse {
                 .record_path(note.getRecord_path())
                 .create_at(note.getCreate_at())
                 .update_at(note.getUpdate_at())
+                .stt_status(stt_status)
                 .build();
     }
 }

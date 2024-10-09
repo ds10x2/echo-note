@@ -34,7 +34,9 @@ const textStore = create((set, get) => ({
       textItems: {
         ...state.textItems,
         [currentPage]: state.textItems[currentPage].map((item) =>
-          item.id === id ? { ...item, text: newText } : item
+          item.id === id
+            ? { ...item, detail: { ...item.detail, text: newText } }
+            : item
         ),
       },
     }));
@@ -47,8 +49,8 @@ const textStore = create((set, get) => ({
         ...state.textItems,
         [currentPage]: state.textItems[currentPage].filter((item) => {
           if (item.id === id) {
-            if (item.text.trim() === "") return false;
-            item.isEditing = false;
+            if (item.detail.text.trim() === "") return false;
+            item.detail.isEditing = false;
           }
           return true;
         }),
@@ -64,7 +66,7 @@ const textStore = create((set, get) => ({
       textItems: {
         ...state.textItems,
         [currentPage]: state.textItems[currentPage].map((item) =>
-          item.id === id ? { ...item, x, y } : item
+          item.id === id ? { ...item, detail: { ...item.detail, x, y } } : item
         ),
       },
     }));
@@ -76,7 +78,12 @@ const textStore = create((set, get) => ({
       textItems: {
         ...state.textItems,
         [currentPage]: state.textItems[currentPage].map((item) =>
-          item.id === id ? { ...item, isDragging, offsetX, offsetY } : item
+          item.id === id
+            ? {
+                ...item,
+                detail: { ...item.detail, isDragging, offsetX, offsetY },
+              }
+            : item
         ),
       },
     }));
@@ -88,7 +95,9 @@ const textStore = create((set, get) => ({
       textItems: {
         ...state.textItems,
         [currentPage]: state.textItems[currentPage].map((item) =>
-          item.id === id ? { ...item, x: newX, y: newY } : item
+          item.id === id
+            ? { ...item, detail: { ...item.detail, x: newX, y: newY } }
+            : item
         ),
       },
     }));
@@ -100,7 +109,9 @@ const textStore = create((set, get) => ({
       textItems: {
         ...state.textItems,
         [currentPage]: state.textItems[currentPage].map((item) =>
-          item.isDragging ? { ...item, isDragging: false } : item
+          item.detail.isDragging
+            ? { ...item, detail: { ...item.detail, isDragging: false } }
+            : item
         ),
       },
     }));
@@ -145,10 +156,42 @@ const textStore = create((set, get) => ({
       textItems: {
         ...state.textItems,
         [currentPage]: items.map((item) =>
-          item.id === selectedText.id ? { ...item, isEditing: true } : item
+          item.id === selectedText.id
+            ? { ...item, detail: { ...item.detail, isEditing: true } }
+            : item
         ),
       },
     }));
+  },
+
+  resetTimestamps: (page) => {
+    set((state) => ({
+      textItems: {
+        ...state.textItems,
+        [page]: state.textItems[page]?.map((item) => ({
+          ...item,
+          detail: {
+            ...item.detail,
+            timestamp: null, // 타임스탬프를 null로 초기화
+          },
+        })),
+      },
+    }));
+  },
+
+  getTimestampForSelectedText: () => {
+    const currentPage = get().currentPage;
+    const selectedTextId = get().selectedText.id;
+    const textItemsForPage = get().textItems[currentPage];
+
+    if (!textItemsForPage || !selectedTextId) {
+      return null; // 유효하지 않은 경우 null 반환
+    }
+
+    const selectedItem = textItemsForPage.find(
+      (item) => item.id === selectedTextId
+    );
+    return selectedItem?.detail?.timestamp || null; // timestamp가 있으면 반환, 없으면 null
   },
 }));
 
