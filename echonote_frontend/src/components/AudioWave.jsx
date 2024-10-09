@@ -33,9 +33,7 @@ const AudioWave = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // const [recordTime, setRecordTime] = useState(0);
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
-  const [objectUrl, setObjectUrl] = useState(null); // presigned URL 저장
   const { startTime, setStartTime, setRecordTime, recordTime } =
     useAudioStore();
   const { note_id, record_path, setRecordPath, stt_status, setSTTStatus } =
@@ -88,7 +86,6 @@ const AudioWave = () => {
         try {
           const data = await getPresignedUrl();
           const objectUrl = data.object_url;
-          console.log("data: " + data);
           console.log("object URL: " + objectUrl);
 
           // Blob을 File 객체로 변환

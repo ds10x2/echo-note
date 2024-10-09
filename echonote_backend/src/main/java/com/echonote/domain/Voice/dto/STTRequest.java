@@ -17,10 +17,6 @@ public class STTRequest {
     private String text;
     private Boolean isAnomaly;
 
-    public void setAnomaly(Boolean status) {
-        this.isAnomaly = status;
-    }
-
     @Builder.Default
     private boolean anomaly = false;
 

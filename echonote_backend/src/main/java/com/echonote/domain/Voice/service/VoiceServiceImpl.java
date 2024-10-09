@@ -144,7 +144,7 @@ public class VoiceServiceImpl implements VoiceService {
 
 	// 음성 분석 모델에 보내기
 	private void sendAnalysisFlask(FlaskSendRequest flaskSendRequest) {
-		String flaskUrl = "http://70.12.130.111:4998/voice/analysis";  // 음성 분석 모델 API URL
+		String flaskUrl = "https://cd41-222-107-238-124.ngrok-free.app/voice/analysis";  // 음성 분석 모델 API URL
 
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();

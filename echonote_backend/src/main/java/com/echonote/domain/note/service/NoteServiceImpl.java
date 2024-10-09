@@ -43,7 +43,7 @@ public class NoteServiceImpl implements NoteService {
 		String fullPath = "pdf/" + filePath;
 		res.setPresignedUrl(
 			amazonS3.generatePresignedUrl(bucketName, fullPath, calendar.getTime(), httpMethod).toString());
-		res.setObjectUrl("https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/pdf/" + fullPath);
+		res.setObjectUrl("https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/" + fullPath);
 		return res;
 
 	}
