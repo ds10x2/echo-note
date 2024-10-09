@@ -2,13 +2,15 @@ import { styled } from "styled-components";
 import { theme } from "@/shared/styles/theme";
 import { shouldNotForwardPropsWithKeys } from "@shared/utils/shouldForwardProp";
 
-export const DrawingToolContainer = styled.div`
+export const DrawingToolContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => !["isSelected"].includes(prop), // isActive만 필터링
+})`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 30px;
-  max-width: 350px;
+  max-width: ${(props) => (props.isSelected ? "170px" : "300px")};
   padding: 10px;
   background-color: white;
   border-radius: 15px;

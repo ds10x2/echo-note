@@ -13,6 +13,13 @@ const shapeStore = create((set, get) => ({
     strokeWidth: 1,
   },
 
+  selectedShape: { id: null, type: null, detail: null },
+
+  setSelectedShape: (id, type, detail) => {
+    set(() => ({
+      selectedShape: { id, type, detail }, // detail도 함께 저장
+    }));
+  },
   addRectangle: (rectangle) => {
     const currentPage = get().currentPage;
     set((state) => ({
@@ -170,6 +177,28 @@ const shapeStore = create((set, get) => ({
             timestamp: null, // 타임스탬프를 null로 초기화
           },
         })),
+      },
+    }));
+  },
+
+  removeRectangle: (index) => {
+    const currentPage = get().currentPage;
+    set((state) => ({
+      rectangles: {
+        ...state.rectangles,
+        [currentPage]: state.rectangles[currentPage].filter(
+          (_, i) => i !== index
+        ),
+      },
+    }));
+  },
+
+  removeCircle: (index) => {
+    const currentPage = get().currentPage;
+    set((state) => ({
+      circles: {
+        ...state.circles,
+        [currentPage]: state.circles[currentPage].filter((_, i) => i !== index),
       },
     }));
   },
