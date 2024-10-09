@@ -60,6 +60,7 @@ const TextEditor = ({
 }) => {
   const {
     updateTextItem,
+    deleteTextItem,
     finishEditing,
     updateTextItemPosition,
     addTextItem,
