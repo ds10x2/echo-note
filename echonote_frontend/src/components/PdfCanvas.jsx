@@ -6,6 +6,7 @@ import pageStore from "@/stores/pageStore"; // zustand 스토어 가져오기
 import DrawingEditor from "@components/DrawingEditor";
 import { DrawingEditorContainer } from "@components/styles/DrawingEditor.style";
 import canvasStore from "@stores/canvasStore";
+import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
   const canvasRef = useRef();
@@ -16,6 +17,7 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
+  const { mode } = drawingTypeStore();
 
   const sampleUrl =
     "https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf";
@@ -107,9 +109,8 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
         originalSize={originalSize}
         currentPage={currentPage}
         containerRef={containerRef}
-        isDrawingEditorOpened={isDrawingEditorOpened}
       />
-      {isDrawingEditorOpened ? (
+      {mode.pen ? (
         <DrawingEditor scale={scale} page={currentPage} readOnly={false} />
       ) : (
         <DrawingEditor scale={scale} page={currentPage} readOnly={true} />

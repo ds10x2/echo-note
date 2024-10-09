@@ -6,7 +6,6 @@ import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const PdfViewer = ({ isDrawingEditorOpened }) => {
   const containerRef = useRef();
-  const { mode } = drawingTypeStore();
 
   return (
     <St.PdfContainer ref={containerRef}>
