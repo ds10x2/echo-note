@@ -28,11 +28,11 @@ const STTComponent = ({
   const [sttData, setSttData] = useState([]);
   const [modifiedTexts, setModifiedTexts] = useState([]);
   const { setStartTime } = useAudioStore();
-  const [eventMessage, setEventMessage] = useState('');
+  const [eventMessage, setEventMessage] = useState("");
 
   const { currentIndex, setCurrentIndex, searchResults, setSearchResults } =
     useSearchStore();
-  const resultRefs = useRef([]); // 전체 세그먼트 참조 저장
+  const resultRefs = useRef([]);
   const highlightRefs = useRef([]); // 하이라이트 텍스트의 참조 저장
   const containerRef = useRef(null); // STTContainer 참조 저장
 
@@ -119,7 +119,7 @@ const STTComponent = ({
           results.push({ index, ref: resultRefs.current[index] });
         }
       });
-      setSearchResults(results); // 검색 결과 저장
+      setSearchResults(results);
     }
   }, [searchTerm, sttData, setSearchResults]);
 
