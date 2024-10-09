@@ -23,11 +23,13 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
 
   const handleEraserClick = () => {
     setEraseMode(true);
+    setLassoMode(false);
     canvasRef.current?.eraseMode(true);
   };
 
   const handlePenClick = () => {
     setEraseMode(false);
+    setLassoMode(false);
     canvasRef.current?.eraseMode(false);
   };
 
@@ -103,6 +105,7 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
           onClearChange={handleClearClick}
           onNoEditChange={handleNoEditChange}
           onLassoClick={toggleLassoMode}
+          lassoMode={lassoMode}
         />
       )}
 

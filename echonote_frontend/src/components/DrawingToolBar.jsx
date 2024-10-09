@@ -27,6 +27,7 @@ const DrawingToolBar = ({
   onClearChange,
   onNoEditChange,
   onLassoClick,
+  lassoMode,
 }) => {
   const [activeTool, setActiveTool] = useState("pen");
   const [showSlider, setShowSlider] = useState(false);
@@ -124,7 +125,9 @@ const DrawingToolBar = ({
       </St.IconButton>
 
       <St.IconButton onClick={handleLassoClick} ref={buttonRefs.lasso}>
-        <LuLasso color={activeTool === "lasso" ? "gray" : "black"} />
+        <LuLasso
+          color={activeTool === "lasso" && lassoMode ? "gray" : "black"}
+        />
       </St.IconButton>
 
       {showSlider && (
