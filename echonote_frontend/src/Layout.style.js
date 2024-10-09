@@ -26,13 +26,19 @@ export const AppContainer = styled.div`
 export const Layout = styled.div`
   display: flex;
   position: relative;
-  height: 100vh; /* 100% 높이로 설정 */
+  height: 100%; /* 100% 높이로 설정 */
+  background-color: ${(props) => props.theme.colors.backgroundColor};
 `;
 
 // 중앙 메인 콘텐츠를 Flex로 가운데 정렬
-export const MainContent = styled.main`
+export const MainContent = styled.main.withConfig({
+  shouldForwardProp: (prop) => !["isCollapsed"].includes(prop),
+})`
   flex-grow: 1;
   display: flex;
   justify-content: center;
-  background-color: ${(props) => props.theme.colors.backgroundColor};
+  width: 100%;
+  // ToolBar가 접혔을 때와 펼쳐졌을 때의 height 설정
+  height: ${(props) =>
+    props.isCollapsed ? "calc(800px - 54px)" : "calc(800px - 99px)"};
 `;

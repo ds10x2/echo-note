@@ -8,7 +8,7 @@ import { DrawingEditorContainer } from "@components/styles/DrawingEditor.style";
 import canvasStore from "@stores/canvasStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 
-const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
+const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened, onResize }) => {
   const canvasRef = useRef();
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
@@ -101,20 +101,26 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
     );
   }, [url]);
 
+  useEffect(() => {
+    onResize(canvasSize.width, canvasSize.height);
+  }, [canvasSize]);
+
   return (
     <St.PdfCanvasContainer width={canvasSize.width} height={canvasSize.height}>
-      <canvas ref={canvasRef}></canvas>
-      <PdfEditor
-        scale={scale}
-        originalSize={originalSize}
-        currentPage={currentPage}
-        containerRef={containerRef}
-      />
-      {mode.pen ? (
-        <DrawingEditor scale={scale} page={currentPage} readOnly={false} />
-      ) : (
-        <DrawingEditor scale={scale} page={currentPage} readOnly={true} />
-      )}
+      <div style={{ margin: "10px" }}>
+        <canvas ref={canvasRef}></canvas>
+        <PdfEditor
+          scale={scale}
+          originalSize={originalSize}
+          currentPage={currentPage}
+          containerRef={containerRef}
+        />
+        {mode.pen ? (
+          <DrawingEditor scale={scale} page={currentPage} readOnly={false} />
+        ) : (
+          <DrawingEditor scale={scale} page={currentPage} readOnly={true} />
+        )}
+      </div>
     </St.PdfCanvasContainer>
   );
 };
