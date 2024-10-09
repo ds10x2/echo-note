@@ -6,7 +6,8 @@ export const ToolBarContainer = styled.div`
   width: 100%;
   background-color: white;
   box-sizing: border-box;
-  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 10px 10px -5px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(77, 77, 77, 0.1);
   display: flex;
   flex-direction: column;
   padding: 10px 0px;
@@ -21,7 +22,7 @@ export const ToolBarHeader = styled.div`
   width: 100%;
   padding-bottom: 10px;
   position: relative; /* For absolute positioning of the setting button */
-  border-bottom: 1px solid rgba(77, 77, 77, 0.1);
+  border-bottom: 1px solid rgba(43, 43, 43, 0.062);
 `;
 
 // 부드러운 애니메이션을 위한 컨테이너
