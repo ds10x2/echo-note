@@ -23,6 +23,7 @@ const ShapeTextToolBar = ({}) => {
     setSelectedShape,
     removeCircle,
     removeRectangle,
+    getTimestampForSelectedShape,
   } = shapeStore();
   const {
     deleteTextItem,
@@ -38,6 +39,7 @@ const ShapeTextToolBar = ({}) => {
     setCircleMode,
     setShapeMode,
     setTextMode,
+    setShapeModeFalse,
   } = drawingTypeStore();
   const { setStartTime } = useAudioStore();
   const [showFillPalette, setShowFillPalette] = useState(false);
@@ -92,6 +94,20 @@ const ShapeTextToolBar = ({}) => {
     } else {
       console.log("타임스탬프가 존재하지 않음");
     }
+  };
+
+  const handleShapeTimestamp = () => {
+    const timestamp = getTimestampForSelectedShape();
+    if (timestamp !== null) {
+      console.log(timestamp);
+      setStartTime(timestamp);
+    } else {
+      console.log("타임스탬프가 없습니다");
+    }
+  };
+
+  const handleCloseShapeToolbar = () => {
+    setShapeModeFalse();
   };
 
   if (mode.shape && selectedShape.id === null) {
@@ -175,18 +191,21 @@ const ShapeTextToolBar = ({}) => {
         </St.ToolBarButton>
       </St.ShapeToolContainer>
     );
-  } else if (mode.shape && selectedShape.id !== null) {
+  } else if (selectedShape.id !== null) {
     return (
       <St.ShapeToolContainer isSelected={true}>
         <St.ToolBarButton>
           <St.IconContainer>
-            <St.IconButton as={PiFileAudio} />
+            <St.IconButton as={PiFileAudio} onClick={handleShapeTimestamp} />
           </St.IconContainer>
           <St.Divider />
           <St.IconContainer>
             {/* 도형 지우기, toolbar 닫기 */}
             <St.IconButton as={FaTrash} onClick={deleteShape} />
-            <St.IconButton as={FaRegCircleXmark} onClick={setShapeMode} />
+            <St.IconButton
+              as={FaRegCircleXmark}
+              onClick={handleCloseShapeToolbar}
+            />
           </St.IconContainer>
         </St.ToolBarButton>
       </St.ShapeToolContainer>

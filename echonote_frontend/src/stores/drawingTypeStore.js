@@ -56,5 +56,14 @@ const drawingTypeStore = create((set, get) => ({
         circle: true,
       },
     })),
+
+  setShapeModeFalse: () => {
+    set((state) => ({
+      mode: {
+        ...state.mode,
+        shape: false,
+      },
+    }));
+  },
 }));
 export default drawingTypeStore;

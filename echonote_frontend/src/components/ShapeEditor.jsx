@@ -103,7 +103,7 @@ const ShapeEditor = ({
             width: 0,
             height: 0,
             property: property,
-            timeStamp: recordTime,
+            timestamp: recordTime,
           },
         });
         setSelectedShape(null, null);
@@ -119,7 +119,7 @@ const ShapeEditor = ({
             rx: 0, // 타원의 가로 반경
             ry: 0, // 타원의 세로 반경
             property: property,
-            timeStamp: recordTime,
+            timestamp: recordTime,
           },
         });
         setSelectedShape(null, null);

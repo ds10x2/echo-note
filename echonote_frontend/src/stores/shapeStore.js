@@ -204,6 +204,30 @@ const shapeStore = create((set, get) => ({
       },
     }));
   },
+
+  // 선택된 도형의 타임스탬프를 가져오는 메서드
+  getTimestampForSelectedShape: () => {
+    const currentPage = get().currentPage; // 현재 페이지 가져오기
+    const selectedShapeId = get().selectedShape.id; // 선택된 도형의 ID 가져오기
+    let itemsForPage;
+
+    // selectedShape의 타입에 따라 해당 도형의 배열을 가져옴
+    if (get().selectedShape.type === "rectangle") {
+      itemsForPage = get().rectangles[currentPage] || [];
+    } else if (get().selectedShape.type === "circle") {
+      itemsForPage = get().circles[currentPage] || [];
+    } else {
+      return null; // 유효하지 않은 타입일 경우 null 반환
+    }
+
+    // 선택된 도형의 ID와 일치하는 도형 찾기
+    const selectedItem = itemsForPage[selectedShapeId];
+    console.log(selectedItem);
+    console.log(selectedShapeId);
+
+    // 해당 도형의 타임스탬프 반환
+    return selectedItem?.detail?.timestamp || null; // timestamp가 있으면 반환, 없으면 null
+  },
 }));
 
 export default shapeStore;
