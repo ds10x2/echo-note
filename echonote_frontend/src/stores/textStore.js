@@ -163,6 +163,36 @@ const textStore = create((set, get) => ({
       },
     }));
   },
+
+  resetTimestamps: (page) => {
+    set((state) => ({
+      textItems: {
+        ...state.textItems,
+        [page]: state.textItems[page]?.map((item) => ({
+          ...item,
+          detail: {
+            ...item.detail,
+            timestamp: null, // 타임스탬프를 null로 초기화
+          },
+        })),
+      },
+    }));
+  },
+
+  getTimestampForSelectedText: () => {
+    const currentPage = get().currentPage;
+    const selectedTextId = get().selectedText.id;
+    const textItemsForPage = get().textItems[currentPage];
+
+    if (!textItemsForPage || !selectedTextId) {
+      return null; // 유효하지 않은 경우 null 반환
+    }
+
+    const selectedItem = textItemsForPage.find(
+      (item) => item.id === selectedTextId
+    );
+    return selectedItem?.detail?.timestamp || null; // timestamp가 있으면 반환, 없으면 null
+  },
 }));
 
 export default textStore;

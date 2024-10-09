@@ -12,7 +12,7 @@ const ShapeEditor = ({
 }) => {
   const { setRectangles, setCircles, property } = shapeStore();
   const { mode, shapeMode } = drawingTypeStore();
-  const { createTime, isRecording } = useAudioStore();
+  const { recordTime } = useAudioStore();
 
   const svgRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -25,10 +25,6 @@ const ShapeEditor = ({
   const [currentRects, setCurrentRects] = useState(currentPageRecs);
   const [currentCircles, setCurrentCircles] = useState(currentPageCircles);
   const [selectedShape, setSelectedShape] = useState({ id: null, type: null });
-
-  const getTimestamp = (recordStartTime, shapecreatedTime) => {
-    return Math.floor((shapecreatedTime - recordStartTime) / 1000);
-  };
 
   useEffect(() => {
     setCurrentRects(currentPageRecs);
@@ -98,9 +94,7 @@ const ShapeEditor = ({
             width: 0,
             height: 0,
             property: property,
-            timeStamp: isRecording
-              ? getTimestamp(createTime, Date.now())
-              : null,
+            timeStamp: recordTime,
           },
         });
         setSelectedShape({ id: null, type: null });
@@ -116,9 +110,7 @@ const ShapeEditor = ({
             rx: 0, // 타원의 가로 반경
             ry: 0, // 타원의 세로 반경
             property: property,
-            timeStamp: isRecording
-              ? getTimestamp(createTime, Date.now())
-              : null,
+            timeStamp: recordTime,
           },
         });
         setSelectedShape({ id: null, type: null });
@@ -132,6 +124,7 @@ const ShapeEditor = ({
       shapeMode.circle,
       property,
       scale,
+      recordTime,
     ]
   );
 

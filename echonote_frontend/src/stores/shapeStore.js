@@ -6,7 +6,7 @@ const shapeStore = create((set, get) => ({
   circles: {},
   currentPage: 1,
   property: {
-    fill: true,
+    fill: false,
     fillColor: theme.colors.shapeFillDefaultColor,
     stroke: true,
     strokeColor: theme.colors.shapeStrokeDefaultColor,
