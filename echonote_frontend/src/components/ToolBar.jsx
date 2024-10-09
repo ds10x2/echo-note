@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AnalyzeModal from "@components/modal/AnalyzeModal";
 import PdfSettingModal from "@components/modal/PdfSettingModal";
 import { RiSpeakLine } from "react-icons/ri";
@@ -39,8 +40,9 @@ import {
   FontSizeText,
   FontSizeButton,
   ToolBarIconContainer,
+  ListButton,
 } from "@components/styles/ToolBar.style";
-import { VscSettings } from "react-icons/vsc";
+import { VscSettings, VscArrowLeft } from "react-icons/vsc";
 import textStore from "@/stores/textStore";
 
 const ToolBar = ({ onToggleDrawingEditor }) => {
@@ -71,6 +73,7 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
   const [buttonPosition, setButtonPosition] = useState(null);
   const settingButtonRef = useRef(null);
   const [isPenActive, setIsPenActive] = useState(false);
+  const navigate = useNavigate();
 
   //도형모드 off -> 사각형 모드 -> 원 모드 -> 도형모드 off
   const handleShapeMode = () => {
@@ -99,6 +102,10 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
     }
 
     setIsPdfSettingModalOpen(!isPdfSettingModalOpen);
+  };
+
+  const moveNoteList = () => {
+    navigate(-1);
   };
 
   const toggleAnalyzeModal = () => {
@@ -138,6 +145,9 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
     <ToolBarContainer>
       <AnimatedToolBarContent collapsed={isCollapsed}>
         <ToolBarHeader>
+          <ListButton onClick={moveNoteList}>
+            <VscArrowLeft style={{ marginLeft: "10px", fontSize: "20px" }} />
+          </ListButton>
           <Title>
             pdf file name
             <FaStar style={{ marginLeft: "10px", color: "gold" }} />
