@@ -24,6 +24,7 @@ const ShapeTextToolBar = ({}) => {
     removeCircle,
     removeRectangle,
     getTimestampForSelectedShape,
+    setStrokeWidth,
   } = shapeStore();
   const {
     deleteTextItem,
@@ -165,12 +166,23 @@ const ShapeTextToolBar = ({}) => {
               {showStrokePalette && (
                 <St.ColorPalette ref={strokePaletteRef}>
                   <St.PropertyContainer>
-                    <St.PropertyTitle>선</St.PropertyTitle>
+                    <St.PropertyTitle>외곽선</St.PropertyTitle>
                     <ToggleButton isOn={property.stroke} onChange={setStroke} />
                   </St.PropertyContainer>
                   <St.AnimatedContainer isVisible={property.stroke}>
                     <St.PropertyContainer>
                       <St.PropertyText>두께</St.PropertyText>
+                      <St.SliderBox>
+                        <input
+                          type="range"
+                          min="1"
+                          max="10"
+                          step="1"
+                          value={property.strokeWidth}
+                          onChange={(e) => setStrokeWidth(e.target.value)}
+                        />
+                      </St.SliderBox>
+                      <St.PropertyText>{property.strokeWidth}</St.PropertyText>
                     </St.PropertyContainer>
                     <Colorful
                       color={property.strokeColor}
