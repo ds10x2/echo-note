@@ -152,7 +152,6 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
   const handlePenClick = () => {
     setIsPenActive(!isPenActive);
     setPenMode();
-    console.log(mode.pen);
     onToggleDrawingEditor();
   };
 
