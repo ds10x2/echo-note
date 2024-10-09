@@ -13,13 +13,18 @@ const shapeStore = create((set, get) => ({
     strokeWidth: 1,
   },
 
-  selectedShape: { id: null, type: null, detail: null },
+  selectedShape: { id: null, type: null }, // detail 제거
 
-  setSelectedShape: (id, type, detail) => {
-    set(() => ({
-      selectedShape: { id, type, detail }, // detail도 함께 저장
-    }));
+  // 선택된 도형 설정
+  setSelectedShape: (id, type) => {
+    const { selectedShape } = get();
+    if (selectedShape.id !== id || selectedShape.type !== type) {
+      set(() => ({
+        selectedShape: { id, type }, // id와 type만 저장
+      }));
+    }
   },
+
   addRectangle: (rectangle) => {
     const currentPage = get().currentPage;
     set((state) => ({
