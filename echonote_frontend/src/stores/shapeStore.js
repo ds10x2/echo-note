@@ -17,12 +17,9 @@ const shapeStore = create((set, get) => ({
 
   // 선택된 도형 설정
   setSelectedShape: (id, type) => {
-    const { selectedShape } = get();
-    if (selectedShape.id !== id || selectedShape.type !== type) {
-      set(() => ({
-        selectedShape: { id, type }, // id와 type만 저장
-      }));
-    }
+    set(() => ({
+      selectedShape: { id, type }, // id와 type만 저장
+    }));
   },
 
   addRectangle: (rectangle) => {
