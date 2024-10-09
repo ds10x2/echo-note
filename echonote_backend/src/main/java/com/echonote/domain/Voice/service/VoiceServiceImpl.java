@@ -204,12 +204,12 @@ public class VoiceServiceImpl implements VoiceService {
 			
 			// 결과 조합하기
 			List<STTRequest> sttRequest = twoFlaskResult.getSttResultRequest().getResult();
-			List<Float> anomalyTimes = twoFlaskResult.getAnalysisResultRequest().getAnomalyTime();
+			List<String> anomalyTimes = twoFlaskResult.getAnalysisResultRequest().getAnomalyTime();
 
 			for (int sttIdx = 0, aIdx = 0; sttIdx < sttRequest.size() || aIdx < anomalyTimes.size(); ) {
 
-				if( Float.parseFloat(sttRequest.get(sttIdx).getStart()) <= anomalyTimes.get(aIdx) &&
-					Float.parseFloat(sttRequest.get(sttIdx).getEnd()) >= anomalyTimes.get(aIdx) ) {
+				if( Float.parseFloat(sttRequest.get(sttIdx).getStart()) <= Float.parseFloat(anomalyTimes.get(aIdx)) &&
+					Float.parseFloat(sttRequest.get(sttIdx).getEnd()) >= Float.parseFloat(anomalyTimes.get(aIdx)) ) {
 					// 속성 변경
 					System.out.println("changed");
 					sttRequest.get(sttIdx).setAnomaly(true);
