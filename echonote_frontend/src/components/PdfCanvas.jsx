@@ -17,9 +17,6 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
   const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
 
-  const { getCanvasImage } = canvasStore.getState(); // 이미지 데이터를 가져오는 함수 호출
-  const savedImage = getCanvasImage(currentPage);
-
   const sampleUrl =
     "https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf";
 
@@ -110,13 +107,12 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
         originalSize={originalSize}
         currentPage={currentPage}
         containerRef={containerRef}
+        isDrawingEditorOpened={isDrawingEditorOpened}
       />
       {isDrawingEditorOpened ? (
-        <DrawingEditor scale={scale} page={currentPage} />
+        <DrawingEditor scale={scale} page={currentPage} readOnly={false} />
       ) : (
-        <DrawingEditorContainer>
-          {savedImage && <img src={savedImage} alt="Saved Canvas" />}
-        </DrawingEditorContainer>
+        <DrawingEditor scale={scale} page={currentPage} readOnly={true} />
       )}
     </St.PdfCanvasContainer>
   );

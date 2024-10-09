@@ -31,8 +31,8 @@ const DrawingCanvas = forwardRef(
       ref.current.eraseMode(eraseMode);
     }, [eraseMode, scale, page]);
 
-    const handleCanvasChange = () => {
-      const { setCanvasPath, setCanvasImage } = canvasStore.getState();
+    const handleEndStroke = () => {
+      const { setCanvasPath } = canvasStore.getState();
 
       if (ref.current) {
         // Path 저장
@@ -57,17 +57,6 @@ const DrawingCanvas = forwardRef(
           .catch((e) => {
             console.log("Error exporting paths:", e);
           });
-
-        // Svg 저장
-        ref.current
-          .exportSvg()
-          .then((data) => {
-            const svgDataUrl = "data:image/svg+xml;base64," + btoa(data);
-            setCanvasImage(page, svgDataUrl);
-          })
-          .catch((error) => {
-            console.error("Error exporting SVG:", error);
-          });
       }
     };
 
@@ -79,6 +68,7 @@ const DrawingCanvas = forwardRef(
             height: "100%",
             pointerEvents: readOnly ? "none" : "auto",
           }}
+          onTouchEnd={handleEndStroke}
         >
           <ReactSketchCanvas
             ref={ref}
@@ -90,7 +80,6 @@ const DrawingCanvas = forwardRef(
             canvasColor="transparent"
             readOnly={readOnly}
             style={{ border: 0, borderRadius: 0 }}
-            onChange={handleCanvasChange}
           />
         </div>
       </St.DrawingCanvasContainer>
