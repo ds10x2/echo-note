@@ -13,16 +13,40 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
   const [strokeColor, setStrokeColor] = useState("#000000");
   const [noEdit, setNoEdit] = useState(false);
   const { mode } = drawingTypeStore();
+  const [lassoMode, setLassoMode] = useState(false);
+  const [isPenActive, setIsPenActive] = useState(true);
+  const [isEraserActive, setIsEraserActive] = useState(false);
 
   const { undo, redo, clearCanvasPath, getCanvasPath } = canvasStore.getState();
 
+  const toggleLassoMode = () => {
+    setLassoMode((prevMode) => {
+      if (!prevMode) {
+        // 갈고리 모드가 켜질 때, 펜과 지우개 모드를 저장하고 비활성화
+        setIsPenActive(!eraseMode); // 펜 모드가 활성화된 상태면 true
+        setIsEraserActive(eraseMode); // 지우개 모드가 활성화된 상태면 true
+        setEraseMode(false);
+      } else {
+        // 갈고리 모드가 꺼질 때, 이전 펜/지우개 상태로 복원
+        if (isEraserActive) {
+          setEraseMode(true);
+        } else if (isPenActive) {
+          setEraseMode(false);
+        }
+      }
+      return !prevMode;
+    });
+  };
+
   const handleEraserClick = () => {
     setEraseMode(true);
+    setLassoMode(false);
     canvasRef.current?.eraseMode(true);
   };
 
   const handlePenClick = () => {
     setEraseMode(false);
+    setLassoMode(false);
     canvasRef.current?.eraseMode(false);
   };
 
@@ -97,6 +121,8 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
           onRedoChange={handleRedoClick}
           onClearChange={handleClearClick}
           onNoEditChange={handleNoEditChange}
+          onLassoClick={toggleLassoMode}
+          lassoMode={lassoMode}
         />
       )}
 
@@ -106,9 +132,10 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
         eraserWidth={eraserWidth * scale}
         strokeColor={strokeColor}
         eraseMode={eraseMode}
-        readOnly={readOnly | noEdit}
+        readOnly={readOnly || noEdit}
         scale={scale}
         page={page}
+        lassoMode={lassoMode}
       />
     </St.DrawingEditorContainer>
   );
