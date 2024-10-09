@@ -15,6 +15,7 @@ const TextBox = React.memo(
     selectedItemId,
     handleDelete,
     handleEdit,
+    isSelected,
   }) => {
     return (
       <St.TextBox
@@ -26,6 +27,7 @@ const TextBox = React.memo(
         isDragging={item.isDragging}
         className="text-box"
         onTouchStart={(e) => handleTouchStart(e, item.id)} // 터치 이벤트로 변경
+        isSelected={isSelected}
         style={{
           fontSize: `${item.fontSize}px`,
         }}
@@ -359,6 +361,7 @@ const TextEditor = ({
           selectedItemId={selectedItemId}
           handleDelete={handleDelete}
           handleEdit={handleEdit}
+          isSelected={selectedItemId === item.id}
         />
       ))}
     </St.TextContainer>
