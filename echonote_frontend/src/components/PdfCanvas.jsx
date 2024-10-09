@@ -20,7 +20,7 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
   const { mode } = drawingTypeStore();
 
   const sampleUrl =
-    "https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf";
+    "https://timeisnullnull.s3.ap-northeast-2.amazonaws.com/le_Petit_Prince_%EB%B3%B8%EB%AC%B8.pdf";
 
   const renderPage = useCallback(
     (pageNum, pdf = pdfRef) => {

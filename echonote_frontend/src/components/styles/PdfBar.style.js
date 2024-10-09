@@ -5,17 +5,18 @@ export const SidebarContainer = styled.div.withConfig({
   shouldForwardProp: shouldNotForwardPropsWithKeys(["isOpened"]),
 })`
   position: absolute;
+  display: flex;
   left: 0;
   top: 0;
   width: ${(props) => (props.isOpened ? "135px" : "0")};
-  height: 100vh;
+  height: 100%;
   transition: width 0.3s ease;
   background-color: white;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
+  overflow-y: auto; /* 세로 스크롤을 사이드바 안에서만 동작하도록 설정 */
   overflow-x: hidden;
   white-space: nowrap;
-  z-index: 3;
+  z-index: 2; /* 툴바보다 낮은 z-index 값 설정 */
 
   /* 커스텀 스크롤바 */
   &::-webkit-scrollbar {

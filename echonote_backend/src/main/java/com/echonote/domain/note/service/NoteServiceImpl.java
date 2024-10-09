@@ -3,7 +3,10 @@ package com.echonote.domain.note.service;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.echonote.domain.note.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +15,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.echonote.domain.User.dao.UserRepository;
 import com.echonote.domain.User.entity.User;
 import com.echonote.domain.note.dao.NoteRepository;
-import com.echonote.domain.note.dto.NoteCreateRequest;
-import com.echonote.domain.note.dto.NoteCreateResponse;
-import com.echonote.domain.note.dto.UrlResponse;
 import com.echonote.domain.note.entity.Note;
 import com.echonote.global.aop.exception.BusinessLogicException;
 import com.echonote.global.aop.exception.ErrorCode;
@@ -64,5 +64,32 @@ public class NoteServiceImpl implements NoteService {
 
 		return res;
 	}
+
+	@Override
+	public List<NoteListResponse> getNoteList(Long userId) {
+
+		List<Note> notes = noteRepository.findByUserId(userId);
+
+		return notes.stream()
+				.map(NoteListResponse::fromEntity)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public GetNoteResponse getNote(Long noteId) {
+
+		Note note = noteRepository.findById(noteId)
+				.orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
+		GetNoteResponse res = GetNoteResponse.fromEntity(note);
+
+		return res;
+	}
+
+	@Override
+	public void deleteNote(Long noteId) {
+		noteRepository.deleteById(noteId);
+	}
+
+
 
 }

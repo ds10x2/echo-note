@@ -5,7 +5,7 @@ export const PdfContainer = styled.div`
   justify-content: center;
   position: relative;
   width: 100%;
-  height: 95%;
+  height: 100%;
   overflow: auto;
 `;
 
