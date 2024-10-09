@@ -129,17 +129,23 @@ const DrawingCanvas = forwardRef(
 
     const checkIntersections = (polygon) => {
       const savedPaths = getCanvasPath(page);
-      const selectedIndices = savedPaths
-        .map((stroke, index) => {
-          // stroke가 다각형과 겹치는지 확인하고, 겹치는 경우 인덱스를 반환
-          if (stroke.paths.some((point) => pointInPolygon(point, polygon))) {
-            return index;
-          }
-          return null;
-        })
-        .filter((index) => index !== null); // 겹치는 인덱스만 필터링
 
-      setStartTime(getMinRecordingTime(page, selectedIndices));
+      if (savedPaths && savedPaths.length > 0) {
+        const selectedIndices = savedPaths
+          .map((stroke, index) => {
+            // stroke가 다각형과 겹치는지 확인하고, 겹치는 경우 인덱스를 반환
+            if (stroke.paths.some((point) => pointInPolygon(point, polygon))) {
+              return index;
+            }
+            return null;
+          })
+          .filter((index) => index !== null); // 겹치는 인덱스만 필터링
+
+        if (selectedIndices && selectedIndices.length > 0) {
+          const minTime = getMinRecordingTime(page, selectedIndices);
+          setStartTime(minTime);
+        }
+      }
     };
 
     const saveCanvasPath = () => {
