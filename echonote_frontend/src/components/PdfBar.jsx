@@ -18,8 +18,6 @@ const PdfBar = () => {
   const { isPdfBarOpened } = useSidebarStore();
   const [images, setImages] = useState([]);
   const [isDragEnabled, setIsDragEnabled] = useState(false);
-  const imageRefs = useRef([]);
-  const { currentPage } = pageStore();
 
   const pdfUrl =
     "https://timeisnullnull.s3.ap-northeast-2.amazonaws.com/le_Petit_Prince_%EB%B3%B8%EB%AC%B8.pdf";
@@ -51,7 +49,7 @@ const PdfBar = () => {
         imageArray.push({ id: i, name: `page ${i}`, src: imgSrc });
       }
 
-      setImages(imageArray); // 이미지 배열로 업데이트
+      setImages(imageArray);
     };
 
     loadPdf();
@@ -94,24 +92,11 @@ const PdfBar = () => {
   //   saveAs(blob, "reordered.pdf"); // 파일을 사용자에게 다운로드합니다.
   // };
 
-  // useEffect(() => {
-  //   if (imageRefs.current[currentPage - 1]) {
-  //     imageRefs.current[currentPage - 1].scrollIntoView({
-  //       behavior: "smooth", // 부드러운 스크롤
-  //       block: "start", // 페이지를 뷰포트의 상단에 맞추기
-  //     });
-  //   }
-  // }, [currentPage]);
-
   return (
     <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
       <SidebarContainer isOpened={isPdfBarOpened}>
         <ImageContainer>
           {images.map((image, index) => (
-            // <div
-            //   ref={(el) => (imageRefs.current[index] = el)} // 각 이미지를 참조에 저장
-            //   key={image.id}
-            // >
             <DraggableItem
               key={image.id}
               index={index}
@@ -119,11 +104,10 @@ const PdfBar = () => {
               src={image.src}
               moveImage={moveImage}
               name={image.name}
-              isDragEnabled={isDragEnabled} // 드래그 가능 여부
-              enableDrag={enableDrag} // 드래그 활성화 함수
-              disableDrag={disableDrag} // 드래그 비활성화 함수
+              isDragEnabled={isDragEnabled}
+              enableDrag={enableDrag}
+              disableDrag={disableDrag}
             />
-            // </div>
           ))}
         </ImageContainer>
       </SidebarContainer>
@@ -150,7 +134,7 @@ const DraggableItem = ({
   const [{ isDragging }, drag] = useDrag({
     type: "IMAGE",
     item: { id, index },
-    canDrag: isDragEnabled, // 드래그 가능 여부 설정
+    canDrag: isDragEnabled,
     collect: (monitor) => ({
       isDragging: monitor.isDragging(), // 드래그 중인지 여부를 수집
     }),
@@ -184,7 +168,7 @@ const DraggableItem = ({
   });
 
   const handleClick = () => {
-    setCurrentPage(id); // 클릭한 페이지 ID를 setPages로 전달
+    setCurrentPage(id);
   };
 
   // 길게 눌렀을 때 드래그 활성화
@@ -192,7 +176,7 @@ const DraggableItem = ({
     const timeout = setTimeout(() => {
       setIsPressed(true);
       enableDrag(); // 1초 후 드래그 앤 드롭 활성화
-    }, 1000); // 1초 대기
+    }, 1000);
     setLongPressTimeout(timeout);
   };
 

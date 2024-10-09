@@ -38,7 +38,6 @@ export const SidebarContainer = styled.div.withConfig({
 export const ImageContainer = styled.div`
   display: grid;
   padding: 10px;
-  flex-direction: column;
   gap: 20px;
   justify-content: center;
   align-items: center;
