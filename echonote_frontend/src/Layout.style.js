@@ -1,32 +1,44 @@
 import styled from "styled-components";
 
+// Root 컨테이너: 화면 중앙에 맞추기
+export const RootContainer = styled.div`
+  width: 100vw;
+  height: 100vh;
+  background: black;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+// App 컨테이너: 고정된 크기를 유지하지만 줌 설정으로 반응형 처리
+export const AppContainer = styled.div`
+  background: white;
+  position: relative;
+  width: 1280px; /* 기준 너비 */
+  height: 800px; /* 기준 높이 */
+  overflow: hidden;
+  transform: scale(${(props) => props.zoom}); /* 줌 값에 따라 확대/축소 */
+  transform-origin: top left; /* 확대/축소 기준을 왼쪽 상단으로 설정 */
+`;
+
 // 레이아웃 컨테이너: 사이드바와 메인 콘텐츠를 배치하는 Flex 레이아웃
 export const Layout = styled.div`
   display: flex;
-  position: relative; /* 툴바와 독립된 고정 레이아웃 */
-  height: 100%;
-`;
-
-// 중앙 메인 콘텐츠를 Flex를 사용해 가운데 정렬
-export const MainContent = styled.main`
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
+  height: 100%; /* 100% 높이로 설정 */
   background-color: ${(props) => props.theme.colors.backgroundColor};
 `;
 
-// 스타일 설정 (1280x800으로 고정)
-export const rootStyle = {
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  overflow: "hidden", // 화면이 넘치지 않도록 설정
-  backgroundColor: "black", // 검은색 배경
-};
-
-export const appStyle = {
-  width: "1280px", // 고정 너비
-  height: "800px", // 고정 높이
-  backgroundColor: "white", // App 배경색 설정
-};
+// 중앙 메인 콘텐츠를 Flex로 가운데 정렬
+export const MainContent = styled.main.withConfig({
+  shouldForwardProp: (prop) => !["isCollapsed"].includes(prop),
+})`
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  // ToolBar가 접혔을 때와 펼쳐졌을 때의 height 설정
+  height: ${(props) =>
+    props.isCollapsed ? "calc(800px - 54px)" : "calc(800px - 99px)"};
+`;

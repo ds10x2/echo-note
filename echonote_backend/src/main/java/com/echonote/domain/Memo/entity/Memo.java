@@ -35,4 +35,8 @@ public class Memo {
 
     @Nullable
     private Map<String, List<MemoRequest.MemoText>> circle;
+
+    @Nullable
+    private Map<String, List<MemoRequest.MemoText>> drawing;
+
 }

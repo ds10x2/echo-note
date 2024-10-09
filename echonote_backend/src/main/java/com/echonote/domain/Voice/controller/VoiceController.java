@@ -1,10 +1,16 @@
 package com.echonote.domain.Voice.controller;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +37,8 @@ import com.echonote.domain.note.dto.NoteCreateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,8 +50,11 @@ public class VoiceController {
 	@Value("${amazon.aws.bucket}")
 	private String bucketName;
 
+	private final Map<Long, SseEmitter> emitters = new HashMap<>();
+
+
 	// 확장자명에 따라 presigned url 반환
-	@GetMapping
+	@GetMapping("/url")
 	@Operation(summary = "녹음본 Presigned url 요청", description = "녹음본 S3 업로드를 위한 presigned url과 객체 Url을 요청")
 	public ResponseEntity<UrlResponse> generatePresignedUrl() {
 
@@ -69,6 +80,35 @@ public class VoiceController {
 	@Operation(summary = "STT 모델 결과 받기", description = "Flask STT 모델에서 처리된 결과를 받습니다.")
 	public ResponseEntity<String> receiveSTTResult(@RequestBody STTResultRequest sttResultRequest) {
 		voiceService.saveSTTResult(sttResultRequest);
+
+		STT stt = new STT().builder()
+				.id(sttResultRequest.getId())
+				.result(sttResultRequest.getResult())
+				.processId(sttResultRequest.getProcessId())
+				.build();
+
+		voiceService.insertSTT(stt);
+
+		if(emitters.get(sttResultRequest.getId()) != null){
+			SseEmitter emitter = emitters.get(sttResultRequest.getId());
+			try {
+				emitter.send(
+						SseEmitter
+								.event()
+								.name("stt_complete")
+								.data("STT 정보 수신 완료"));
+
+				emitter.complete(); // 이미터 kill
+
+			} catch (IOException e) {
+				emitter.completeWithError(e);
+			}finally {
+				// 이미터를 null로 설정 (선택 사항)
+				emitters.remove(sttResultRequest.getId());
+				emitter = null;  // 참조를 제거
+			}
+		}
+
 		// voiceService.checkAndProcessVoice(sttResultRequest.getProcessId());
 		return ResponseEntity.ok("STT 완료");
 	}
@@ -76,8 +116,14 @@ public class VoiceController {
 	@PostMapping("/analysisResult")
 	@Operation(summary = "음성 분석 모델 결과 받기", description = "Flask 음성 분석 모델에서 처리된 결과를 받습니다.")
 	public ResponseEntity<String> receiveSTTResult(@RequestBody AnalysisResultRequest analysisResultRequest) {
+		System.out.println("=============");
+		System.out.println(analysisResultRequest);
+		System.out.println("=============");
+
+		// 결과가 들어오면 map에 임시로 저장한다.
 		voiceService.saveAnalysisResult(analysisResultRequest);
-		voiceService.checkAndProcessVoice(analysisResultRequest.getProcessId());
+
+		// voiceService.checkAndProcessVoice(analysisResultRequest.getProcessId());
 		return ResponseEntity.ok("음성 분석 완료");
 	}
 
@@ -89,13 +135,40 @@ public class VoiceController {
 		return new ResponseEntity<>(stt, HttpStatus.OK);
 	}
 
-	@PostMapping("/stt")
-	@Operation(summary = "stt 저장", description = "stt를 저장하는 API. flask 서버와 연동된다.")
-	public ResponseEntity<STT> saveSTT(@RequestBody STT result) {
-		voiceService.insertSTT(result);
+//	@PostMapping("/stt")
+//	@Operation(summary = "stt 저장", description = "stt를 저장하는 API. flask 서버와 연동된다.")
+//	public ResponseEntity<STT> saveSTT(@RequestBody STT result) {
+//		voiceService.insertSTT(result);
+//
+//		return new ResponseEntity<>(HttpStatus.OK);
+//	}
 
-		return new ResponseEntity<>(HttpStatus.OK);
+//	@CrossOrigin(origins = "*", allowedHeaders = "*") // 특정 출처 허용
+	@GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public SseEmitter streamSTT(@RequestParam("note_id") long noteId) {
+
+		if(emitters.get(noteId) == null){
+			SseEmitter emitter = new SseEmitter(30*60000L);
+			emitters.put(noteId, emitter);
+
+			emitter.onCompletion(() -> emitters.remove(emitter));
+			emitter.onTimeout(() -> emitters.remove(emitter));
+
+			try {
+				emitter.send(SseEmitter.event().name("")
+				);
+			} catch (IOException e) {
+				emitter.completeWithError(e);
+			}
+
+
+			return emitter;
+		}else{
+			SseEmitter emitter = emitters.get(noteId);
+			return emitter;
+		}
 	}
+
 
 	@PutMapping("/stt")
 	@Operation(summary = "stt 업데이트", description = "note_id와 stt 정보를 보내주면 mongoDB에서 업데이트 할 수 있다.")

@@ -1,5 +1,6 @@
 package com.echonote.domain.Voice.service;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +8,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -69,9 +77,10 @@ public class VoiceServiceImpl implements VoiceService {
 		calendar.add(Calendar.MINUTE, 10); //validfy of 10 minutes
 
 		UrlResponse res = new UrlResponse();
+		String fullPath = "wav/" + filePath;
 		res.setPresignedUrl(
-			amazonS3.generatePresignedUrl(bucketName, filePath, calendar.getTime(), httpMethod).toString());
-		res.setObjectUrl("https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/" + filePath);
+			amazonS3.generatePresignedUrl(bucketName, fullPath, calendar.getTime(), httpMethod).toString());
+		res.setObjectUrl("https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/" + fullPath);
 		return res;
 	}
 
@@ -94,12 +103,23 @@ public class VoiceServiceImpl implements VoiceService {
 			.objectUrl(voiceSendRequest.getObjectUrl())
 			.build();
 		sendSTTFlask(flaskSendRequest);
-		// sendAnalysisFlask(flaskSendRequest); // 음성 분석 모델에 요청 보내기
+
+
+		// 3. Flask에 음성분석 요청
+		FlaskSendRequest analysisRequest = FlaskSendRequest.builder()
+			.processId(processId)
+			.noteId(voiceSendRequest.getNoteId())
+			.objectUrl(voiceSendRequest.getObjectUrl())
+			.build();
+		sendAnalysisFlask(analysisRequest); // 음성 분석 모델에 요청 보내기
 	}
 
-	public STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
-		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
-
+	private STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
+		// String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
+//		String flaskUrl = "http://localhost:5000/stt";
+//		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
+		String flaskUrl = "https://f1f9-34-83-36-185.ngrok-free.app/voice_stt/stt";
+		
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
@@ -119,11 +139,12 @@ public class VoiceServiceImpl implements VoiceService {
 		}
 
 		return response.getBody();
+
 	}
 
 	// 음성 분석 모델에 보내기
-	public void sendAnalysisFlask(FlaskSendRequest flaskSendRequest) {
-		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/";  // 음성 분석 모델 API URL
+	private void sendAnalysisFlask(FlaskSendRequest flaskSendRequest) {
+		String flaskUrl = "https://cd41-222-107-238-124.ngrok-free.app/voice/analysis";  // 음성 분석 모델 API URL
 
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
@@ -146,29 +167,70 @@ public class VoiceServiceImpl implements VoiceService {
 
 	@Override
 	public void saveSTTResult(STTResultRequest sttResultRequest) {
+		System.out.println("save stt");
+
 		String processId = sttResultRequest.getProcessId();
 		TwoFlaskResult twoFlaskResult = resultStore.getOrDefault(processId, new TwoFlaskResult());
 		twoFlaskResult.setSttResultRequest(sttResultRequest);
 		resultStore.put(processId, twoFlaskResult);
+
+		// 두 결과가 모두 들어오면 합친다.
+		if (resultStore.get(processId).getAnalysisResultRequest() != null) {
+			checkAndProcessVoice(processId);
+		}
 	}
+
+
 
 	@Override
 	public void saveAnalysisResult(AnalysisResultRequest analysisResultRequest) {
+		System.out.println("save analysis");
 		String processId = analysisResultRequest.getProcessId();
 		TwoFlaskResult twoFlaskResult = resultStore.getOrDefault(processId, new TwoFlaskResult());
 		twoFlaskResult.setAnalysisResultRequest(analysisResultRequest);
 		resultStore.put(processId, twoFlaskResult);
+
+		// 두 결과가 모두 들어오면 합친다.
+		if (resultStore.get(processId).getSttResultRequest() != null) {
+			checkAndProcessVoice(processId);
+		}
 	}
 
 	@Override
 	public void checkAndProcessVoice(String processId) {
+		System.out.println("start result combining");
 		TwoFlaskResult twoFlaskResult = resultStore.get(processId);
 
 		// 두 결과가 모두 도착하면 처리
 		if (twoFlaskResult != null && twoFlaskResult.getSttResultRequest() != null
 			&& twoFlaskResult.getAnalysisResultRequest() != null) {
+
+			// 결과 조합하기
+			List<STTRequest> sttRequest = twoFlaskResult.getSttResultRequest().getResult();
+			List<String> anomalyTimes = twoFlaskResult.getAnalysisResultRequest().getAnomalyTime();
+
+			for (int sttIdx = 0, aIdx = 0; sttIdx < sttRequest.size() && aIdx < anomalyTimes.size(); ) {
+
+				if( Float.parseFloat(sttRequest.get(sttIdx).getStart()) <= Float.parseFloat(anomalyTimes.get(aIdx)) &&
+					Float.parseFloat(sttRequest.get(sttIdx).getEnd()) >= Float.parseFloat(anomalyTimes.get(aIdx)) ) {
+					// 속성 변경
+					System.out.println("changed");
+					sttRequest.get(sttIdx).changeAnomaly(true);
+					aIdx++;
+				}
+
+				sttIdx++;
+			}
+
+
 			// MongoDB에 조합한 결과 저장
-			// voiceRepository.save(matchResult(twoFlaskResult));
+			STT totalResult = STT.builder()
+									.processId(processId)
+									.id(twoFlaskResult.getSttResultRequest().getId())
+									.result(sttRequest)
+									.build();
+			voiceRepository.save(totalResult);
+
 
 			// 저장 완료 후 삭제
 			resultStore.remove(processId);
@@ -198,8 +260,7 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 
-
-//	@CrossOrigin(origins = "http://localhost:5173")
+	//	@CrossOrigin(origins = "http://localhost:5173")
 	@Override
 	public STT getSTT(long id) {
 		Optional<STT> stt = voiceRepository.findById(id);

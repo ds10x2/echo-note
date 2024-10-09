@@ -13,6 +13,28 @@ const useSidebarStore = create((set) => ({
 
   toggleRecordingBar: () =>
     set((state) => ({ isRecordingBarOpened: !state.isRecordingBarOpened })),
+
+  resetSidebarStore: () =>
+    set({
+      isPdfBarOpened: false,
+      isSTTBarOpened: false,
+      isRecordingBarOpened: false,
+    }),
 }));
 
-export default useSidebarStore;
+const useSearchStore = create((set) => ({
+  currentIndex: 0,
+  setCurrentIndex: (index) => set({ currentIndex: index }),
+  searchResults: [],
+  setSearchResults: (results) => set({ searchResults: results }),
+
+  isKeyword: false,
+  toggleKeyword: () => set((state) => ({ isKeyword: !state.isKeyword })),
+
+  sttKeyword: ["비극", "영하", "음질"],
+  setSTTKeywords: (keywords) => set({ sttKeyword: keywords }),
+  currentKeyword: [],
+  setCurrentKeyword: (keywords) => set({ currentKeyword: keywords }),
+}));
+
+export { useSidebarStore, useSearchStore };

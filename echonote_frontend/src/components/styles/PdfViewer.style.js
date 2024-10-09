@@ -2,11 +2,10 @@ import { styled } from "styled-components";
 
 export const PdfContainer = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
+  /* justify-content: center; */
   position: relative;
   width: 100%;
-  height: 95%;
+  height: 100%;
   overflow: auto;
 `;
 
@@ -16,5 +15,4 @@ export const ButtonContainer = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 2;
 `;

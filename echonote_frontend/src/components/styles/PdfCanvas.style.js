@@ -5,7 +5,6 @@ export const PdfCanvasContainer = styled.div.attrs((props) => ({
   style: {
     width: `${props.width}px`,
     height: `${props.height}px`,
-    transform: `scale(${props.scale})`,
   },
 }))`
   position: relative;
@@ -13,4 +12,5 @@ export const PdfCanvasContainer = styled.div.attrs((props) => ({
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: auto;
 `;
