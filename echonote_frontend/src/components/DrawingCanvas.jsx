@@ -8,6 +8,7 @@ import React, {
 import { ReactSketchCanvas } from "react-sketch-canvas";
 import * as St from "@components/styles/DrawingEditor.style";
 import canvasStore from "@stores/canvasStore";
+import { useAudioStore } from "@stores/recordStore";
 
 const DrawingCanvas = forwardRef(
   (
@@ -25,7 +26,10 @@ const DrawingCanvas = forwardRef(
   ) => {
     const containerRef = useRef();
     const [selectionPath, setSelectionPath] = useState([]);
-    const { getCanvasPath, setCanvasPath } = canvasStore.getState();
+    const { getCanvasPath, setCanvasPath, getMinRecordingTime } =
+      canvasStore.getState();
+    const { recordTime, setStartTime } = useAudioStore();
+    const [drawingTime, setDrawingTime] = useState(0);
 
     const loadCanvasPath = () => {
       const savedPaths = getCanvasPath(page);
@@ -74,6 +78,8 @@ const DrawingCanvas = forwardRef(
       if (lassoMode) {
         const pos = getRelativePosition(event);
         setSelectionPath([pos]);
+      } else {
+        setDrawingTime(recordTime ?? 0);
       }
     };
 
@@ -91,6 +97,7 @@ const DrawingCanvas = forwardRef(
         loadCanvasPath();
       } else {
         saveCanvasPath();
+        setDrawingTime(0);
       }
     };
 
@@ -122,12 +129,20 @@ const DrawingCanvas = forwardRef(
 
     const checkIntersections = (polygon) => {
       const savedPaths = getCanvasPath(page);
-      const selectedStrokes = savedPaths.filter((stroke) =>
-        stroke.paths.some((point) => pointInPolygon(point, polygon))
-      );
+      const selectedIndices = savedPaths
+        .map((stroke, index) => {
+          // stroke가 다각형과 겹치는지 확인하고, 겹치는 경우 인덱스를 반환
+          if (stroke.paths.some((point) => pointInPolygon(point, polygon))) {
+            return index;
+          }
+          return null;
+        })
+        .filter((index) => index !== null); // 겹치는 인덱스만 필터링
+
+      setStartTime(getMinRecordingTime(page, selectedIndices));
     };
 
-    const saveCanvasPath = (event) => {
+    const saveCanvasPath = () => {
       if (ref.current) {
         // Path 저장
         ref.current
@@ -146,7 +161,7 @@ const DrawingCanvas = forwardRef(
               })),
             }));
 
-            setCanvasPath(page, unscaledPaths);
+            setCanvasPath(page, unscaledPaths, drawingTime);
           })
           .catch((e) => {
             console.log("Error exporting paths:", e);
@@ -162,7 +177,7 @@ const DrawingCanvas = forwardRef(
             height: "100%",
             pointerEvents: readOnly ? "none" : "auto",
           }}
-          onTouchStart={lassoMode ? handleTouchStart : null}
+          onTouchStart={handleTouchStart}
           onTouchMove={lassoMode ? handleTouchMove : null}
           onTouchEnd={handleTouchEnd}
         >

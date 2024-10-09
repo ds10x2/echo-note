@@ -7,4 +7,5 @@ export const useAudioStore = create((set) => ({
   setStartTime: (time) => set({ startTime: time }),
   setCreatetime: (time) => set({ createTime: time }),
   setIsRecording: (state) => set({ isRecording: state }),
+  setRecordTime: (time) => set({ recordTime: time }),
 }));

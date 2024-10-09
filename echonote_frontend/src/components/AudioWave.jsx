@@ -34,7 +34,7 @@ const AudioWave = () => {
   const [audioUrl, setAudioUrl] = useState(null);
   // const [audioUrl, setAudioUrl] = useState("src/assets/hitsong.wav");
 
-  const [recordTime, setRecordTime] = useState(0);
+  // const [recordTime, setRecordTime] = useState(0);
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
   const [objectUrl, setObjectUrl] = useState(null); // presigned URL 저장
   const {
@@ -42,6 +42,8 @@ const AudioWave = () => {
     setCreatetime,
     setIsRecording: checkRecording,
     setStartTime,
+    setRecordTime,
+    recordTime,
   } = useAudioStore();
 
   const [fileId, setFileId] = useState(2);
@@ -225,7 +227,7 @@ const AudioWave = () => {
       <WaveContainer ref={containerRef} />
 
       <Timer>
-        {new Date((!audioUrl ? recordTime : currentTime) * 1000)
+        {new Date((!audioUrl ? recordTime ?? 0 : currentTime) * 1000)
           .toISOString()
           .substring(14, 19)}
       </Timer>
