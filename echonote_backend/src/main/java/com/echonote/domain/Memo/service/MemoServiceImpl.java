@@ -15,7 +15,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -34,34 +37,67 @@ public class MemoServiceImpl implements MemoService {
 
     // 메모 업데이트
     @Override
-    public void updateMemo (Memo list){
-        long id = list.getId();
+    public void updateMemo(Memo list) {
+        long memoId = list.getId();
 
-        for(MemoRequest.memoDto memo : list.getMemo()){
-            Query query = new Query(Criteria.where("_id").is(id).and("memo._id").is(memo.getId()));
-            Update update = new Update().set("memo.$.memo", memo.getMemo());
+        Map<String, Map<String, List<MemoRequest.MemoText>>> fieldsToUpdate = new HashMap<>();
+        fieldsToUpdate.put("text", list.getText());
+        fieldsToUpdate.put("rectangle", list.getRectangle());
+        fieldsToUpdate.put("circle", list.getCircle());
+        fieldsToUpdate.put("drawing", list.getCircle());
+        
+        for (Map.Entry<String, Map<String, List<MemoRequest.MemoText>>> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Map<String, List<MemoRequest.MemoText>> fieldValue = entry.getValue();
 
-            // 업데이트 실행
-            try {
-                UpdateResult result = mongoTemplate.updateFirst(query, update, Memo.class);
+            if (fieldValue != null) {
+                for (Map.Entry<String, List<MemoRequest.MemoText>> groupEntry : fieldValue.entrySet()) {
+                    String groupKey = groupEntry.getKey();
+                    List<MemoRequest.MemoText> memoTexts = groupEntry.getValue();
 
-                if (result.getMatchedCount() == 0) { // 새로운 메모 id를 삽입할 시
-                    // 기존 메모 목록에 새로운 메모 추가
-                    Query insertQuery = new Query(Criteria.where("_id").is(id));
-                    Update insertUpdate = new Update().push("memo", memo); // 메모 배열에 추가
-                    mongoTemplate.updateFirst(insertQuery, insertUpdate, Memo.class);
+                    for (MemoRequest.MemoText memoText : memoTexts) {
+                        String updatePath = fieldName + "." + groupKey;
+                        Query query = new Query(Criteria.where("_id").is(memoId)
+                                .and(updatePath).elemMatch(Criteria.where("id").is(memoText.getId())));
 
+                        String updateDetail = memoText.getDetail();
+
+                        Update update;
+                        if (updateDetail.isEmpty()) {
+                            // Delete the item if detail is empty
+                            update = new Update().pull(updatePath,
+                                    Query.query(Criteria.where("id").is(memoText.getId())));
+                        } else {
+                            // Update the item if detail is not empty
+                            update = new Update().set(updatePath + ".$.detail", updateDetail);
+                        }
+
+                        try {
+                            UpdateResult result = mongoTemplate.updateFirst(query, update, Memo.class);
+                            if (result.getMatchedCount() == 0 && !updateDetail.isEmpty()) {
+                                // If no matching document found and detail is not empty, add a new item
+                                Query addQuery = new Query(Criteria.where("_id").is(memoId));
+                                Update addUpdate = new Update().push(updatePath, memoText);
+                                mongoTemplate.updateFirst(addQuery, addUpdate, Memo.class);
+                                log.info("Added new item to " + fieldName + "." + groupKey + ": " + memoText);
+                            } else if (updateDetail.isEmpty()) {
+                                log.info("Deleted item from " + fieldName + "." + groupKey + ": " + memoText.getId());
+                            } else {
+                                log.info("Updated existing item in " + fieldName + "." + groupKey + ": " + memoText);
+                            }
+                        } catch (DataIntegrityViolationException e) {
+                            log.error("Memo data integrity violation for " + fieldName + ": " + e.getMessage());
+                        }
+                    }
                 }
-            } catch (DataIntegrityViolationException e) {
-                log.error("Memo 데이터 무결성 위반: " + e.getMessage());
             }
         }
     }
 
     // 메모 삭제하기(전체 삭제가 아니라 특정 메모만 삭제합니다.)
     @Override
-    public void deleteMemo(long id, List<Long> memoId){
-        for(long memo : memoId) {
+    public void deleteMemo(long id, List<Long> memoId) {
+        for (long memo : memoId) {
             // memoId는 전체 메모 ID (부모 ID), targetMemoId는 삭제할 메모의 ID입니다.
             Query query = new Query(Criteria.where("id").is(id).and("memo.id").is(memo));
             // 업데이트 명령어로 해당 메모 ID를 삭제
@@ -72,19 +108,19 @@ public class MemoServiceImpl implements MemoService {
                 UpdateResult result = mongoTemplate.updateFirst(query, update, Memo.class);
 
                 if (result.getMatchedCount() > 0) {
-                    log.info(id + "번 Note " + memo+ "번 memo 삭제");
+                    log.info(id + "번 Note " + memo + "번 memo 삭제");
                 } else {
-                    log.warn(id + "번 Note " + memo+ "번 memo 삭제 실패");
+                    log.warn(id + "번 Note " + memo + "번 memo 삭제 실패");
                 }
             } catch (DataIntegrityViolationException e) {
-                log.error("memo 데이터 삭제 실패: "+e);
+                log.error("memo 데이터 삭제 실패: " + e);
             }
         }
 
     }
 
     // 전체 메모 삭제
-    public void deleteAllMemo(long id){
+    public void deleteAllMemo(long id) {
         memoRepository.deleteById(id);
     }
 
