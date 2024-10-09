@@ -7,11 +7,7 @@ import com.echonote.domain.note.dto.NoteListResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.echonote.domain.Voice.dto.VoiceSendRequest;
 import com.echonote.domain.note.dto.NoteCreateRequest;
@@ -58,11 +54,17 @@ public class NoteController {
 	}
 
 	@GetMapping("/list")
-	@Operation()
+	@Operation(summary = "노트 목록 조회", description = "사용자의 노트 목록을 조회합니다.")
 	public ResponseEntity<List<NoteListResponse>> listNotes() {
 		Long userId = 1L;
 		List<NoteListResponse> response = noteService.getNoteList(userId);
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@DeleteMapping
+	@Operation(summary = "노트 삭제", description = "noteId에 해당하는 노트를 삭제합니다.")
+	public void deleteNote(@RequestParam("noteId") Long noteId) {
+		noteService.deleteNote(noteId);
 	}
 
 }
