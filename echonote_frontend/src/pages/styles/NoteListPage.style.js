@@ -55,12 +55,13 @@ export const NoteTitle = styled.div`
 
 // 새 노트 작성 버튼 스타일
 export const NewNoteButton = styled(Link)`
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  width: 60px;
+  height: 60px;
   background-color: #ffc107;
   color: white;
-  padding: 15px;
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   text-align: center;
@@ -68,13 +69,15 @@ export const NewNoteButton = styled(Link)`
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  z-index: 3;
 
   &:hover {
     background-color: #ffa000;
+    transform: scale(1.1); // 버튼을 클릭할 때 약간의 확대 효과
   }
 
   i {
-    font-size: 20px;
+    font-size: 24px;
   }
 `;
