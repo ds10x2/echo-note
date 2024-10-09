@@ -18,6 +18,8 @@ const PdfBar = () => {
   const { isPdfBarOpened } = useSidebarStore();
   const [images, setImages] = useState([]);
   const [isDragEnabled, setIsDragEnabled] = useState(false);
+  const imageRefs = useRef([]);
+  const { currentPage } = pageStore();
 
   const pdfUrl =
     "https://timeisnullnull.s3.ap-northeast-2.amazonaws.com/le_Petit_Prince_%EB%B3%B8%EB%AC%B8.pdf";
@@ -92,11 +94,24 @@ const PdfBar = () => {
   //   saveAs(blob, "reordered.pdf"); // 파일을 사용자에게 다운로드합니다.
   // };
 
+  // useEffect(() => {
+  //   if (imageRefs.current[currentPage - 1]) {
+  //     imageRefs.current[currentPage - 1].scrollIntoView({
+  //       behavior: "smooth", // 부드러운 스크롤
+  //       block: "start", // 페이지를 뷰포트의 상단에 맞추기
+  //     });
+  //   }
+  // }, [currentPage]);
+
   return (
     <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
       <SidebarContainer isOpened={isPdfBarOpened}>
         <ImageContainer>
           {images.map((image, index) => (
+            // <div
+            //   ref={(el) => (imageRefs.current[index] = el)} // 각 이미지를 참조에 저장
+            //   key={image.id}
+            // >
             <DraggableItem
               key={image.id}
               index={index}
@@ -108,6 +123,7 @@ const PdfBar = () => {
               enableDrag={enableDrag} // 드래그 활성화 함수
               disableDrag={disableDrag} // 드래그 비활성화 함수
             />
+            // </div>
           ))}
         </ImageContainer>
       </SidebarContainer>
@@ -128,7 +144,7 @@ const DraggableItem = ({
   const ref = useRef(null);
   const [longPressTimeout, setLongPressTimeout] = useState(null);
   const [isPressed, setIsPressed] = useState(false);
-  const { currentPage, setCurrentPage } = pageStore();
+  const { setCurrentPage } = pageStore();
 
   // 드래그 앤 드롭 설정
   const [{ isDragging }, drag] = useDrag({
