@@ -167,14 +167,16 @@ public class VoiceServiceImpl implements VoiceService {
 
 	@Override
 	public void saveSTTResult(STTResultRequest sttResultRequest) {
+		System.out.println("save stt");
+
 		String processId = sttResultRequest.getProcessId();
 		TwoFlaskResult twoFlaskResult = resultStore.getOrDefault(processId, new TwoFlaskResult());
 		twoFlaskResult.setSttResultRequest(sttResultRequest);
 		resultStore.put(processId, twoFlaskResult);
 
 		// 두 결과가 모두 들어오면 합친다.
-		if (twoFlaskResult.getSttResultRequest() != null) {
-			checkAndProcessVoice(processId); // c 메서드 호출
+		if (resultStore.get(processId).getAnalysisResultRequest() != null) {
+			checkAndProcessVoice(processId);
 		}
 	}
 
@@ -182,20 +184,21 @@ public class VoiceServiceImpl implements VoiceService {
 
 	@Override
 	public void saveAnalysisResult(AnalysisResultRequest analysisResultRequest) {
+		System.out.println("save analysis");
 		String processId = analysisResultRequest.getProcessId();
 		TwoFlaskResult twoFlaskResult = resultStore.getOrDefault(processId, new TwoFlaskResult());
 		twoFlaskResult.setAnalysisResultRequest(analysisResultRequest);
 		resultStore.put(processId, twoFlaskResult);
 
 		// 두 결과가 모두 들어오면 합친다.
-		if (twoFlaskResult.getSttResultRequest() != null) {
-			checkAndProcessVoice(processId); // c 메서드 호출
+		if (resultStore.get(processId).getSttResultRequest() != null) {
+			checkAndProcessVoice(processId);
 		}
 	}
 
 	@Override
 	public void checkAndProcessVoice(String processId) {
-		System.out.println("start result combining");
+		log.debug("start result combining");
 		TwoFlaskResult twoFlaskResult = resultStore.get(processId);
 
 		// 두 결과가 모두 도착하면 처리
