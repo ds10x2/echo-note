@@ -171,7 +171,14 @@ public class VoiceServiceImpl implements VoiceService {
 		TwoFlaskResult twoFlaskResult = resultStore.getOrDefault(processId, new TwoFlaskResult());
 		twoFlaskResult.setSttResultRequest(sttResultRequest);
 		resultStore.put(processId, twoFlaskResult);
+
+		// 두 결과가 모두 들어오면 합친다.
+		if (twoFlaskResult.getSttResultRequest() != null) {
+			checkAndProcessVoice(processId); // c 메서드 호출
+		}
 	}
+
+
 
 	@Override
 	public void saveAnalysisResult(AnalysisResultRequest analysisResultRequest) {
@@ -179,17 +186,48 @@ public class VoiceServiceImpl implements VoiceService {
 		TwoFlaskResult twoFlaskResult = resultStore.getOrDefault(processId, new TwoFlaskResult());
 		twoFlaskResult.setAnalysisResultRequest(analysisResultRequest);
 		resultStore.put(processId, twoFlaskResult);
+
+		// 두 결과가 모두 들어오면 합친다.
+		if (twoFlaskResult.getSttResultRequest() != null) {
+			checkAndProcessVoice(processId); // c 메서드 호출
+		}
 	}
 
 	@Override
 	public void checkAndProcessVoice(String processId) {
+		System.out.println("start result combining");
 		TwoFlaskResult twoFlaskResult = resultStore.get(processId);
 
 		// 두 결과가 모두 도착하면 처리
 		if (twoFlaskResult != null && twoFlaskResult.getSttResultRequest() != null
 			&& twoFlaskResult.getAnalysisResultRequest() != null) {
+			
+			// 결과 조합하기
+			List<STTRequest> sttRequest = twoFlaskResult.getSttResultRequest().getResult();
+			List<String> anomalyTimes = twoFlaskResult.getAnalysisResultRequest().getAnomalyTime();
+
+			for (int sttIdx = 0, aIdx = 0; sttIdx < sttRequest.size() || aIdx < anomalyTimes.size(); ) {
+
+				if( Float.parseFloat(sttRequest.get(sttIdx).getStart()) <= Float.parseFloat(anomalyTimes.get(aIdx)) &&
+					Float.parseFloat(sttRequest.get(sttIdx).getEnd()) >= Float.parseFloat(anomalyTimes.get(aIdx)) ) {
+					// 속성 변경
+					System.out.println("changed");
+					sttRequest.get(sttIdx).setAnomaly(true);
+					aIdx++;
+				}
+
+				sttIdx++;
+			}
+
+
 			// MongoDB에 조합한 결과 저장
-			// voiceRepository.save(matchResult(twoFlaskResult));
+			STT totalResult = STT.builder()
+									.processId(processId)
+									.id(twoFlaskResult.getSttResultRequest().getId())
+									.result(sttRequest)
+									.build();
+			voiceRepository.save(totalResult);
+
 
 			// 저장 완료 후 삭제
 			resultStore.remove(processId);
@@ -219,8 +257,7 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 
-
-//	@CrossOrigin(origins = "http://localhost:5173")
+	//	@CrossOrigin(origins = "http://localhost:5173")
 	@Override
 	public STT getSTT(long id) {
 		Optional<STT> stt = voiceRepository.findById(id);

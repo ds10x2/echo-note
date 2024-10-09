@@ -135,11 +135,11 @@ export const ToolBarIconDetail = styled.div.withConfig({
   opacity: ${(props) => (props.isOpen ? "1" : "0")};
   transform-origin: left;
   transition: max-width 0.5s ease, opacity 0.5s ease, visibility 0.5s ease;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: left;
   margin-left: ${(props) => (props.isOpen ? "5px" : "0")};
+  position: relative;
 `;
 
 export const FontSizeText = styled.div`

@@ -10,7 +10,13 @@ const ShapeEditor = ({
   scale,
   parentContainerRef,
 }) => {
-  const { setRectangles, setCircles, property } = shapeStore();
+  const {
+    setRectangles,
+    setCircles,
+    property,
+    selectedShape,
+    setSelectedShape,
+  } = shapeStore();
   const { mode, shapeMode } = drawingTypeStore();
   const { recordTime } = useAudioStore();
 
@@ -24,13 +30,16 @@ const ShapeEditor = ({
 
   const [currentRects, setCurrentRects] = useState(currentPageRecs);
   const [currentCircles, setCurrentCircles] = useState(currentPageCircles);
-  const [selectedShape, setSelectedShape] = useState({ id: null, type: null });
+  // const [selectedShape, setSelectedShape] = useState({ id: null, type: null });
 
   useEffect(() => {
     setCurrentRects(currentPageRecs);
     setCurrentCircles(currentPageCircles);
-    setSelectedShape({ id: null, type: null });
   }, [currentPageRecs, currentPageCircles]);
+
+  useEffect(() => {
+    if (!mode.shape) setSelectedShape(null, null);
+  }, [mode, setSelectedShape]);
 
   const handleMouseDownRec = useCallback(
     (e) => {
@@ -67,7 +76,7 @@ const ShapeEditor = ({
           x: x - currentRects[clickedRectIndex].detail.x,
           y: y - currentRects[clickedRectIndex].detail.y,
         });
-        setSelectedShape({ id: clickedRectIndex, type: "rectangle" });
+        setSelectedShape(clickedRectIndex, "rectangle");
       } else if (clickedCircleIndex !== -1) {
         setIsDragging(true);
         setDraggingIndex(clickedCircleIndex);
@@ -81,7 +90,7 @@ const ShapeEditor = ({
             (currentCircles[clickedCircleIndex].detail.y +
               currentCircles[clickedCircleIndex].detail.ry),
         });
-        setSelectedShape({ id: clickedCircleIndex, type: "circle" });
+        setSelectedShape(clickedCircleIndex, "circle");
       } else if (mode.shape && shapeMode.rectangle) {
         setIsDrawing(true);
         setCurrentRect({
@@ -94,10 +103,10 @@ const ShapeEditor = ({
             width: 0,
             height: 0,
             property: property,
-            timeStamp: recordTime,
+            timestamp: recordTime,
           },
         });
-        setSelectedShape({ id: null, type: null });
+        setSelectedShape(null, null);
       } else if (mode.shape && shapeMode.circle) {
         setIsDrawing(true);
         setCurrentCircle({
@@ -110,10 +119,10 @@ const ShapeEditor = ({
             rx: 0, // 타원의 가로 반경
             ry: 0, // 타원의 세로 반경
             property: property,
-            timeStamp: recordTime,
+            timestamp: recordTime,
           },
         });
-        setSelectedShape({ id: null, type: null });
+        setSelectedShape(null, null);
       }
     },
     [
@@ -125,6 +134,7 @@ const ShapeEditor = ({
       property,
       scale,
       recordTime,
+      setSelectedShape,
     ]
   );
 
@@ -211,7 +221,7 @@ const ShapeEditor = ({
       isDragging,
       draggingIndex,
       offset,
-      selectedShape,
+      setSelectedShape,
       currentRects,
       currentCircles,
       scale,
@@ -220,6 +230,7 @@ const ShapeEditor = ({
 
   const handleEnd = useCallback(() => {
     setIsDragging(false);
+
     if (isDrawing && currentRect) {
       shapeStore.getState().addRectangle(currentRect);
       setCurrentRect(null);
@@ -238,9 +249,9 @@ const ShapeEditor = ({
           .getState()
           .updateCircle(draggingIndex, currentCircles[draggingIndex]);
       }
-      setIsDragging(false);
-      setDraggingIndex(null);
     }
+
+    setDraggingIndex(null);
     setOffset({ x: 0, y: 0 });
   }, [
     isDrawing,
@@ -250,8 +261,18 @@ const ShapeEditor = ({
     draggingIndex,
     currentRects,
     currentCircles,
-    selectedShape,
+    setSelectedShape,
   ]);
+
+  // useEffect(() => {
+  //   setCurrentRects(currentPageRecs);
+  //   setCurrentCircles(currentPageCircles);
+
+  //   // 여기서 선택된 도형 상태를 유지하는 코드 추가
+  //   if (!selectedShape.id) {
+  //     setSelectedShape({ id: null, type: null });
+  //   }
+  // }, [currentPageRecs, currentPageCircles, selectedShape.id]);
 
   useEffect(() => {
     const touchMoveHandler = (e) => {};
@@ -315,7 +336,7 @@ const ShapeEditor = ({
             strokeWidth={
               rect.detail.property.stroke ? rect.detail.property.strokeWidth : 0
             }
-            onClick={() => setSelectedShape({ id: index, type: "rectangle" })}
+            onClick={() => setSelectedShape(index, "rectangle")}
             isSelected={
               selectedShape.id === index && selectedShape.type === "rectangle"
             } // 선택 여부
@@ -343,7 +364,7 @@ const ShapeEditor = ({
                 ? circle.detail.property.strokeWidth
                 : 0
             }
-            onClick={() => setSelectedShape({ id: index, type: "circle" })}
+            onClick={() => setSelectedShape(index, "circle")}
             isSelected={
               selectedShape.id === index && selectedShape.type === "circle"
             } // 선택 여부
