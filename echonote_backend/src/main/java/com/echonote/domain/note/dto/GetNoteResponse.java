@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 public class GetNoteResponse {
     private Long note_id;
 
+    private String note_name;
+
     private String pdf_path;
 
     private String record_path;
@@ -26,6 +28,7 @@ public class GetNoteResponse {
     public static GetNoteResponse fromEntity(Note note) {
         return GetNoteResponse.builder()
                 .note_id(note.getId())
+                .note_name(note.getNote_name())
                 .pdf_path(note.getPdf_path())
                 .record_path(note.getRecord_path())
                 .create_at(note.getCreate_at())
