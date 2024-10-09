@@ -26,23 +26,28 @@ export const StyledRectangle = styled.rect
   }))`
     cursor: move;
     transition: transform 0.2s, fill 0.2s;
-  
+
     &:hover {
       fill: ${({ hoverFillColor }) => hoverFillColor || "#1e6b91"};
       cursor: grab;
     }
-  
+
     ${({ isSelected }) =>
       isSelected &&
       `
-      stroke: #000;  // 선택 시 항상 검정색 외곽선을 보여줌
-      stroke-width: 2;
-      stroke-dasharray: 4;
-      stroke-linecap: round;
-      transform: translate(-2px, -2px);
-      width: calc(100% + 4px);
-      height: calc(100% + 4px);
-    `}
+      stroke: #000 !important;  // 선택 시 검정색 외곽선
+      stroke-width: 1 !important;
+      stroke-dasharray: 4 !important;
+      stroke-linecap: round !important;
+      transform: translate(-2px, -2px) !important;  // 살짝 이동
+      animation: dash 1s linear infinite !important;  // 애니메이션 추가
+      `}
+
+    @keyframes dash {
+      to {
+        stroke-dashoffset: -16;  // 도트가 움직이는 애니메이션
+      }
+    }
   `;
 
 // 원 스타일
@@ -62,22 +67,28 @@ export const StyledCircle = styled.ellipse
   }))`
     cursor: move;
     transition: transform 0.2s, fill 0.2s;
-  
+
     &:hover {
       fill: ${({ hoverFillColor }) => hoverFillColor || "#1e6b91"};
       cursor: grab;
     }
-  
-    ${({ isSelected }) =>
+
+    ${({ isSelected, r }) =>
       isSelected &&
       `
-      stroke: #000;  // 선택 시 검정색 외곽선 추가
-      stroke-width: 2;
-      stroke-dasharray: 4;
-      stroke-linecap: round;
-      transform: translate(-2px, -2px);
-      r: calc(${(props) => props.r}px + 2px);  // 원의 반지름을 2px 늘림
-    `}
+      stroke: #000 !important;  // 선택 시 검정색 외곽선 추가
+      stroke-width: 1 !important;
+      stroke-dasharray: 4 !important;
+      stroke-linecap: round !important;
+      transform: translate(-2px, -2px) !important;  // 살짝 이동
+      animation: dash 1s linear infinite !important;  // 외곽선 애니메이션
+      `}
+
+    @keyframes dash {
+      to {
+        stroke-dashoffset: -16;  // 도트 외곽선이 움직이는 애니메이션
+      }
+    }
   `;
 
 // 현재 그리는 사각형 스타일
