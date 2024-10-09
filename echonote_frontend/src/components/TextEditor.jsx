@@ -160,6 +160,14 @@ const TextEditor = ({
 
   const handleTouchStart = (e, id) => {
     e.stopPropagation();
+
+    const nowItem = curItems.find((item) => item.id === id);
+
+    // 이미 선택된 텍스트 상자를 다시 누를 때 선택 해제를 막고 동작을 방지
+    if (nowItem.isEditing && selectedItemId === id) {
+      return;
+    }
+
     isDraggingRef.current = true;
     hasDraggedRef.current = false;
     setSelectedItemId(id);
