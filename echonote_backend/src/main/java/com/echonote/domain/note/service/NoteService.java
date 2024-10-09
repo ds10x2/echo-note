@@ -16,4 +16,6 @@ public interface NoteService {
 	NoteCreateResponse addNote(Long userId, NoteCreateRequest noteCreateRequest);
 
     List<NoteListResponse> getNoteList(Long userId);
+
+	void deleteNote(Long noteId);
 }

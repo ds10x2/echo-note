@@ -78,4 +78,9 @@ public class NoteServiceImpl implements NoteService {
 				.collect(Collectors.toList());
 	}
 
+	@Override
+	public void deleteNote(Long noteId) {
+		noteRepository.deleteById(noteId);
+	}
+
 }
