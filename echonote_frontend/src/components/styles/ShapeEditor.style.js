@@ -26,6 +26,7 @@ export const StyledRectangle = styled.rect
   }))`
     cursor: move;
     transition: transform 0.2s, fill 0.2s;
+    pointer-events: auto;
 
     &:hover {
       fill: ${({ hoverFillColor }) => hoverFillColor || "#1e6b91"};
@@ -70,6 +71,7 @@ export const StyledCircle = styled.ellipse
   }))`
     cursor: move;
     transition: transform 0.2s, fill 0.2s;
+    pointer-events: auto;
 
     &:hover {
       fill: ${({ hoverFillColor }) => hoverFillColor || "#1e6b91"};
