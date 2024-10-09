@@ -54,7 +54,7 @@ public class VoiceController {
 
 
 	// 확장자명에 따라 presigned url 반환
-	@GetMapping
+	@GetMapping("/url")
 	@Operation(summary = "녹음본 Presigned url 요청", description = "녹음본 S3 업로드를 위한 presigned url과 객체 Url을 요청")
 	public ResponseEntity<UrlResponse> generatePresignedUrl() {
 
@@ -117,7 +117,11 @@ public class VoiceController {
 	@Operation(summary = "음성 분석 모델 결과 받기", description = "Flask 음성 분석 모델에서 처리된 결과를 받습니다.")
 	public ResponseEntity<String> receiveSTTResult(@RequestBody AnalysisResultRequest analysisResultRequest) {
 		voiceService.saveAnalysisResult(analysisResultRequest);
-		voiceService.checkAndProcessVoice(analysisResultRequest.getProcessId());
+
+		System.out.println("=============");
+		System.out.println(analysisResultRequest);
+		System.out.println("=============");
+		// voiceService.checkAndProcessVoice(analysisResultRequest.getProcessId());
 		return ResponseEntity.ok("음성 분석 완료");
 	}
 

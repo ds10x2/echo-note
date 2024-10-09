@@ -3,6 +3,7 @@ const drawingTypeStore = create((set, get) => ({
   mode: {
     text: false,
     shape: false,
+    pen: false,
   },
   shapeMode: {
     rectangle: true,
@@ -16,6 +17,7 @@ const drawingTypeStore = create((set, get) => ({
       mode: {
         text: !state.mode.text, // text의 값을 토글
         shape: false,
+        pen: false,
       },
     })),
 
@@ -25,6 +27,17 @@ const drawingTypeStore = create((set, get) => ({
       mode: {
         text: false,
         shape: !state.mode.shape,
+        pen: false,
+      },
+    })),
+
+  //그리기 모드
+  setPenMode: () =>
+    set((state) => ({
+      mode: {
+        text: false,
+        shape: false,
+        pen: !state.mode.pen,
       },
     })),
 

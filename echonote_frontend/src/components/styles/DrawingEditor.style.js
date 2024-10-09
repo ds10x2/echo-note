@@ -1,6 +1,9 @@
 import { styled } from "styled-components";
+import { shouldNotForwardPropsWithKeys } from "@/shared/utils/shouldForwardProp";
 
-export const DrawingEditorContainer = styled.div`
+export const DrawingEditorContainer = styled.div.withConfig({
+  shouldForwardProp: shouldNotForwardPropsWithKeys(["mode"]),
+})`
   position: absolute;
   top: 0;
   left: 0;
@@ -9,6 +12,7 @@ export const DrawingEditorContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  z-index: ${({ mode }) => (mode ? 3 : 1)};
 `;
 
 export const DrawingCanvasContainer = styled.div`

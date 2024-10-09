@@ -62,6 +62,7 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
     shapeMode,
     setRectangleMode,
     setCircleMode,
+    setPenMode,
   } = drawingTypeStore();
 
   const { nextPage, prevPage, zoomIn, zoomOut, currentPage } = pageStore();
@@ -138,6 +139,8 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
 
   const handlePenClick = () => {
     setIsPenActive(!isPenActive);
+    setPenMode();
+    console.log(mode.pen);
     onToggleDrawingEditor();
   };
 
@@ -166,11 +169,7 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
             isActive={isRecordingBarOpened}
           />
           <Divider />
-          <IconButton
-            as={FaPen}
-            onClick={handlePenClick}
-            isActive={isPenActive}
-          />
+          <IconButton as={FaPen} onClick={handlePenClick} isActive={mode.pen} />
           <ToolBarIconContainer>
             <ToolBarIcon
               as={FaTextHeight}

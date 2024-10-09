@@ -103,13 +103,23 @@ public class VoiceServiceImpl implements VoiceService {
 			.objectUrl(voiceSendRequest.getObjectUrl())
 			.build();
 		sendSTTFlask(flaskSendRequest);
-		// sendAnalysisFlask(flaskSendRequest); // 음성 분석 모델에 요청 보내기
+
+
+		// 3. Flask에 음성분석 요청
+		FlaskSendRequest analysisRequest = FlaskSendRequest.builder()
+			.processId(processId)
+			.noteId(voiceSendRequest.getNoteId())
+			.objectUrl(voiceSendRequest.getObjectUrl())
+			.build();
+		sendAnalysisFlask(analysisRequest); // 음성 분석 모델에 요청 보내기
 	}
 
 	private STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
-		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
+		// String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
 //		String flaskUrl = "http://localhost:5000/stt";
 //		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
+		String flaskUrl = "https://uniformly-right-mako.ngrok-free.app/voice_stt/stt";
+		
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
@@ -134,7 +144,7 @@ public class VoiceServiceImpl implements VoiceService {
 
 	// 음성 분석 모델에 보내기
 	private void sendAnalysisFlask(FlaskSendRequest flaskSendRequest) {
-		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/";  // 음성 분석 모델 API URL
+		String flaskUrl = "http://70.12.130.111:4998/voice/analysis";  // 음성 분석 모델 API URL
 
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();

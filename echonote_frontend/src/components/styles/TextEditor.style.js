@@ -18,6 +18,7 @@ export const TextBox = styled.div
     shouldForwardProp: shouldNotForwardPropsWithKeys([
       "isDragging",
       "isEditing",
+      "isSelected",
       "minWidth",
     ]),
   })
@@ -34,9 +35,6 @@ export const TextBox = styled.div
   position: absolute;
   padding: 4px;
   z-index: 1;
-  border: ${({ isDragging }) =>
-    isDragging ? `1px solid ${theme.colors.textSelectedStrokeColor}` : "none"};
-  border-radius: 3px;
   background-color: ${({ isDragging, isEditing }) =>
     isDragging
       ? "rgba(173, 216, 230, 0.5)"
@@ -45,28 +43,41 @@ export const TextBox = styled.div
       : "transparent"};
   transition: border 0.2s, background-color 0.2s;
   user-select: none;
-  min-width: ${({ minWidth }) => minWidth}px; 
+  min-width: ${({ minWidth }) => minWidth}px;
+
+  ${({ isSelected }) =>
+    isSelected &&
+    `
+      border: 1px solid ${theme.colors.textSelectedStrokeColor};
+      border-radius: 4px;
+      box-shadow: 0 0 5px ${theme.colors.textSelectedStrokeColor};
+      animation: subtlePulse 1.5s infinite;
+    `}
+
+  @keyframes subtlePulse {
+    0% {
+      box-shadow: 0 0 5px ${theme.colors.textSelectedStrokeColor};
+    }
+    50% {
+      box-shadow: 0 0 8px ${theme.colors.textSelectedStrokeColor};
+    }
+    100% {
+      box-shadow: 0 0 5px ${theme.colors.textSelectedStrokeColor};
+    }
+  }
 `;
 
 export const TextArea = styled.textarea`
   font-size: ${({ fontSize }) => fontSize || 16}px;
-  border: 1px solid ${theme.colors.textSelectedStrokeColor};
-  background-color: ${theme.colors.textEditBackground};
   padding: 4px;
+  background-color: transparent;
   outline: none;
   resize: none;
   user-select: none;
+  border: none;
   border-radius: 4px;
   line-height: 1.5;
-  width: ${({ minWidth }) => (minWidth ? `${minWidth}px` : "100%")};
-  min-width: ${({ minWidth }) => (minWidth ? `${minWidth}px` : "150px")};
   transition: all 0.2s ease-in-out;
-
-  &:focus {
-    border-color: ${theme.colors.textFocusedStrokeColor};
-    box-shadow: 0 0 5px ${theme.colors.pdfShadowColor};
-    backdrop-filter: blur(5px);
-  }
 `;
 
 export const TextDetail = styled.div`

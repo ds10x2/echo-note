@@ -6,4 +6,5 @@ import lombok.Data;
 public class AnalysisResultRequest {
 
 	private String processId;
+	private String anomalyTime;
 }
