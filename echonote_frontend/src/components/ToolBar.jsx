@@ -54,6 +54,7 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
     toggleSTTBar,
     isRecordingBarOpened,
     toggleRecordingBar,
+    resetSidebarStore,
   } = useSidebarStore();
 
   const {
@@ -109,6 +110,7 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
 
   const moveNoteList = () => {
     navigate(-1);
+    resetSidebarStore();
   };
 
   const toggleAnalyzeModal = () => {
