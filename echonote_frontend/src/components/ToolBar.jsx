@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AnalyzeModal from "@components/modal/AnalyzeModal";
 import PdfSettingModal from "@components/modal/PdfSettingModal";
 import { RiSpeakLine } from "react-icons/ri";
@@ -23,6 +24,7 @@ import { LuZoomIn, LuZoomOut } from "react-icons/lu";
 import { useSidebarStore } from "@stores/sideBarStore";
 import drawingTypeStore from "@stores/drawingTypeStore";
 import pageStore from "@stores/pageStore";
+import { useNoteStore } from "@stores/noteStore";
 import {
   AnimatedToolBarContent,
   Divider,
@@ -39,8 +41,9 @@ import {
   FontSizeText,
   FontSizeButton,
   ToolBarIconContainer,
+  ListButton,
 } from "@components/styles/ToolBar.style";
-import { VscSettings } from "react-icons/vsc";
+import { VscSettings, VscArrowLeft } from "react-icons/vsc";
 import textStore from "@/stores/textStore";
 
 const ToolBar = ({ onToggleDrawingEditor }) => {
@@ -72,6 +75,8 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
   const [buttonPosition, setButtonPosition] = useState(null);
   const settingButtonRef = useRef(null);
   const [isPenActive, setIsPenActive] = useState(false);
+  const navigate = useNavigate();
+  const { note_name } = useNoteStore();
 
   //도형모드 off -> 사각형 모드 -> 원 모드 -> 도형모드 off
   const handleShapeMode = () => {
@@ -100,6 +105,10 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
     }
 
     setIsPdfSettingModalOpen(!isPdfSettingModalOpen);
+  };
+
+  const moveNoteList = () => {
+    navigate(-1);
   };
 
   const toggleAnalyzeModal = () => {
@@ -141,8 +150,11 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
     <ToolBarContainer>
       <AnimatedToolBarContent collapsed={isCollapsed}>
         <ToolBarHeader>
+          <ListButton onClick={moveNoteList}>
+            <VscArrowLeft style={{ marginLeft: "10px", fontSize: "20px" }} />
+          </ListButton>
           <Title>
-            pdf file name
+            {note_name}
             <FaStar style={{ marginLeft: "10px", color: "gold" }} />
           </Title>
           <SettingButton ref={settingButtonRef} onClick={togglePdfModal}>

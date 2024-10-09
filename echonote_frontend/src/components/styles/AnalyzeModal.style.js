@@ -142,7 +142,9 @@ export const ToggleContainer = styled.div`
   }
 `;
 
-export const TagButton = styled.button`
+export const TagButton = styled.button.withConfig({
+  shouldForwardProp: shouldNotForwardPropsWithKeys(["isSelected"]),
+})`
   border: 2px solid ${(props) => props.theme.colors.recordInActive};
   background-color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.recordActive : "transparent"};

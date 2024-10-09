@@ -26,7 +26,7 @@ export const AppContainer = styled.div`
 export const Layout = styled.div`
   display: flex;
   position: relative;
-  height: 100%; /* 100% 높이로 설정 */
+  height: 100vh; /* 100% 높이로 설정 */
 `;
 
 // 중앙 메인 콘텐츠를 Flex로 가운데 정렬

@@ -10,6 +10,7 @@ import {
 import Github, { GithubPlacement } from "@uiw/react-color-github";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
+import { useSearchStore } from "@stores/sideBarStore";
 
 const CORLER_HEX = [
   "#B80000",
@@ -34,19 +35,24 @@ const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
   const [isVisible, setIsVisible] = useState(isOpen);
   const [hex, setHex] = useState("#fff");
   const [isOn, setisOn] = useState(false);
-  const keywordArray = ["강남", "서초구", "종로구", "용산구"];
-  const [selectedTags, setSelectedTags] = useState([]);
+  const { sttKeyword, currentKeyword, setCurrentKeyword, toggleKeyword } =
+    useSearchStore();
 
   const toggleHandler = () => {
     setisOn(!isOn);
   };
 
+  const toggleKeywordHandler = () => {
+    setisOn(!isOn);
+    toggleKeyword();
+  };
+
   const toggleTag = (tag) => {
-    setSelectedTags((prevSelectedTags) =>
-      prevSelectedTags.includes(tag)
-        ? prevSelectedTags.filter((item) => item !== tag)
-        : [...prevSelectedTags, tag]
-    );
+    if (currentKeyword.includes(tag)) {
+      setCurrentKeyword(currentKeyword.filter((keyword) => keyword !== tag));
+    } else {
+      setCurrentKeyword([...currentKeyword, tag]);
+    }
   };
 
   useEffect(() => {
@@ -90,7 +96,7 @@ const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
           <>
             <ModalHeader>
               <span>키워드 분석</span>
-              <ToggleContainer onClick={toggleHandler}>
+              <ToggleContainer onClick={toggleKeywordHandler}>
                 <div
                   className={`toggle-container ${
                     isOn ? "toggle--checked" : null
@@ -102,11 +108,11 @@ const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
               </ToggleContainer>
             </ModalHeader>
             <AnalyzedSection>
-              {keywordArray.map((keyword) => (
+              {sttKeyword.map((keyword) => (
                 <TagButton
                   key={keyword}
                   onClick={() => toggleTag(keyword)}
-                  isSelected={selectedTags.includes(keyword)} // 선택 상태에 따라 스타일 변경
+                  isSelected={currentKeyword.includes(keyword)} // currentKeyword에 있는지 확인
                 >
                   {keyword}
                 </TagButton>
