@@ -18,23 +18,19 @@ const formatTime = (seconds) => {
   return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
 };
 
-const STTComponent = ({
-  id,
-  searchTerm,
-  isEditMode,
-  onSubmit,
-  handleArrowNavigation,
-}) => {
+const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
   const [sttData, setSttData] = useState([]);
   const [modifiedTexts, setModifiedTexts] = useState([]);
   const { setStartTime } = useAudioStore();
-  const [eventMessage, setEventMessage] = useState("");
 
-  const { currentIndex, setCurrentIndex, searchResults, setSearchResults } =
-    useSearchStore();
+  const {
+    currentIndex,
+    setSearchResults,
+    currentKeyword,
+    setCurrentKeyword,
+    isKeyword,
+  } = useSearchStore();
   const resultRefs = useRef([]);
-  const highlightRefs = useRef([]); // 하이라이트 텍스트의 참조 저장
-  const containerRef = useRef(null); // STTContainer 참조 저장
 
   // 컴포넌트 마운트 시 API 데이터 가져오기
   useEffect(() => {
@@ -49,22 +45,45 @@ const STTComponent = ({
 
   // 검색어를 포함한 부분 강조 및 참조 저장
   const highlightText = (text, index) => {
-    if (!searchTerm) return text;
+    if (
+      !searchTerm &&
+      (!isKeyword || !currentKeyword || currentKeyword.length === 0)
+    ) {
+      return text; // 검색어와 키워드가 없으면 원본 텍스트 반환
+    }
 
-    const parts = text.split(new RegExp(`(${searchTerm})`, "gi"));
+    const searchRegex = searchTerm ? `(${searchTerm})` : null;
+    const keywordRegex =
+      currentKeyword.length > 0 ? `(${currentKeyword.join("|")})` : null;
+
+    const combinedRegex = new RegExp(
+      [searchRegex, keywordRegex].filter(Boolean).join("|"),
+      "gi"
+    );
+
+    const parts = text.split(combinedRegex);
+
     return (
       <span>
         {parts.map((part, i) => (
           <span
             key={i}
-            ref={(el) => {
-              if (part.toLowerCase() === searchTerm.toLowerCase() && el) {
-                highlightRefs.current[index] = el; // 하이라이트 부분 참조 저장
-              }
-            }}
             style={
-              part.toLowerCase() === searchTerm.toLowerCase()
-                ? { backgroundColor: "yellow" }
+              typeof part === "string" &&
+              part.toLowerCase() === searchTerm?.toLowerCase()
+                ? {
+                    backgroundColor: "yellow", // 검색어 하이라이트 색상
+                  }
+                : isKeyword &&
+                  currentKeyword.some(
+                    (keyword) =>
+                      typeof part === "string" &&
+                      part.toLowerCase() === keyword.toLowerCase()
+                  )
+                ? {
+                    color: "lightgreen",
+                    backgroundColor: "black",
+                  }
                 : {}
             }
           >
@@ -74,18 +93,6 @@ const STTComponent = ({
       </span>
     );
   };
-
-  useEffect(() => {
-    if (highlightRefs.current[currentIndex]) {
-      const highlightElement = highlightRefs.current[currentIndex];
-
-      // 해당 하이라이트된 요소가 존재하면 스크롤을 해당 위치로 이동
-      highlightElement.scrollIntoView({
-        behavior: "smooth", // 부드럽게 스크롤
-        block: "center", // 화면 중앙에 위치하도록 설정
-      });
-    }
-  }, [currentIndex]);
 
   // 텍스트 수정 시 호출되는 함수
   const handleTextChange = (segmentId, newText) => {
@@ -99,7 +106,6 @@ const STTComponent = ({
         text: newText,
       };
 
-      // 기존에 수정된 텍스트가 있는 경우 업데이트, 없는 경우 새로 추가
       const exists = modifiedTexts.find((item) => item.id === segmentId);
       if (exists) {
         setModifiedTexts((prev) =>
@@ -110,6 +116,12 @@ const STTComponent = ({
       }
     }
   };
+
+  useEffect(() => {
+    if (onSubmit) {
+      onSubmit(modifiedTexts);
+    }
+  }, [modifiedTexts, onSubmit]);
 
   useEffect(() => {
     if (searchTerm) {
@@ -123,14 +135,8 @@ const STTComponent = ({
     }
   }, [searchTerm, sttData, setSearchResults]);
 
-  useEffect(() => {
-    if (onSubmit) {
-      onSubmit(modifiedTexts);
-    }
-  }, [modifiedTexts, onSubmit]);
-
   return (
-    <STTContainer ref={containerRef}>
+    <STTContainer>
       {sttData && sttData.length > 0 ? (
         <STTResultList>
           {sttData.map((segment, index) => (
@@ -160,13 +166,6 @@ const STTComponent = ({
       )}
     </STTContainer>
   );
-};
-
-STTComponent.propTypes = {
-  id: PropTypes.number.isRequired,
-  searchTerm: PropTypes.string,
-  isEditMode: PropTypes.bool.isRequired,
-  onSubmit: PropTypes.func.isRequired,
 };
 
 export default STTComponent;

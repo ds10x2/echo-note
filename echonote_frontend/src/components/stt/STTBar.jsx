@@ -46,23 +46,10 @@ const STTBar = () => {
     setIsEditMode(!isEditMode);
   };
 
-  const handleArrowNavigation = (direction) => {
-    if (direction === "up") {
-      setCurrentIndex(
-        currentIndex - 1 < 0 ? searchResults.length - 1 : currentIndex - 1
-      );
-    } else if (direction === "down") {
-      setCurrentIndex((currentIndex + 1) % searchResults.length);
-    }
-  };
-
   return (
     <STTBarContainer isOpened={isSTTBarOpened}>
       <STTBarSearchRow>
-        <SearchBar
-          onSearch={handleSearch}
-          handleArrowNavigation={handleArrowNavigation}
-        />
+        <SearchBar onSearch={handleSearch} />
       </STTBarSearchRow>
       <STTBarHeader>
         <IconButton onClick={toggleEditMode}>
@@ -75,7 +62,6 @@ const STTBar = () => {
           searchTerm={searchTerm}
           isEditMode={isEditMode}
           onSubmit={setModifiedTexts}
-          handleArrowNavigation={handleArrowNavigation}
         />
       </STTBarContent>
     </STTBarContainer>
