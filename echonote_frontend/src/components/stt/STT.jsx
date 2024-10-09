@@ -1,5 +1,5 @@
-import "@components/stt/styles.css";
-import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState, useRef } from "react";
 import {
   STTContainer,
   STTResultList,
@@ -8,31 +8,8 @@ import {
   ResultText,
 } from "@/components/styles/STT.style";
 import { useAudioStore } from "@stores/recordStore";
-
-// API 호출 함수
-export const getSTTResult = async (id) => {
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}voice/stt?id=${id}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        mode: "cors", // CORS 모드 설정
-      }
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return null; // 에러 발생 시 null 반환
-  }
-};
+import { getSTTResult } from "@services/sttApi";
+import { useSearchStore } from "@stores/sideBarStore";
 
 // 시간 포맷팅 함수 (초를 분:초로 변환)
 const formatTime = (seconds) => {
@@ -41,13 +18,25 @@ const formatTime = (seconds) => {
   return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
 };
 
-const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
+const STTComponent = ({
+  id,
+  searchTerm,
+  isEditMode,
+  onSubmit,
+  handleArrowNavigation,
+}) => {
   const [sttData, setSttData] = useState([]);
   const [modifiedTexts, setModifiedTexts] = useState([]);
   const { setStartTime } = useAudioStore();
   const [eventMessage, setEventMessage] = useState('');
 
-// 컴포넌트 마운트 시 API 데이터 가져오기
+  const { currentIndex, setCurrentIndex, searchResults, setSearchResults } =
+    useSearchStore();
+  const resultRefs = useRef([]); // 전체 세그먼트 참조 저장
+  const highlightRefs = useRef([]); // 하이라이트 텍스트의 참조 저장
+  const containerRef = useRef(null); // STTContainer 참조 저장
+
+  // 컴포넌트 마운트 시 API 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
       const data = await getSTTResult(id);
@@ -58,38 +47,82 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     fetchData();
   }, [id]);
 
-
-
-  // 검색어를 포함한 부분 강조
-  const highlightText = (text) => {
+  // 검색어를 포함한 부분 강조 및 참조 저장
+  const highlightText = (text, index) => {
     if (!searchTerm) return text;
+
     const parts = text.split(new RegExp(`(${searchTerm})`, "gi"));
-    return parts.map((part, index) =>
-      part.toLowerCase() === searchTerm.toLowerCase() ? (
-        <span key={index} style={{ backgroundColor: "yellow" }}>
-          {part}
-        </span>
-      ) : (
-        part
-      )
+    return (
+      <span>
+        {parts.map((part, i) => (
+          <span
+            key={i}
+            ref={(el) => {
+              if (part.toLowerCase() === searchTerm.toLowerCase() && el) {
+                highlightRefs.current[index] = el; // 하이라이트 부분 참조 저장
+              }
+            }}
+            style={
+              part.toLowerCase() === searchTerm.toLowerCase()
+                ? { backgroundColor: "yellow" }
+                : {}
+            }
+          >
+            {part}
+          </span>
+        ))}
+      </span>
     );
   };
 
+  useEffect(() => {
+    if (highlightRefs.current[currentIndex]) {
+      const highlightElement = highlightRefs.current[currentIndex];
+
+      // 해당 하이라이트된 요소가 존재하면 스크롤을 해당 위치로 이동
+      highlightElement.scrollIntoView({
+        behavior: "smooth", // 부드럽게 스크롤
+        block: "center", // 화면 중앙에 위치하도록 설정
+      });
+    }
+  }, [currentIndex]);
+
   // 텍스트 수정 시 호출되는 함수
   const handleTextChange = (segmentId, newText) => {
-    const exists = modifiedTexts.find((item) => item.id === segmentId);
-    if (exists) {
-      setModifiedTexts((prev) =>
-        prev.map((item) =>
-          item.id === segmentId ? { id: segmentId, text: newText } : item
-        )
-      );
-    } else {
-      setModifiedTexts((prev) => [...prev, { id: segmentId, text: newText }]);
+    const segment = sttData.find((item) => item.id === segmentId);
+
+    if (segment) {
+      const modifiedSegment = {
+        id: segmentId,
+        start: segment.start,
+        end: segment.end,
+        text: newText,
+      };
+
+      // 기존에 수정된 텍스트가 있는 경우 업데이트, 없는 경우 새로 추가
+      const exists = modifiedTexts.find((item) => item.id === segmentId);
+      if (exists) {
+        setModifiedTexts((prev) =>
+          prev.map((item) => (item.id === segmentId ? modifiedSegment : item))
+        );
+      } else {
+        setModifiedTexts((prev) => [...prev, modifiedSegment]);
+      }
     }
   };
 
-  // 상위 컴포넌트로 수정된 데이터를 전달하는 함수
+  useEffect(() => {
+    if (searchTerm) {
+      const results = [];
+      sttData.forEach((segment, index) => {
+        if (segment.text.toLowerCase().includes(searchTerm.toLowerCase())) {
+          results.push({ index, ref: resultRefs.current[index] });
+        }
+      });
+      setSearchResults(results); // 검색 결과 저장
+    }
+  }, [searchTerm, sttData, setSearchResults]);
+
   useEffect(() => {
     if (onSubmit) {
       onSubmit(modifiedTexts);
@@ -97,25 +130,27 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
   }, [modifiedTexts, onSubmit]);
 
   return (
-    <STTContainer>
+    <STTContainer ref={containerRef}>
       {sttData && sttData.length > 0 ? (
         <STTResultList>
-          {sttData.map((segment) => (
-            <STTResultItem key={segment.id}>
+          {sttData.map((segment, index) => (
+            <STTResultItem
+              key={segment.id}
+              ref={(el) => (resultRefs.current[index] = el)} // 각 세그먼트 참조 저장
+            >
               <ResultLink
-                href="#"
-                onClick={() => setStartTime(parseFloat(segment.start))}
+                onClick={() => setStartTime(Number(segment.start).toFixed(6))}
               >
                 {formatTime(parseFloat(segment.start))} ~{" "}
                 {formatTime(parseFloat(segment.end))}
               </ResultLink>
               <ResultText
                 contentEditable={isEditMode}
-                onBlur={(e) => handleTextChange(segment.id, e.target.innerText)} // Save text on edit
+                onBlur={(e) => handleTextChange(segment.id, e.target.innerText)}
                 suppressContentEditableWarning={true} // Prevent warning
-                $isEditMode={isEditMode} // isEditMode prop 전달
+                $isEditMode={isEditMode}
               >
-                {highlightText(segment.text)} {/* Display highlighted text */}
+                {highlightText(segment.text, index)} {/* 검색어 하이라이트 */}
               </ResultText>
             </STTResultItem>
           ))}
@@ -125,6 +160,13 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
       )}
     </STTContainer>
   );
+};
+
+STTComponent.propTypes = {
+  id: PropTypes.number.isRequired,
+  searchTerm: PropTypes.string,
+  isEditMode: PropTypes.bool.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default STTComponent;

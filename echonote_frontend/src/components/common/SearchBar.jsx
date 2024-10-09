@@ -1,17 +1,25 @@
 import { useState, useRef, useEffect } from "react";
+import PropTypes from "prop-types";
 import {
   SearchContainer,
   SearchInput,
   SearchButton,
   SearchIconContainer,
+  SearchResultCount,
+  SearchControlIcons,
+  SearchArrowIcon,
+  SearchCloseIcon,
 } from "@components/common/SearchBar.style";
 import { FaSearch } from "react-icons/fa";
+import { IoIosArrowUp, IoIosArrowDown, IoIosClose } from "react-icons/io";
+import { useSearchStore } from "@stores/sideBarStore";
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, handleArrowNavigation }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // 입력된 검색어 상태
-  const [prevSearchTerm, setPrevSearchTerm] = useState(""); // 이전 검색어 상태
   const searchRef = useRef(null);
+  const { currentIndex, setCurrentIndex, searchResults, setSearchResults } =
+    useSearchStore();
 
   const handleSearchClick = () => {
     setIsOpen(true);
@@ -19,7 +27,10 @@ const SearchBar = ({ onSearch }) => {
 
   const handleClickOutside = (event) => {
     if (searchRef.current && !searchRef.current.contains(event.target)) {
-      setIsOpen(false); // 검색 바 외부를 클릭하면 닫힘
+      if (!searchTerm) {
+        // searchTerm에 값이 없을 때만 닫기
+        setIsOpen(false);
+      }
     }
   };
 
@@ -28,15 +39,15 @@ const SearchBar = ({ onSearch }) => {
     onSearch(event.target.value); // 상위 컴포넌트에 검색어 전달
   };
 
-  const handleSearch = () => {
-    if (searchTerm.trim() === "") {
-      setIsOpen(false); // 입력 필드가 비어 있으면 닫힘
+  const handleClearSearch = () => {
+    if (!searchTerm) {
+      setIsOpen(false);
     } else {
-      console.log("Searching for:", searchTerm);
-      setPrevSearchTerm(searchTerm); // 현재 검색어를 이전 검색어로 업데이트
+      setSearchTerm("");
+      setCurrentIndex(0);
+      setSearchResults([]);
     }
   };
-
 
   useEffect(() => {
     if (isOpen) {
@@ -48,24 +59,48 @@ const SearchBar = ({ onSearch }) => {
     return () => {
       document.removeEventListener("click", handleClickOutside, true);
     };
-  }, [isOpen]);
+  }, [isOpen, searchTerm]);
 
   return (
-      <SearchContainer ref={searchRef} isOpen={isOpen}>
-        {isOpen && (
-            <SearchInput
-                placeholder="원하는 것을 검색해보세요"
-                value={searchTerm} // 상태에 따라 입력 필드의 값 설정
-                onChange={handleInputChange} // 입력 변경 시 상태 업데이트 및 상위 컴포넌트에 검색어 전달
-            />
-        )}
+    <SearchContainer ref={searchRef} isOpen={isOpen}>
+      {isOpen && (
+        <>
+          <SearchInput
+            placeholder="원하는 것을 검색해보세요"
+            value={searchTerm} // 상태에 따라 입력 필드의 값 설정
+            onChange={handleInputChange} // 입력 변경 시 상태 업데이트 및 상위 컴포넌트에 검색어 전달
+          />
+        </>
+      )}
+      {!searchTerm && !isOpen ? (
         <SearchButton onClick={handleSearchClick}>
           <SearchIconContainer>
             <FaSearch />
           </SearchIconContainer>
         </SearchButton>
-      </SearchContainer>
+      ) : (
+        <SearchResultCount>
+          {currentIndex}/{searchResults.length}
+          <SearchControlIcons>
+            <SearchArrowIcon onClick={() => handleArrowNavigation("up")}>
+              <IoIosArrowUp />
+            </SearchArrowIcon>
+            <SearchArrowIcon onClick={() => handleArrowNavigation("down")}>
+              <IoIosArrowDown />
+            </SearchArrowIcon>
+            <SearchCloseIcon onClick={handleClearSearch}>
+              <IoIosClose />
+            </SearchCloseIcon>
+          </SearchControlIcons>
+        </SearchResultCount>
+      )}
+    </SearchContainer>
   );
+};
+
+SearchBar.propTypes = {
+  onSearch: PropTypes.func.isRequired,
+  handleArrowNavigation: PropTypes.func.isRequired,
 };
 
 export default SearchBar;

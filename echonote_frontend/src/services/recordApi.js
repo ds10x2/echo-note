@@ -38,7 +38,7 @@ export const saveRecordedFile = async (noteId, objectUrl) => {
   }
 };
 
-// S3에 동영상 업로드 하는 함수
+// S3에 업로드 하는 함수
 export const S3UploadRecord = async (uploadUrl, file) => {
   try {
     const response = await fetch(uploadUrl, {
@@ -50,10 +50,10 @@ export const S3UploadRecord = async (uploadUrl, file) => {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to upload record to S3");
+      throw new Error("Failed to upload to S3");
     }
   } catch (error) {
-    console.error("Error uploading record:", error);
+    console.error("Error uploading:", error);
     throw error;
   }
 };

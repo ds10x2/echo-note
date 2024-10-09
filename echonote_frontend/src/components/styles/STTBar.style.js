@@ -10,7 +10,7 @@ export const STTBarContainer = styled.div.withConfig({
   height: 100%;
   width: ${(props) => (props.isOpened ? "300px" : "0")}; // 너비를 줄이면서 닫기
   background-color: white;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
   overflow: hidden; // 부모 너비가 줄어들 때 내부 콘텐츠가 잘리도록
   transition: width 0.3s ease; // 부드럽게 너비가 변화
 `;
@@ -44,11 +44,6 @@ export const IconButton = styled.button`
   cursor: pointer;
   display: flex;
   align-items: center;
-`;
-
-export const Divider = styled.div`
-  height: 1px;
-  background-color: #ccc;
 `;
 
 export const STTBarContent = styled.div.withConfig({

@@ -1,7 +1,7 @@
 export const theme = {
   colors: {
     main: "#FF900D",
-    subDiscription: "#919191",
+    subDiscription: "#a8a8a8",
     articleDivider: "#e5e7eb",
     backgroundColor: "#F1F5F9",
     sideColor: "#FFFFFF",

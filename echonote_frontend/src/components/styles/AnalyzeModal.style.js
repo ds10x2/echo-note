@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { shouldNotForwardPropsWithKeys } from "@shared/utils/shouldForwardProp";
 
 export const ModalBackdrop = styled.div`
   position: fixed;
@@ -41,7 +42,7 @@ export const AnalyzeModalContainer = styled.div`
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 200px;
+  width: 210px;
   font-size: 12px;
   color: ${(props) => props.theme.colors.textLightColor};
   animation: fadeOut 0.2s ease-out forwards;
@@ -82,6 +83,7 @@ export const AnalyzedSection = styled.div`
   gap: 5px;
   overflow-x: auto;
   white-space: nowrap;
+  margin-bottom: 10px;
 
   /* 스크롤 바 감추기 */
   &::-webkit-scrollbar {
@@ -94,14 +96,13 @@ export const AnalyzedSection = styled.div`
 export const BackgroundColorSection = styled.div`
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 
   .color-option {
     width: 50px;
     height: 50px;
     background-color: black;
     border-radius: 4px;
-    margin: 0 5px;
     cursor: pointer;
   }
 
@@ -118,7 +119,7 @@ export const ToggleContainer = styled.div`
     width: 50px;
     height: 24px;
     border-radius: 30px;
-    background-color: rgb(233, 233, 234);
+    background-color: rgb(163, 163, 163);
   }
   > .toggle--checked {
     background-color: rgb(0, 200, 102);
@@ -142,9 +143,11 @@ export const ToggleContainer = styled.div`
 `;
 
 export const TagButton = styled.button`
-  border: 2px solid ${(props) => props.theme.colors.recordInActive}; /* 테두리 색상 */
-  background-color: transparent; /* 배경 투명 */
-  color: ${(props) => props.theme.colors.recordInActive};
+  border: 2px solid ${(props) => props.theme.colors.recordInActive};
+  background-color: ${({ isSelected, theme }) =>
+    isSelected ? theme.colors.recordActive : "transparent"};
+  color: ${({ isSelected, theme }) =>
+    isSelected ? theme.colors.white : theme.colors.recordInActive};
   border-radius: 20px;
   padding: 5px 10px;
   font-size: 14px;
