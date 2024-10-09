@@ -59,9 +59,9 @@ const ShapeEditor = ({
       );
 
       const clickedCircleIndex = currentCircles.findIndex((circle) => {
-        const dx = x - circle.detail.cx;
-        const dy = y - circle.detail.cy;
-        return Math.sqrt(dx * dx + dy * dy) <= circle.detail.r;
+        const dx = x - (circle.detail.x + circle.detail.rx);
+        const dy = y - (circle.detail.y + circle.detail.ry);
+        return Math.sqrt(dx * dx + dy * dy) <= circle.detail.rx;
       });
 
       if (clickedRectIndex !== -1) {
@@ -76,8 +76,14 @@ const ShapeEditor = ({
         setIsDragging(true);
         setDraggingIndex(clickedCircleIndex);
         setOffset({
-          x: x - currentCircles[clickedCircleIndex].detail.cx,
-          y: y - currentCircles[clickedCircleIndex].detail.cy,
+          x:
+            x -
+            (currentCircles[clickedCircleIndex].detail.x +
+              currentCircles[clickedCircleIndex].detail.rx),
+          y:
+            y -
+            (currentCircles[clickedCircleIndex].detail.y +
+              currentCircles[clickedCircleIndex].detail.ry),
         });
         setSelectedShape({ id: clickedCircleIndex, type: "circle" });
       } else if (mode.shape && shapeMode.rectangle) {
@@ -103,9 +109,12 @@ const ShapeEditor = ({
         setCurrentCircle({
           id: Date.now(),
           detail: {
-            cx: x,
-            cy: y,
-            r: 0,
+            x,
+            y,
+            startX: x,
+            startY: y,
+            rx: 0, // 타원의 가로 반경
+            ry: 0, // 타원의 세로 반경
             property: property,
             timeStamp: isRecording
               ? getTimestamp(createTime, Date.now())
@@ -151,14 +160,19 @@ const ShapeEditor = ({
           },
         });
       } else if (isDrawing && currentCircle) {
-        const dx = x - currentCircle.detail.cx;
-        const dy = y - currentCircle.detail.cy;
-        const newRadius = Math.sqrt(dx * dx + dy * dy);
+        const newRx = Math.abs(x - currentCircle.detail.startX) / 2;
+        const newRy = Math.abs(y - currentCircle.detail.startY) / 2;
+        const newX = Math.min(x, currentCircle.detail.startX);
+        const newY = Math.min(y, currentCircle.detail.startY);
+
         setCurrentCircle({
           ...currentCircle,
           detail: {
             ...currentCircle.detail,
-            r: newRadius,
+            x: newX,
+            y: newY,
+            rx: newRx,
+            ry: newRy,
           },
         });
       }
@@ -186,8 +200,8 @@ const ShapeEditor = ({
                 ...circle,
                 detail: {
                   ...circle.detail,
-                  cx: x - offset.x,
-                  cy: y - offset.y,
+                  x: x - offset.x - circle.detail.rx,
+                  y: y - offset.y - circle.detail.ry,
                 },
               };
             }
@@ -317,9 +331,10 @@ const ShapeEditor = ({
         {currentCircles.map((circle, index) => (
           <St.StyledCircle
             key={index}
-            cx={circle.detail.cx}
-            cy={circle.detail.cy}
-            r={circle.detail.r}
+            cx={circle.detail.x + circle.detail.rx}
+            cy={circle.detail.y + circle.detail.ry}
+            rx={circle.detail.rx}
+            ry={circle.detail.ry}
             fill={
               circle.detail.property.fill
                 ? circle.detail.property.fillColor
@@ -365,10 +380,11 @@ const ShapeEditor = ({
           />
         )}
         {currentCircle && (
-          <St.CurrentCircle
-            cx={currentCircle.detail.cx}
-            cy={currentCircle.detail.cy}
-            r={currentCircle.detail.r}
+          <St.StyledCircle
+            cx={currentCircle.detail.x + currentCircle.detail.rx}
+            cy={currentCircle.detail.y + currentCircle.detail.ry}
+            rx={currentCircle.detail.rx}
+            ry={currentCircle.detail.ry}
             fill={
               currentCircle.detail.property.fill
                 ? currentCircle.detail.property.fillColor

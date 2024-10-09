@@ -46,7 +46,7 @@ export const StyledRectangle = styled.rect
   `;
 
 // 원 스타일
-export const StyledCircle = styled.circle
+export const StyledCircle = styled.ellipse
   .withConfig({
     shouldForwardProp: shouldNotForwardPropsWithKeys(["isSelected"]),
   })
