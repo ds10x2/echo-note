@@ -9,12 +9,16 @@ import {
   NewNoteButton,
 } from "@pages/styles/NoteListPage.style";
 import { getNoteList } from "@services/noteApi";
+import { LuPenLine } from "react-icons/lu";
+import NewNoteModal from "@components/modal/NewNoteModal";
 
 const NoteListPage = () => {
-  // notes 상태 관리
   const [notes, setNotes] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 데이터 가져오기
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,7 +29,8 @@ const NoteListPage = () => {
             id: note.note_id,
             title: note.note_name,
             createdAt: note.create_at,
-            image: "src/assets/images/noteExample.avif", // 필요 시, 이미지 경로를 설정
+            image:
+              "https://timeisnullnull.s3.ap-northeast-2.amazonaws.com/noteExample.avif", // 필요 시, 이미지 경로를 설정
           }));
           setNotes(formattedNotes);
         }
@@ -49,10 +54,11 @@ const NoteListPage = () => {
           </NoteItem>
         ))}
       </NoteGrid>
-      {/* 새 노트 작성 버튼 */}
-      <NewNoteButton to="/create-note">
-        <i className="icon-pencil" /> {/* 아이콘을 넣는 부분 */}
+      <NewNoteButton to="#" onClick={openModal}>
+        <LuPenLine />
       </NewNoteButton>
+
+      <NewNoteModal isOpen={isModalOpen} onClose={closeModal} />
     </NoteListContainer>
   );
 };
