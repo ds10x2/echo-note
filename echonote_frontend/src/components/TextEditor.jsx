@@ -91,6 +91,10 @@ const TextEditor = ({
     }
   }, [currentPageItems]);
 
+  useEffect(() => {
+    if (!mode.text) setSelectedItemId(null);
+  }, [mode]);
+
   const handleAddTextBox = useCallback(
     (e) => {
       if (isDraggingRef.current || hasDraggedRef.current) return;
