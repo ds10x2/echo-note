@@ -43,6 +43,46 @@ const STTComponent = ({ id, searchTerm, isEditMode, onSubmit }) => {
     fetchData();
   }, [id]);
 
+  // useEffect(() => {
+  //   const eventSource = new EventSource(
+  //     `${import.meta.env.VITE_API_URL}voice/sse?note_id=${id}`
+  //   ); // notd_id를 키값으로 들고다님 반드시 필요!
+
+  //   console.log("SSE 연결 시도 중...");
+
+  //   // 연결 시 초기 메시지 처리
+  //   eventSource.onopen = (event) => {
+  //     console.log("연결 완료: ", event);
+  //   };
+
+  //   // STT 완료 이벤트 처리
+  //   eventSource.addEventListener("stt_complete", (event) => {
+  //     console.log("STT 완료: ", event.data);
+  //     alert("STT 정보 수신 완료");
+
+  //     eventSource.close();
+  //     alert("STT 완료!");
+  //   });
+
+  //   // 일반 메시지 처리
+  //   eventSource.onmessage = (event) => {
+  //     console.log("메시지 수신: ", event.data);
+  //   };
+
+  //   // 오류 처리
+  //   eventSource.onerror = (event) => {
+  //     console.error("SSE 오류 발생:", event);
+  //     console.error("readyState:", eventSource.readyState); // 상태 로그
+  //     eventSource.close(); // 연결 종료
+  //   };
+
+  //   // 컴포넌트 언마운트 시 SSE 연결 닫기
+  //   return () => {
+  //     eventSource.close();
+  //     console.log("SSE 연결 종료");
+  //   };
+  // }, []);
+
   // 검색어를 포함한 부분 강조 및 참조 저장
   const highlightText = (text, index) => {
     if (
