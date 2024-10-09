@@ -35,7 +35,6 @@ const AudioWave = () => {
 
   // const [recordTime, setRecordTime] = useState(0);
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
-  const [objectUrl, setObjectUrl] = useState(null); // presigned URL 저장
   const {
     startTime,
     setCreatetime,
@@ -85,16 +84,14 @@ const AudioWave = () => {
         }
         // 녹음된 Blob 객체로부터 오디오 URL을 생성하고 상태에 저장
         const recordedUrl = URL.createObjectURL(blob);
-        setNoteDetail((prevState) => ({
-          ...prevState, // 기존 상태 유지
-          record_path: recordedUrl, // record_path만 업데이트
-        }));
+
         setIsRecording(false);
         checkRecording(false);
 
         try {
           const data = await getPresignedUrl();
-          setObjectUrl(data.object_url);
+          const objectUrl = data.object_url;
+          console.log("data: " + data);
           console.log("object URL: " + objectUrl);
 
           // Blob을 File 객체로 변환
@@ -102,11 +99,17 @@ const AudioWave = () => {
             type: "audio/wav",
           });
           if (!objectUrl) {
-            await S3UploadRecord(data.presigned_url, wavFile);
+            return;
           }
+          await S3UploadRecord(data.presigned_url, wavFile);
 
           // 서버로 녹음된 파일 정보 저장
           await saveRecordedFile(note_id, objectUrl);
+
+          setNoteDetail((prevState) => ({
+            ...prevState, // 기존 상태 유지
+            record_path: recordedUrl, // record_path만 업데이트
+          }));
         } catch (error) {
           console.error("Error during recording process:", error);
           setIsRecording(false);
@@ -133,7 +136,7 @@ const AudioWave = () => {
   }, [wavesurfer]);
 
   useEffect(() => {
-    if (wavesurfer && startTime !== null && audioUrl) {
+    if (wavesurfer && startTime !== null && record_path) {
       wavesurfer.setTime(startTime);
       setTimeout(() => {
         wavesurfer.getCurrentTime(), setStartTime(null);
