@@ -198,18 +198,18 @@ public class VoiceServiceImpl implements VoiceService {
 
 	@Override
 	public void checkAndProcessVoice(String processId) {
-		log.debug("start result combining");
+		System.out.println("start result combining");
 		TwoFlaskResult twoFlaskResult = resultStore.get(processId);
 
 		// 두 결과가 모두 도착하면 처리
 		if (twoFlaskResult != null && twoFlaskResult.getSttResultRequest() != null
 			&& twoFlaskResult.getAnalysisResultRequest() != null) {
-			
+
 			// 결과 조합하기
 			List<STTRequest> sttRequest = twoFlaskResult.getSttResultRequest().getResult();
 			List<String> anomalyTimes = twoFlaskResult.getAnalysisResultRequest().getAnomalyTime();
 
-			for (int sttIdx = 0, aIdx = 0; sttIdx < sttRequest.size() || aIdx < anomalyTimes.size(); ) {
+			for (int sttIdx = 0, aIdx = 0; sttIdx < sttRequest.size() && aIdx < anomalyTimes.size(); ) {
 
 				if( Float.parseFloat(sttRequest.get(sttIdx).getStart()) <= Float.parseFloat(anomalyTimes.get(aIdx)) &&
 					Float.parseFloat(sttRequest.get(sttIdx).getEnd()) >= Float.parseFloat(anomalyTimes.get(aIdx)) ) {
