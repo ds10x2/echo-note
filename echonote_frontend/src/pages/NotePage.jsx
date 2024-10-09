@@ -30,7 +30,7 @@ const NotePage = () => {
     };
 
     fetchNoteDetail();
-  }, [id, setNoteDetail]);
+  }, [id]);
 
   return (
     <>

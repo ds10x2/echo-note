@@ -22,6 +22,7 @@ import {
   S3UploadRecord,
 } from "@services/recordApi";
 import { useAudioStore } from "@stores/recordStore";
+import { useNoteStore } from "@stores/noteStore";
 
 const AudioWave = () => {
   const containerRef = useRef(null);
@@ -31,28 +32,24 @@ const AudioWave = () => {
   const [speedBarVisible, setSpeedBarVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audioUrl, setAudioUrl] = useState(null);
-  // const [audioUrl, setAudioUrl] = useState("src/assets/hitsong.wav");
 
-  // const [recordTime, setRecordTime] = useState(0);
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
-  const [objectUrl, setObjectUrl] = useState(null); // presigned URL 저장
   const { startTime, setStartTime, setRecordTime, recordTime } =
     useAudioStore();
-
-  const [fileId, setFileId] = useState(2);
+  const { note_id, record_path, setRecordPath, stt_status, setSTTStatus } =
+    useNoteStore();
 
   const { wavesurfer, currentTime } = useWavesurfer({
     container: containerRef,
     height: 30,
-    width: audioUrl ? 300 : 350,
+    width: record_path ? 300 : 350,
     barHeight: 1,
     barWidth: 2,
     waveColor: "rgb(138, 111, 211)",
     progressColor: "rgb(89, 39, 226)",
     cursorWidth: 1,
     barRadius: 5,
-    url: audioUrl || null,
+    url: record_path || null,
     minPxPerSec: 30,
     hideScrollbar: true,
     plugins: useMemo(() => [], []),
@@ -78,15 +75,17 @@ const AudioWave = () => {
           record.startRecording();
           return;
         }
+        setSTTStatus("processing");
         // 녹음된 Blob 객체로부터 오디오 URL을 생성하고 상태에 저장
         const recordedUrl = URL.createObjectURL(blob);
-        setAudioUrl(recordedUrl); // audioUrl에 저장
+        setRecordPath(recordedUrl);
+
         setIsRecording(false);
         setRecordTime(null);
 
         try {
           const data = await getPresignedUrl();
-          setObjectUrl(data.object_url);
+          const objectUrl = data.object_url;
           console.log("object URL: " + objectUrl);
 
           // Blob을 File 객체로 변환
@@ -94,11 +93,12 @@ const AudioWave = () => {
             type: "audio/wav",
           });
           if (!objectUrl) {
-            await S3UploadRecord(data.presigned_url, wavFile);
+            return;
           }
+          await S3UploadRecord(data.presigned_url, wavFile);
 
           // 서버로 녹음된 파일 정보 저장
-          await saveRecordedFile(2, objectUrl);
+          await saveRecordedFile(note_id, objectUrl);
         } catch (error) {
           console.error("Error during recording process:", error);
           setIsRecording(false);
@@ -108,29 +108,16 @@ const AudioWave = () => {
 
       return recPlugin;
     }
-  }, [wavesurfer]);
+  }, [note_id, wavesurfer]);
 
   useEffect(() => {
-    if (wavesurfer) {
-      wavesurfer.on("finish", () => {
-        setIsPlaying(false);
-      });
-    }
-    return () => {
-      if (wavesurfer) {
-        wavesurfer.destroy();
-      }
-    };
-  }, [wavesurfer]);
-
-  useEffect(() => {
-    if (wavesurfer && startTime !== null && audioUrl) {
+    if (wavesurfer && startTime !== null && record_path) {
       wavesurfer.setTime(startTime);
       setTimeout(() => {
         wavesurfer.getCurrentTime(), setStartTime(null);
       }, 200); // 200ms 정도의 딜레이를 주고 확인
     }
-  }, [startTime, wavesurfer, audioUrl]);
+  }, [startTime, wavesurfer, record_path]);
 
   const togglePlayPause = () => {
     if (!wavesurfer) return;
@@ -151,16 +138,16 @@ const AudioWave = () => {
   };
 
   const handleStartStopRecording = async () => {
-    try {
-      const devices = await RecordPlugin.getAvailableAudioDevices();
-      const deviceId = devices[0]?.deviceId;
+    const devices = await RecordPlugin.getAvailableAudioDevices();
+    const deviceId = devices[0]?.deviceId;
 
+    try {
       if (recordTime >= 1) {
         record.stopRecording(); // 녹음 중단
       } else {
-        setAudioUrl(null);
+        setRecordPath(null);
         setRecordTime(0);
-        record.startRecording({ deviceId }); // 녹음 시작
+        record.startRecording({ deviceId });
       }
     } catch (error) {
       console.error("Error accessing microphone or starting recording", error);
@@ -195,6 +182,11 @@ const AudioWave = () => {
   }, []);
 
   useEffect(() => {
+    if (wavesurfer) {
+      wavesurfer.on("finish", () => {
+        setIsPlaying(false);
+      });
+    }
     return () => {
       if (wavesurfer) {
         wavesurfer.destroy();
@@ -204,7 +196,7 @@ const AudioWave = () => {
 
   return (
     <AudioContainer>
-      {audioUrl ? (
+      {record_path ? (
         <PlayPauseButton onClick={togglePlayPause}>
           {isPlaying ? <FaPauseCircle /> : <FaPlayCircle />}
         </PlayPauseButton>
@@ -217,11 +209,11 @@ const AudioWave = () => {
       <WaveContainer ref={containerRef} />
 
       <Timer>
-        {new Date((!audioUrl ? recordTime ?? 0 : currentTime) * 1000)
+        {new Date((!record_path ? recordTime ?? 0 : currentTime) * 1000)
           .toISOString()
           .substring(14, 19)}
       </Timer>
-      {audioUrl && (
+      {record_path && (
         <>
           <SpeedButton
             ref={speedButtonRef}
@@ -245,7 +237,7 @@ const AudioWave = () => {
         </>
       )}
       <StopReplayButton onClick={handleStartStopRecording}>
-        {audioUrl ? <MdOutlineReplayCircleFilled /> : <IoIosSend />}
+        {record_path ? <MdOutlineReplayCircleFilled /> : <IoIosSend />}
       </StopReplayButton>
     </AudioContainer>
   );
