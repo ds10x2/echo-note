@@ -56,6 +56,7 @@ public class NoteServiceImpl implements NoteService {
 
 		Note note = Note.builder()
 			.user(user)
+				.note_name("새 노트")
 			.pdf_path(noteCreateRequest.getObjectUrl())
 			.create_at(LocalDateTime.now()).build();
 
@@ -80,7 +81,13 @@ public class NoteServiceImpl implements NoteService {
 
 		Note note = noteRepository.findById(noteId)
 				.orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
-		GetNoteResponse res = GetNoteResponse.fromEntity(note);
+		String stt_status;
+		if (note.getRecord_path()==null){
+			stt_status = "processing";
+		}else{
+			stt_status = "done";
+		}
+		GetNoteResponse res = GetNoteResponse.fromEntity(note, stt_status);
 
 		return res;
 	}
