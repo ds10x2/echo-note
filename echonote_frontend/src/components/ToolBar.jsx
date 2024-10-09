@@ -45,6 +45,7 @@ import {
 } from "@components/styles/ToolBar.style";
 import { VscSettings, VscArrowLeft } from "react-icons/vsc";
 import textStore from "@/stores/textStore";
+import Dropdown from "@components/common/Dropdown";
 
 const ToolBar = ({ onToggleDrawingEditor }) => {
   const {
@@ -77,6 +78,15 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
   const [isPenActive, setIsPenActive] = useState(false);
   const navigate = useNavigate();
   const { note_name } = useNoteStore();
+  const [isFontSizeOpen, setIsFontSizeOpen] = useState(false);
+  const fontSizeRef = useRef(null);
+
+  const handleFontDropDown = () => {
+    setIsFontSizeOpen((prev) => !prev);
+  };
+
+  // 1부터 64까지의 숫자 배열(폰트사이즈)
+  const fontSizeOptions = Array.from({ length: 64 }, (_, index) => index + 1);
 
   //도형모드 off -> 사각형 모드 -> 원 모드 -> 도형모드 off
   const handleShapeMode = () => {
@@ -178,9 +188,21 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
               onClick={setTextMode}
               isActive={mode.text}
             />
-            <ToolBarIconDetail isOpen={mode.text}>
-              <FontSizeText>{fontProperty.fontSize}px</FontSizeText>
+            <ToolBarIconDetail
+              ref={fontSizeRef}
+              isOpen={mode.text}
+              onClick={handleFontDropDown}
+            >
+              <FontSizeText>{fontProperty.fontSize}</FontSizeText>
               <FontSizeButton as={FaCaretDown} />
+              <Dropdown
+                isOpen={isFontSizeOpen}
+                setIsOpen={setIsFontSizeOpen}
+                parentRef={fontSizeRef}
+                options={fontSizeOptions}
+                onSelect={setFontSize}
+                selectedOption={fontProperty.fontSize}
+              />
             </ToolBarIconDetail>
           </ToolBarIconContainer>
           <ToolBarIcon as={FaImage} />
