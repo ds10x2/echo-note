@@ -71,7 +71,7 @@ const TextEditor = ({
     setSelectedText,
     selectedText, // 전역에서 선택된 텍스트를 가져옴
   } = textStore();
-  const { createTime, isRecording } = useAudioStore();
+  const { recordTime } = useAudioStore();
 
   const { mode } = drawingTypeStore();
 
@@ -89,10 +89,6 @@ const TextEditor = ({
   useEffect(() => {
     if (!mode.text) setSelectedText(null); // 모드가 변경될 때 선택된 텍스트 해제
   }, [mode, setSelectedText]);
-
-  const getTimestamp = (recordStartTime, shapecreatedTime) => {
-    return Math.floor((shapecreatedTime - recordStartTime) / 1000);
-  };
 
   const handleAddTextBox = useCallback(
     (e) => {
@@ -119,7 +115,7 @@ const TextEditor = ({
           offsetX: 0,
           offsetY: 0,
           fontSize: textStore.getState().fontProperty.fontSize,
-          timeStamp: isRecording ? getTimestamp(createTime, Date.now()) : null,
+          timestamp: recordTime,
         },
       });
 
@@ -132,6 +128,7 @@ const TextEditor = ({
       scale,
       parentContainerRef,
       setSelectedText,
+      recordTime,
     ]
   );
 
