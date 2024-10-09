@@ -24,6 +24,7 @@ import { LuZoomIn, LuZoomOut } from "react-icons/lu";
 import { useSidebarStore } from "@stores/sideBarStore";
 import drawingTypeStore from "@stores/drawingTypeStore";
 import pageStore from "@stores/pageStore";
+import { useNoteStore } from "@stores/noteStore";
 import {
   AnimatedToolBarContent,
   Divider,
@@ -75,6 +76,7 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
   const settingButtonRef = useRef(null);
   const [isPenActive, setIsPenActive] = useState(false);
   const navigate = useNavigate();
+  const { note_name } = useNoteStore();
 
   //도형모드 off -> 사각형 모드 -> 원 모드 -> 도형모드 off
   const handleShapeMode = () => {
@@ -152,7 +154,7 @@ const ToolBar = ({ onToggleDrawingEditor }) => {
             <VscArrowLeft style={{ marginLeft: "10px", fontSize: "20px" }} />
           </ListButton>
           <Title>
-            pdf file name
+            {note_name}
             <FaStar style={{ marginLeft: "10px", color: "gold" }} />
           </Title>
           <SettingButton ref={settingButtonRef} onClick={togglePdfModal}>
