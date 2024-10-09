@@ -9,7 +9,7 @@ import canvasStore from "@stores/canvasStore";
 
 const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened }) => {
   const canvasRef = useRef();
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs`;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
   const [pdfRef, setPdfRef] = useState(null);
   const { currentPage, setPages, scale } = pageStore(); // zustand의 상태와 액션 가져오기
