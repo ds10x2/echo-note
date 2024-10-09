@@ -23,7 +23,7 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
   const [sttData, setSttData] = useState([]);
   const [modifiedTexts, setModifiedTexts] = useState([]);
   const { setStartTime } = useAudioStore();
-  const { note_id, record_path, stt_status } = useNoteStore();
+  const { note_id, record_path, stt_status, setSTTStatus } = useNoteStore();
 
   const {
     currentIndex,
@@ -34,6 +34,13 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
   } = useSearchStore();
   const resultRefs = useRef([]);
 
+  const fetchData = async () => {
+    const data = await getSTTResult(note_id);
+    if (data && data.result) {
+      setSttData(data.result);
+    }
+  };
+
   // 컴포넌트 마운트 시 API 데이터 가져오기
   useEffect(() => {
     if (!note_id || !stt_status || !record_path) {
@@ -42,14 +49,9 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
 
     if (stt_status === "done") {
       console.log("stt 불러옴");
-      const fetchData = async () => {
-        const data = await getSTTResult(note_id);
-        if (data && data.result) {
-          setSttData(data.result);
-        }
-      };
       fetchData();
     } else if (stt_status === "processing") {
+      console.log("stt 분석중");
       const eventSource = new EventSource(
         `${import.meta.env.VITE_API_URL}voice/sse?note_id=${note_id}`
       ); // notd_id를 키값으로 들고다님 반드시 필요!
@@ -64,10 +66,12 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
       // STT 완료 이벤트 처리
       eventSource.addEventListener("stt_complete", (event) => {
         console.log("STT 완료: ", event.data);
-        alert("STT 정보 수신 완료");
 
         eventSource.close();
         alert("STT 완료!");
+
+        setSTTStatus("done");
+        fetchData();
       });
 
       // 일반 메시지 처리
@@ -151,6 +155,7 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
         start: segment.start,
         end: segment.end,
         text: newText,
+        anomaly: false,
       };
 
       const exists = modifiedTexts.find((item) => item.id === segmentId);
