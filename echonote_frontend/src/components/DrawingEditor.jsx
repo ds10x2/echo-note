@@ -13,8 +13,13 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
   const [strokeColor, setStrokeColor] = useState("#000000");
   const [noEdit, setNoEdit] = useState(false);
   const { mode } = drawingTypeStore();
+  const [lassoMode, setLassoMode] = useState(false);
 
   const { undo, redo, clearCanvasPath, getCanvasPath } = canvasStore.getState();
+
+  const toggleLassoMode = () => {
+    setLassoMode((prevMode) => !prevMode);
+  };
 
   const handleEraserClick = () => {
     setEraseMode(true);
@@ -97,6 +102,7 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
           onRedoChange={handleRedoClick}
           onClearChange={handleClearClick}
           onNoEditChange={handleNoEditChange}
+          onLassoClick={toggleLassoMode}
         />
       )}
 
@@ -106,9 +112,10 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
         eraserWidth={eraserWidth * scale}
         strokeColor={strokeColor}
         eraseMode={eraseMode}
-        readOnly={readOnly | noEdit}
+        readOnly={readOnly || noEdit}
         scale={scale}
         page={page}
+        lassoMode={lassoMode}
       />
     </St.DrawingEditorContainer>
   );

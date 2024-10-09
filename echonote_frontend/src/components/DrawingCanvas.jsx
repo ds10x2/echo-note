@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, useCallback, useEffect, useRef } from "react";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 import * as St from "@components/styles/DrawingEditor.style";
 import canvasStore from "@stores/canvasStore";
@@ -8,6 +8,8 @@ const DrawingCanvas = forwardRef(
     { strokeWidth, eraserWidth, strokeColor, eraseMode, readOnly, scale, page },
     ref
   ) => {
+    const containerRef = useRef();
+
     useEffect(() => {
       const { getCanvasPath } = canvasStore.getState();
       const savedPaths = getCanvasPath(page);
@@ -27,14 +29,37 @@ const DrawingCanvas = forwardRef(
 
         ref.current.loadPaths(scaledPaths);
       }
-
+      console.log(canvasStore.getState().getCanvasPath(page));
       ref.current.eraseMode(eraseMode);
     }, [eraseMode, scale, page]);
 
-    const handleEndStroke = () => {
+    const getRelativePosition = useCallback(
+      (e) => {
+        if (containerRef.current) {
+          const clientX = e.changedTouches[0].clientX;
+          const clientY = e.changedTouches[0].clientY;
+
+          const containerRect = containerRef.current.getBoundingClientRect();
+
+          const x = (clientX - containerRect.left) / scale;
+          const y = (clientY - containerRect.top) / scale;
+
+          return { x, y };
+        }
+        return { x: 0, y: 0 };
+      },
+      [scale]
+    );
+
+    const handleEndStroke = (event) => {
       const { setCanvasPath } = canvasStore.getState();
 
       if (ref.current) {
+        if (event.changedTouches && event.changedTouches[0]) {
+          const relativePos = getRelativePosition(event);
+          console.log("Converted PDF coordinates:", relativePos);
+        }
+
         // Path 저장
         ref.current
           .exportPaths()
@@ -58,10 +83,11 @@ const DrawingCanvas = forwardRef(
             console.log("Error exporting paths:", e);
           });
       }
+      console.log(canvasStore.getState().getCanvasPath(page));
     };
 
     return (
-      <St.DrawingCanvasContainer>
+      <St.DrawingCanvasContainer ref={containerRef}>
         <div
           style={{
             width: "100%",

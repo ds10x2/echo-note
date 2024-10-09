@@ -9,6 +9,7 @@ import {
   FaPen,
 } from "react-icons/fa";
 import { MdOutlineLineWeight } from "react-icons/md";
+import { LuLasso } from "react-icons/lu";
 import ColorPalette from "@components/ColorPalette";
 
 const DrawingToolBar = ({
@@ -25,6 +26,7 @@ const DrawingToolBar = ({
   onRedoChange,
   onClearChange,
   onNoEditChange,
+  onLassoClick,
 }) => {
   const [activeTool, setActiveTool] = useState("pen");
   const [showSlider, setShowSlider] = useState(false);
@@ -33,6 +35,7 @@ const DrawingToolBar = ({
     pen: useRef(null),
     eraser: useRef(null),
     wave: useRef(null),
+    lasso: useRef(null),
   };
 
   // 외부 클릭 감지 핸들러
@@ -81,6 +84,11 @@ const DrawingToolBar = ({
     });
   };
 
+  const handleLassoClick = () => {
+    setActiveTool("lasso");
+    onLassoClick();
+  };
+
   const handleIncrease = () => {
     if (activeTool === "pen") {
       onStrokeWidthChange({ target: { value: strokeWidth + 0.5 } });
@@ -113,6 +121,10 @@ const DrawingToolBar = ({
 
       <St.IconButton onClick={handleWaveClick} ref={buttonRefs.wave}>
         <MdOutlineLineWeight color={showSlider ? "gray" : "black"} />
+      </St.IconButton>
+
+      <St.IconButton onClick={handleLassoClick} ref={buttonRefs.lasso}>
+        <LuLasso color={activeTool === "lasso" ? "gray" : "black"} />
       </St.IconButton>
 
       {showSlider && (
