@@ -13,6 +13,13 @@ const useSidebarStore = create((set) => ({
 
   toggleRecordingBar: () =>
     set((state) => ({ isRecordingBarOpened: !state.isRecordingBarOpened })),
+
+  resetSidebarStore: () =>
+    set({
+      isPdfBarOpened: false,
+      isSTTBarOpened: false,
+      isRecordingBarOpened: false,
+    }),
 }));
 
 const useSearchStore = create((set) => ({
