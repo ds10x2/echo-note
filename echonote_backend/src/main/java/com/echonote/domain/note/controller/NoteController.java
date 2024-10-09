@@ -43,7 +43,6 @@ public class NoteController {
 	public ResponseEntity<NoteCreateResponse> createNote(@RequestBody NoteCreateRequest noteCreateRequest) {
 
 		Long userId = 1L;
-		System.out.println(noteCreateRequest.toString());
 		NoteCreateResponse response = noteService.addNote(userId, noteCreateRequest);
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
