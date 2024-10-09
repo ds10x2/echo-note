@@ -1,5 +1,6 @@
 package com.echonote.domain.Voice.service;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +8,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -101,6 +109,7 @@ public class VoiceServiceImpl implements VoiceService {
 	private STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
 		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
 //		String flaskUrl = "http://localhost:5000/stt";
+//		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
@@ -120,6 +129,7 @@ public class VoiceServiceImpl implements VoiceService {
 		}
 
 		return response.getBody();
+
 	}
 
 	// 음성 분석 모델에 보내기

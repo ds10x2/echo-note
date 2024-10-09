@@ -28,6 +28,7 @@ const STTComponent = ({
   const [sttData, setSttData] = useState([]);
   const [modifiedTexts, setModifiedTexts] = useState([]);
   const { setStartTime } = useAudioStore();
+  const [eventMessage, setEventMessage] = useState('');
 
   const { currentIndex, setCurrentIndex, searchResults, setSearchResults } =
     useSearchStore();
