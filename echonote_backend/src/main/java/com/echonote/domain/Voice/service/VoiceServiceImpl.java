@@ -212,7 +212,7 @@ public class VoiceServiceImpl implements VoiceService {
 					Float.parseFloat(sttRequest.get(sttIdx).getEnd()) >= Float.parseFloat(anomalyTimes.get(aIdx)) ) {
 					// 속성 변경
 					System.out.println("changed");
-					sttRequest.get(sttIdx).setAnomaly(true);
+					sttRequest.get(sttIdx).changeAnomaly(true);
 					aIdx++;
 				}
 
