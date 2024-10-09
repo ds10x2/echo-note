@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import * as St from "@components/styles/ShapeToolBar.style";
+import * as St from "@/components/styles/ShapeTextToolBar.style";
 import { PiWaveSineBold, PiFileAudio } from "react-icons/pi";
 import { FaTrash, FaCircle, FaSquare } from "react-icons/fa";
 import { FaXmark, FaRegCircleXmark } from "react-icons/fa6";
@@ -10,7 +10,7 @@ import { Colorful } from "@uiw/react-color";
 import ToggleButton from "./common/ToggleButton";
 import { PiNotePencil } from "react-icons/pi";
 
-const ShapeToolBar = ({}) => {
+const ShapeTextToolBar = ({}) => {
   const {
     property,
     setFillColor,
@@ -183,4 +183,4 @@ const ShapeToolBar = ({}) => {
   } else return null;
 };
 
-export default ShapeToolBar;
+export default ShapeTextToolBar;

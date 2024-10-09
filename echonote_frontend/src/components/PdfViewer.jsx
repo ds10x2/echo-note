@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import PdfCanvas from "@components/PdfCanvas";
 import * as St from "@components/styles/PdfViewer.style";
-import ShapeToolBar from "./ShapeToolBar";
+import ShapeTextToolBar from "@components/ShapeTextToolBar";
 import drawingTypeStore from "@/stores/drawingTypeStore";
 
 const PdfViewer = ({ isDrawingEditorOpened }) => {
@@ -11,7 +11,7 @@ const PdfViewer = ({ isDrawingEditorOpened }) => {
   return (
     <St.PdfContainer ref={containerRef}>
       <St.ButtonContainer>
-        {mode.shape ? <ShapeToolBar /> : null}
+        <ShapeTextToolBar />
       </St.ButtonContainer>
       <PdfCanvas
         containerRef={containerRef}
