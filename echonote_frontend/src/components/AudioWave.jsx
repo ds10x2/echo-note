@@ -38,8 +38,8 @@ const AudioWave = () => {
   const [objectUrl, setObjectUrl] = useState(null); // presigned URL 저장
   const { startTime, setStartTime, setRecordTime, recordTime } =
     useAudioStore();
-
-  const [fileId, setFileId] = useState(2);
+  const { note_id, record_path, setRecordPath, stt_status, setSTTStatus } =
+    useNoteStore();
 
   const { wavesurfer, currentTime } = useWavesurfer({
     container: containerRef,
@@ -77,8 +77,10 @@ const AudioWave = () => {
           record.startRecording();
           return;
         }
+        setSTTStatus("processing");
         // 녹음된 Blob 객체로부터 오디오 URL을 생성하고 상태에 저장
         const recordedUrl = URL.createObjectURL(blob);
+        setRecordPath(recordedUrl);
 
         setIsRecording(false);
         setRecordTime(null);
@@ -100,11 +102,6 @@ const AudioWave = () => {
 
           // 서버로 녹음된 파일 정보 저장
           await saveRecordedFile(note_id, objectUrl);
-
-          setNoteDetail((prevState) => ({
-            ...prevState, // 기존 상태 유지
-            record_path: recordedUrl, // record_path만 업데이트
-          }));
         } catch (error) {
           console.error("Error during recording process:", error);
           setIsRecording(false);
@@ -114,20 +111,7 @@ const AudioWave = () => {
 
       return recPlugin;
     }
-  }, [wavesurfer]);
-
-  useEffect(() => {
-    if (wavesurfer) {
-      wavesurfer.on("finish", () => {
-        setIsPlaying(false);
-      });
-    }
-    return () => {
-      if (wavesurfer) {
-        wavesurfer.destroy();
-      }
-    };
-  }, [wavesurfer]);
+  }, [note_id, wavesurfer]);
 
   useEffect(() => {
     if (wavesurfer && startTime !== null && record_path) {
@@ -157,19 +141,16 @@ const AudioWave = () => {
   };
 
   const handleStartStopRecording = async () => {
-    try {
-      const devices = await RecordPlugin.getAvailableAudioDevices();
-      const deviceId = devices[0]?.deviceId;
+    const devices = await RecordPlugin.getAvailableAudioDevices();
+    const deviceId = devices[0]?.deviceId;
 
+    try {
       if (recordTime >= 1) {
         record.stopRecording(); // 녹음 중단
       } else {
-        setNoteDetail((prevState) => ({
-          ...prevState, // 기존 상태 유지
-          record_path: null, // record_path만 업데이트
-        }));
+        setRecordPath(null);
         setRecordTime(0);
-        record.startRecording({ deviceId }); // 녹음 시작
+        record.startRecording({ deviceId });
       }
     } catch (error) {
       console.error("Error accessing microphone or starting recording", error);
@@ -204,6 +185,11 @@ const AudioWave = () => {
   }, []);
 
   useEffect(() => {
+    if (wavesurfer) {
+      wavesurfer.on("finish", () => {
+        setIsPlaying(false);
+      });
+    }
     return () => {
       if (wavesurfer) {
         wavesurfer.destroy();

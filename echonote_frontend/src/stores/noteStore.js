@@ -16,4 +16,7 @@ export const useNoteStore = create((set) => ({
       record_path: note.record_path,
       stt_status: note.stt_status,
     }),
+
+  setRecordPath: (url) => set({ record_path: url }),
+  setSTTStatus: (state) => set({ stt_status: state }),
 }));
