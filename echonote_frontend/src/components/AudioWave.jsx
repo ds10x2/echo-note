@@ -82,6 +82,7 @@ const AudioWave = () => {
         const recordedUrl = URL.createObjectURL(blob);
         setAudioUrl(recordedUrl); // audioUrl에 저장
         setIsRecording(false);
+        setRecordTime(null);
 
         try {
           const data = await getPresignedUrl();
