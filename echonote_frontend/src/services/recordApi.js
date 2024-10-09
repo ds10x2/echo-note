@@ -3,7 +3,7 @@ import apiClient from "@services/apiConfig";
 // GET 요청: presigned URL 가져오기
 export const getPresignedUrl = async () => {
   try {
-    const response = await apiClient.get("/voice");
+    const response = await apiClient.get("/voice/url");
     if (response.status === 200) {
       return response.data; // presigned_url과 object_url 반환
     } else {

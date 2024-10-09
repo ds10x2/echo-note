@@ -14,7 +14,7 @@ import { FaSearch } from "react-icons/fa";
 import { IoIosArrowUp, IoIosArrowDown, IoIosClose } from "react-icons/io";
 import { useSearchStore } from "@stores/sideBarStore";
 
-const SearchBar = ({ onSearch, handleArrowNavigation }) => {
+const SearchBar = ({ onSearch }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // 입력된 검색어 상태
   const searchRef = useRef(null);
@@ -31,6 +31,16 @@ const SearchBar = ({ onSearch, handleArrowNavigation }) => {
         // searchTerm에 값이 없을 때만 닫기
         setIsOpen(false);
       }
+    }
+  };
+
+  const handleArrowNavigation = (direction) => {
+    if (direction === "up") {
+      setCurrentIndex(
+        currentIndex - 1 < 0 ? searchResults.length - 1 : currentIndex - 1
+      );
+    } else if (direction === "down") {
+      setCurrentIndex((currentIndex + 1) % searchResults.length);
     }
   };
 
@@ -67,8 +77,8 @@ const SearchBar = ({ onSearch, handleArrowNavigation }) => {
         <>
           <SearchInput
             placeholder="원하는 것을 검색해보세요"
-            value={searchTerm} // 상태에 따라 입력 필드의 값 설정
-            onChange={handleInputChange} // 입력 변경 시 상태 업데이트 및 상위 컴포넌트에 검색어 전달
+            value={searchTerm}
+            onChange={handleInputChange}
           />
         </>
       )}
@@ -100,7 +110,6 @@ const SearchBar = ({ onSearch, handleArrowNavigation }) => {
 
 SearchBar.propTypes = {
   onSearch: PropTypes.func.isRequired,
-  handleArrowNavigation: PropTypes.func.isRequired,
 };
 
 export default SearchBar;

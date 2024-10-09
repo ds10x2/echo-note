@@ -111,6 +111,15 @@ export const SettingButton = styled.div`
   cursor: pointer;
 `;
 
+export const ListButton = styled.div`
+  position: absolute;
+  left: 10px; /* Ensure it aligns on the far right */
+  display: flex;
+  align-items: center; /* Vertical centering */
+  justify-content: center;
+  cursor: pointer;
+`;
+
 //폰트 사이즈, 도형 색상 열고 닫는용
 export const ToolBarIconContainer = styled.div`
   display: flex;
