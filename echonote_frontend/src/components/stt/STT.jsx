@@ -29,10 +29,11 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
     currentIndex,
     setSearchResults,
     currentKeyword,
-    setCurrentKeyword,
+    searchResults,
     isKeyword,
   } = useSearchStore();
   const resultRefs = useRef([]);
+  const resultListRef = useRef(null);
 
   const fetchData = async () => {
     const data = await getSTTResult(note_id);
@@ -47,7 +48,7 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
       return;
     }
 
-    if (stt_status === "done") {
+    if (stt_status === "processing") {
       console.log("stt 불러옴");
       fetchData();
     } else if (stt_status === "processing") {
@@ -179,18 +180,37 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
     if (searchTerm) {
       const results = [];
       sttData.forEach((segment, index) => {
-        if (segment.text.toLowerCase().includes(searchTerm.toLowerCase())) {
-          results.push({ index, ref: resultRefs.current[index] });
+        let position = 0;
+        while (
+          (position = segment.text
+            .toLowerCase()
+            .indexOf(searchTerm.toLowerCase(), position)) !== -1
+        ) {
+          results.push({
+            ref: resultRefs.current[index], // 각 세그먼트의 참조 저장
+            position,
+          });
+          position += searchTerm.length; // 다음 검색어 위치로 이동
         }
       });
       setSearchResults(results);
     }
   }, [searchTerm, sttData, setSearchResults]);
 
+  // 검색 결과에 맞게 스크롤 이동 처리
+  useEffect(() => {
+    if (currentIndex !== null && searchResults[currentIndex]?.ref) {
+      searchResults[currentIndex].ref.scrollIntoView({
+        behavior: "smooth",
+        block: "center", // 선택된 요소가 리스트 중앙에 위치하도록 조정
+      });
+    }
+  }, [currentIndex, searchResults]);
+
   return (
     <STTContainer>
       {sttData && sttData.length > 0 ? (
-        <STTResultList>
+        <STTResultList ref={resultListRef}>
           {sttData.map((segment, index) => (
             <STTResultItem
               key={segment.id}

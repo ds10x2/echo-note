@@ -134,13 +134,13 @@ export const Tag = styled.div`
   padding: 5px 10px;
   background-color: #f0f0f0;
   border-radius: 20px;
+  box-shadow: 1px 2px 1px 0px #8888884b;
 `;
 
 export const TagRemoveButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  margin-left: 10px;
 `;
 
 // 모달 푸터 스타일
@@ -149,7 +149,7 @@ export const ModalFooter = styled.div`
   justify-content: flex-end;
 
   button {
-    background-color: #007bff;
+    background-color: #1362b6;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -157,9 +157,13 @@ export const ModalFooter = styled.div`
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.3s ease;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.34) inset,
+      0 2px 0 -1px rgba(0, 0, 0, 0.13), 0 3px 0 -1px rgba(0, 0, 0, 0.08),
+      0 3px 13px -1px rgba(0, 0, 0, 0.21);
 
     &:hover {
-      background-color: #0056b3;
+      background-color: #023d7c;
     }
   }
 `;
@@ -171,11 +175,68 @@ export const TitleBox = styled.input`
   font-size: 16px;
   border: 2px solid #cde3fd; /* 연한 파란색 테두리 */
   border-radius: 5px;
-  box-shadow: 0 0 5px rgba(66, 153, 225, 0.5); /* 그림자 추가 */
+  box-shadow: 0 0 3px rgba(66, 153, 225, 0.5); /* 그림자 추가 */
   outline: none;
 
   &:focus {
     border-color: #3182ce; /* 포커스 시 진한 파란색 테두리 */
     box-shadow: 0 0 8px rgba(49, 130, 206, 0.6); /* 포커스 시 그림자 강화 */
+  }
+`;
+
+export const TagBox = styled.input`
+  flex: 1;
+  width: 85%;
+  padding: 8px;
+  font-size: 14px;
+  border: 2px solid #cde3fd; /* 연한 파란색 테두리 */
+  border-radius: 5px;
+  box-shadow: 0 0 2px rgba(66, 153, 225, 0.5); /* 그림자 추가 */
+  outline: none;
+
+  &:focus {
+    border-color: #3182ce; /* 포커스 시 진한 파란색 테두리 */
+    box-shadow: 0 0 8px rgba(49, 130, 206, 0.6); /* 포커스 시 그림자 강화 */
+  }
+`;
+
+export const TagButton = styled.button`
+  background-color: #6896c7;
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s ease;
+  border-bottom-color: rgba(0, 0, 0, 0.34);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.34) inset,
+    0 2px 0 -1px rgba(0, 0, 0, 0.13), 0 3px 0 -1px rgba(0, 0, 0, 0.08),
+    0 3px 13px -1px rgba(0, 0, 0, 0.21);
+
+  &:hover {
+    background-color: #2c598a;
+  }
+`;
+
+// PDF 업로드 버튼 스타일
+export const UploadButton = styled.label`
+  background-color: #6896c7;
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s ease;
+  border-bottom-color: rgba(0, 0, 0, 0.34);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.34) inset,
+    0 2px 0 -1px rgba(0, 0, 0, 0.13), 0 3px 0 -1px rgba(0, 0, 0, 0.08),
+    0 3px 13px -1px rgba(0, 0, 0, 0.21);
+
+  &:hover {
+    background-color: #2c598a;
   }
 `;
