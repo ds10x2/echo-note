@@ -23,18 +23,12 @@ const canvasStore = create((set, get) => ({
 
   // 저장된 경로 데이터를 불러오는 함수
   getCanvasPath: (page) => {
-    if (get().savedCanvasPaths && get().savedCanvasPaths[page])
-      return get().savedCanvasPaths[page];
-
-    return null;
+    return get().savedCanvasPaths?.[page] || [];
   },
 
   // 저장된 녹음 시간을 불러오는 함수
   getCanvasRecords: (page) => {
-    if (get().savedCanvasRecords && get().savedCanvasRecords[page])
-      return get().savedCanvasRecords[page];
-
-    return [];
+    return get().savedCanvasRecords?.[page] || [];
   },
 
   // 선택된 시간 중 가장 빠른 값을 반환하는 함수

@@ -206,10 +206,10 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
     // 메모 저장
     const data = {
       id: noteId,
-      text: stringifyDetail(textItems),
-      rectangle: stringifyDetail(rectangles),
-      circle: stringifyDetail(circles),
-      drawing: stringifyDetail(drawings()),
+      text: stringifyDetail(textItems) || [],
+      rectangle: stringifyDetail(rectangles) || [],
+      circle: stringifyDetail(circles) || [],
+      drawing: stringifyDetail(drawings()) || [],
     };
 
     // console.log(data);
