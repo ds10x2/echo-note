@@ -10,6 +10,7 @@ import {
   PageNumber,
 } from "@components/styles/PdfBar.style";
 import * as pdfjsLib from "pdfjs-dist";
+import { useNoteStore } from "@stores/noteStore";
 
 // PDF.js에서 사용될 워커 설정 (필요에 따라 경로를 지정)
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`;
@@ -18,14 +19,12 @@ const PdfBar = () => {
   const { isPdfBarOpened } = useSidebarStore();
   const [images, setImages] = useState([]);
   const [isDragEnabled, setIsDragEnabled] = useState(false);
-
-  const pdfUrl =
-    "https://timeisnullnull.s3.ap-northeast-2.amazonaws.com/le_Petit_Prince_%EB%B3%B8%EB%AC%B8.pdf";
+  const { pdf_path } = useNoteStore();
 
   // PDF 파일에서 각 페이지를 이미지로 변환
   useEffect(() => {
     const loadPdf = async () => {
-      const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+      const pdf = await pdfjsLib.getDocument(pdf_path).promise;
       const numPages = pdf.numPages;
       const imageArray = [];
 
@@ -52,8 +51,10 @@ const PdfBar = () => {
       setImages(imageArray);
     };
 
-    loadPdf();
-  }, [pdfUrl]);
+    if (pdf_path) {
+      loadPdf();
+    }
+  }, [pdf_path]);
 
   const moveImage = (dragIndex, hoverIndex) => {
     const draggedImage = images[dragIndex];

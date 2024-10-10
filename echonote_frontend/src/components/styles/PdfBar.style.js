@@ -40,7 +40,6 @@ export const ImageContainer = styled.div`
   padding: 10px;
   gap: 20px;
   justify-content: center;
-  align-items: center;
 `;
 
 export const PageNumber = styled.p`

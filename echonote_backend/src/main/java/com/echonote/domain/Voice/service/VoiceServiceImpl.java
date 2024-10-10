@@ -1,6 +1,5 @@
 package com.echonote.domain.Voice.service;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -83,14 +82,8 @@ public class VoiceServiceImpl implements VoiceService {
 	@Override
 	public void sendVoice(Long userId, String processId, VoiceSendRequest voiceSendRequest) {
 
-		// 1. DB에 S3 URL 저장
 		Note note = noteRepository.findById(voiceSendRequest.getNoteId())
 			.orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
-
-		note.setRecord_path(voiceSendRequest.getObjectUrl());
-
-		noteRepository.save(note);
-		System.out.println("DB 저장 성공");
 
 		// 2. Flask 모델 요청
 		FlaskSendRequest flaskSendRequest = FlaskSendRequest.builder()
@@ -100,7 +93,6 @@ public class VoiceServiceImpl implements VoiceService {
 			.build();
 		sendSTTFlask(flaskSendRequest);
 
-
 		// 3. Flask에 음성분석 요청
 		FlaskSendRequest analysisRequest = FlaskSendRequest.builder()
 			.processId(processId)
@@ -108,6 +100,12 @@ public class VoiceServiceImpl implements VoiceService {
 			.objectUrl(voiceSendRequest.getObjectUrl())
 			.build();
 		sendAnalysisFlask(analysisRequest); // 음성 분석 모델에 요청 보내기
+
+		// 4. DB에 S3 URL 저장 & note.is_processing true로 바꾸기
+		note.setRecord_path(voiceSendRequest.getObjectUrl());
+		note.set_processing(true);
+		noteRepository.save(note);
+
 	}
 
 	private STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
@@ -174,8 +172,6 @@ public class VoiceServiceImpl implements VoiceService {
 		}
 	}
 
-
-
 	@Override
 	public void saveAnalysisResult(AnalysisResultRequest analysisResultRequest) {
 		System.out.println("save analysis");
@@ -199,14 +195,19 @@ public class VoiceServiceImpl implements VoiceService {
 		if (twoFlaskResult != null && twoFlaskResult.getSttResultRequest() != null
 			&& twoFlaskResult.getAnalysisResultRequest() != null) {
 
+			// is_processing false로 바꾸기
+			Note note = noteRepository.findById(twoFlaskResult.getSttResultRequest().getId())
+				.orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
+			note.set_processing(false);
+
 			// 결과 조합하기
 			List<STTRequest> sttRequest = twoFlaskResult.getSttResultRequest().getResult();
 			List<String> anomalyTimes = twoFlaskResult.getAnalysisResultRequest().getAnomalyTime();
 
 			for (int sttIdx = 0, aIdx = 0; sttIdx < sttRequest.size() && aIdx < anomalyTimes.size(); ) {
 
-				if( Float.parseFloat(sttRequest.get(sttIdx).getStart()) <= Float.parseFloat(anomalyTimes.get(aIdx)) &&
-					Float.parseFloat(sttRequest.get(sttIdx).getEnd()) >= Float.parseFloat(anomalyTimes.get(aIdx)) ) {
+				if( (Float.parseFloat(sttRequest.get(sttIdx).getStart()) - 1.0f) <= Float.parseFloat(anomalyTimes.get(aIdx)) &&
+					(Float.parseFloat(sttRequest.get(sttIdx).getEnd()) + 1.0f) >= Float.parseFloat(anomalyTimes.get(aIdx)) ) {
 					// 속성 변경
 					System.out.println("changed");
 					sttRequest.get(sttIdx).changeAnomaly(true);
@@ -216,26 +217,17 @@ public class VoiceServiceImpl implements VoiceService {
 				sttIdx++;
 			}
 
-
 			// MongoDB에 조합한 결과 저장
 			STT totalResult = STT.builder()
-									.processId(processId)
-									.id(twoFlaskResult.getSttResultRequest().getId())
-									.result(sttRequest)
-									.build();
+				.processId(processId)
+				.id(twoFlaskResult.getSttResultRequest().getId())
+				.result(sttRequest)
+				.build();
 			voiceRepository.save(totalResult);
-
 
 			// 저장 완료 후 삭제
 			resultStore.remove(processId);
 		}
-	}
-
-	// 두 모델 결과 조합하는 메소드
-	private STT matchResult(TwoFlaskResult twoFlaskResult) {
-		STT totalResult = new STT();
-
-		return totalResult;
 	}
 
 	// STT Service
@@ -252,7 +244,6 @@ public class VoiceServiceImpl implements VoiceService {
 			log.error("An error occurred while inserting STT: " + e.getMessage());
 		}
 	}
-
 
 	//	@CrossOrigin(origins = "http://localhost:5173")
 	@Override
@@ -283,7 +274,7 @@ public class VoiceServiceImpl implements VoiceService {
 			Query query = new Query(Criteria.where("id").is(id).and("result.id").is(sttInfo.getId()));
 			log.info("Executing query: " + query); // 쿼리 로깅 추가
 			Update update = new Update().set("result.$.text", sttInfo.getText());
-			log.info("Update set: "+update);
+			log.info("Update set: " + update);
 
 			try {
 				UpdateResult result = mongoTemplate.updateFirst(query, update, STT.class);
@@ -298,7 +289,6 @@ public class VoiceServiceImpl implements VoiceService {
 			}
 		}
 	}
-
 
 	@Override
 	public void deleteSTT(long id, List<Long> sttId) {
