@@ -44,7 +44,7 @@ public class MemoServiceImpl implements MemoService {
         fieldsToUpdate.put("text", list.getText());
         fieldsToUpdate.put("rectangle", list.getRectangle());
         fieldsToUpdate.put("circle", list.getCircle());
-        fieldsToUpdate.put("drawing", list.getCircle());
+        fieldsToUpdate.put("drawing", list.getDrawing());
         
         for (Map.Entry<String, Map<String, List<MemoRequest.MemoText>>> entry : fieldsToUpdate.entrySet()) {
             String fieldName = entry.getKey();
