@@ -19,10 +19,12 @@ const NewNoteModal = ({ isOpen, onClose }) => {
 
   // 파일 선택 처리 함수
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
       setSelectedFile(file);
       console.log("선택된 파일:", file);
+    } else {
+      console.error("파일이 선택되지 않았습니다.");
     }
   };
 
@@ -103,40 +105,39 @@ const NewNoteModal = ({ isOpen, onClose }) => {
           </div>
           <p>설정에서 언제든지 새 페이지 스타일을 선택할 수 있습니다.</p>
 
-          <div style={{ marginTop: "20px" }}>
-            <label htmlFor="pdfUpload">PDF 파일 업로드</label>
-            <input
-              type="file"
-              id="pdfUpload"
-              accept="application/pdf"
-              onChange={handleFileChange}
-              style={{ display: "block", marginTop: "10px" }}
-            />
-            {selectedFile && <p>선택된 파일: {selectedFile.name}</p>}
-          </div>
+          <St.UploadButton htmlFor="pdfUpload" onClick={handleFileChange}>
+            PDF 파일 선택
+          </St.UploadButton>
+          <input
+            type="file"
+            id="pdfUpload"
+            accept="application/pdf"
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+          />
+          {selectedFile && <p>선택된 파일: {selectedFile.name}</p>}
 
           <div style={{ marginTop: "20px" }}>
             <label htmlFor="tagInput">태그 추가</label>
             <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-              <input
+              <St.TagBox
                 type="text"
                 id="tagInput"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 placeholder="태그를 입력하세요 (최대 6자)"
-                style={{ flex: 1 }}
               />
-              <button onClick={handleTagAdd}>추가</button>
+              <St.TagButton onClick={handleTagAdd}>추가</St.TagButton>
             </div>
 
             <St.TagContainer>
               {tags.map((tag, index) => (
-                <Tag key={index}>
+                <St.Tag key={index}>
                   <span>{tag}</span>
                   <St.TagRemoveButton onClick={() => handleTagRemove(index)}>
                     <IoMdClose />
                   </St.TagRemoveButton>
-                </Tag>
+                </St.Tag>
               ))}
             </St.TagContainer>
           </div>
