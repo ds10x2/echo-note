@@ -61,7 +61,7 @@ const NotePage = () => {
       }
     };
 
-    // fetchMemo();
+    fetchMemo();
   }, [id, loadTextItems, loadRectangles, loadCircles, loadDrawings]);
 
   const parseDetail = (obj) => {
