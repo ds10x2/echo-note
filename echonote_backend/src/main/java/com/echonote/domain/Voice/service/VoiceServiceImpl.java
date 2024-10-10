@@ -109,9 +109,9 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 	private STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
-//		String flaskUrl = "https://f1f9-34-83-36-185.ngrok-free.app/voice_stt/stt";
+		String flaskUrl = "https://f1f9-34-83-36-185.ngrok-free.app/voice_stt/stt";
 //		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
-		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
+//		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
 
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
@@ -135,7 +135,7 @@ public class VoiceServiceImpl implements VoiceService {
 		} else {
 			System.err.println("Flask 서버 요청 실패: " + response.getStatusCode());
 		}
-		
+
 		return response.getBody();
 
 	}
