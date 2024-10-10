@@ -70,6 +70,7 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
     setRectangleMode,
     setCircleMode,
     setPenMode,
+    resetType,
   } = drawingTypeStore();
 
   const { nextPage, prevPage, zoomIn, zoomOut, setCurrentPage } = pageStore();
@@ -100,6 +101,7 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
     resetAllShapes();
     setCurrentPage(1);
     resetAllDrawings();
+    resetType();
   };
 
   //도형모드 off -> 사각형 모드 -> 원 모드 -> 도형모드 off

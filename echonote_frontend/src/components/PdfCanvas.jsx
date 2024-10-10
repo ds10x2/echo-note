@@ -18,7 +18,7 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
   const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
   const [isRendering, setIsRendering] = useState(true); // 렌더링 상태 추가
-  const { mode } = drawingTypeStore();
+  const { mode, resetType } = drawingTypeStore();
   const { pdf_path } = useNoteStore();
 
   // const pdf_path =
@@ -101,6 +101,7 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
   // PDF 문서를 로드
   useEffect(() => {
     if (pdf_path) {
+      resetType();
       setIsRendering(true);
       const loadingTask = pdfjsLib.getDocument(pdf_path);
       loadingTask.promise.then(
