@@ -16,7 +16,7 @@ export const SidebarContainer = styled.div.withConfig({
   overflow-y: auto; /* 세로 스크롤을 사이드바 안에서만 동작하도록 설정 */
   overflow-x: hidden;
   white-space: nowrap;
-  z-index: 2; /* 툴바보다 낮은 z-index 값 설정 */
+  z-index: 10; /* 툴바보다 낮은 z-index 값 설정 */
 
   /* 커스텀 스크롤바 */
   &::-webkit-scrollbar {

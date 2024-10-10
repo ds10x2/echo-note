@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +52,7 @@ public class NoteController {
 	@Operation(summary = "노트 생성", description = "업로드한 pdf에 대한 노트 생성")
 	public ResponseEntity<NoteCreateResponse> createNote(@RequestBody NoteCreateRequest noteCreateRequest) {
 
+		System.out.println(noteService.toString());
 		Long userId = 1L;
 		NoteCreateResponse response = noteService.addNote(userId, noteCreateRequest);
 
@@ -72,6 +74,12 @@ public class NoteController {
 		GetNoteResponse response = noteService.getNote(noteId);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PatchMapping
+	@Operation(summary = "노트 수정", description = "noteId에 해당하는 노트의 update_at 을 수정합니다.")
+	public void updateNote(@RequestParam("noteId") Long noteId) {
+		noteService.updateDate(noteId);
 	}
 
 	@DeleteMapping

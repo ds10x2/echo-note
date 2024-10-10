@@ -50,7 +50,8 @@ const NotePage = () => {
     const fetchMemo = async () => {
       try {
         const memoData = await getMemo(id);
-        // console.log(memoData);
+
+        if (!memoData) return;
 
         // 각 메모 요소로 전달
         if (memoData.text || memoData.text.length > 0) {

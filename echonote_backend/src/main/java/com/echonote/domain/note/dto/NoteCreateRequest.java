@@ -1,8 +1,8 @@
 package com.echonote.domain.note.dto;
 
-import lombok.Data;
-
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class NoteCreateRequest {
