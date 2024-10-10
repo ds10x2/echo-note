@@ -49,7 +49,7 @@ import textStore from "@/stores/textStore";
 import Dropdown from "@components/common/Dropdown";
 import canvasStore from "@stores/canvasStore";
 import shapeStore from "@stores/shapeStore";
-import { updateMemo } from "@services/memoApi";
+import { updateMemo, saveMemo } from "@services/memoApi";
 
 const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
   const {
@@ -82,7 +82,7 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
   const settingButtonRef = useRef(null);
   const [isPenActive, setIsPenActive] = useState(false);
   const navigate = useNavigate();
-  const { note_name } = useNoteStore();
+  const { note_name, update_at } = useNoteStore();
   const [isFontSizeOpen, setIsFontSizeOpen] = useState(false);
   const fontSizeRef = useRef(null);
 
@@ -201,8 +201,16 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
       circle: stringifyDetail(circles),
       drawing: stringifyDetail(drawings()),
     };
+
     // console.log(data);
-    updateMemo(data);
+    if (update_at) {
+      // console.log("update memo");
+      updateMemo(data);
+    } else {
+      // console.log("save memo");
+      saveMemo(data);
+    }
+
     navigate("/");
   };
 
