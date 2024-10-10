@@ -92,14 +92,14 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
 
   // 1부터 64까지의 숫자 배열(폰트사이즈)
   const fontSizeOptions = Array.from({ length: 64 }, (_, index) => index + 1);
-  const { drawings } = canvasStore();
+  const { drawings, resetAllDrawings } = canvasStore();
   const { rectangles, circles, resetAllShapes } = shapeStore();
 
   const resetItems = () => {
     resetTextItems();
     resetAllShapes();
     setCurrentPage(1);
-    //드로잉
+    resetAllDrawings();
   };
 
   //도형모드 off -> 사각형 모드 -> 원 모드 -> 도형모드 off
@@ -206,10 +206,10 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
     // 메모 저장
     const data = {
       id: noteId,
-      text: stringifyDetail(textItems),
-      rectangle: stringifyDetail(rectangles),
-      circle: stringifyDetail(circles),
-      drawing: stringifyDetail(drawings()),
+      text: stringifyDetail(textItems) || {},
+      rectangle: stringifyDetail(rectangles) || {},
+      circle: stringifyDetail(circles) || {},
+      drawing: stringifyDetail(drawings()) || {},
     };
 
     // console.log(data);

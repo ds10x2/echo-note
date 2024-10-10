@@ -64,8 +64,8 @@ const DrawingEditor = ({ scale, page, readOnly }) => {
 
   const loadCanvasPaths = () => {
     const savedPaths = getCanvasPath(page);
+    canvasRef.current.clearCanvas();
     if (canvasRef.current && savedPaths) {
-      canvasRef.current.clearCanvas();
       const scaledPaths = savedPaths.map((path) => ({
         ...path,
         strokeWidth: path.strokeWidth * scale,

@@ -25,6 +25,7 @@ import { useAudioStore } from "@stores/recordStore";
 import { useNoteStore } from "@stores/noteStore";
 import textStore from "@/stores/textStore";
 import shapeStore from "@/stores/shapeStore";
+import canvasStore from "@stores/canvasStore";
 
 const AudioWave = () => {
   const containerRef = useRef(null);
@@ -42,11 +43,12 @@ const AudioWave = () => {
     useNoteStore();
   const { resetAllTimestamps: resetTextAllTimestamps } = textStore();
   const { resetAllTimestamps: resetShapeAllTimestamps } = shapeStore();
+  const { resetAllTimestamps: resetDrawingAllTimestamps } = canvasStore();
 
   const resetTimestamp = () => {
     resetTextAllTimestamps();
     resetShapeAllTimestamps();
-    //드로잉
+    resetDrawingAllTimestamps();
   };
 
   const { wavesurfer, currentTime } = useWavesurfer({
