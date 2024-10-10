@@ -14,7 +14,7 @@ import { useSearchStore } from "@stores/sideBarStore";
 import { useNoteStore } from "@stores/noteStore";
 
 const CORLER_HEX = [
-  "#B80000",
+  "#d30000",
   "#DB3E00",
   "#FCCB00",
   "#008B02",
@@ -60,10 +60,6 @@ const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
       setCurrentKeyword([...currentKeyword, tag]);
     }
   };
-
-  useEffect(() => {
-    console.log("useEffect keyword : ", currentKeyword);
-  }, [currentKeyword]);
 
   useEffect(() => {
     if (isOpen) {
