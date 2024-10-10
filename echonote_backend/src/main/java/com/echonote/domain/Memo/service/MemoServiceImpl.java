@@ -44,7 +44,7 @@ public class MemoServiceImpl implements MemoService {
         fieldsToUpdate.put("text", list.getText());
         fieldsToUpdate.put("rectangle", list.getRectangle());
         fieldsToUpdate.put("circle", list.getCircle());
-        fieldsToUpdate.put("drawing", list.getCircle());
+        fieldsToUpdate.put("drawing", list.getDrawing());
         
         for (Map.Entry<String, Map<String, List<MemoRequest.MemoText>>> entry : fieldsToUpdate.entrySet()) {
             String fieldName = entry.getKey();
@@ -59,7 +59,6 @@ public class MemoServiceImpl implements MemoService {
                         String updatePath = fieldName + "." + groupKey;
                         Query query = new Query(Criteria.where("_id").is(memoId)
                                 .and(updatePath).elemMatch(Criteria.where("id").is(memoText.getId())));
-
                         String updateDetail = memoText.getDetail();
 
                         Update update;
