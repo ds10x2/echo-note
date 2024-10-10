@@ -8,14 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -27,7 +21,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.client.RestTemplate;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -64,6 +57,9 @@ public class VoiceServiceImpl implements VoiceService {
 	private final VoiceRepository voiceRepository;
 	@Autowired
 	private final RestTemplate restTemplate;
+
+	@Value("${voice_analysis_server}")
+	String analysisServerUrl;  // 음성 분석 모델 API URL
 
 	private final Map<String, TwoFlaskResult> resultStore = new ConcurrentHashMap<>();
 
@@ -144,8 +140,6 @@ public class VoiceServiceImpl implements VoiceService {
 
 	// 음성 분석 모델에 보내기
 	private void sendAnalysisFlask(FlaskSendRequest flaskSendRequest) {
-		String flaskUrl = "https://cd41-222-107-238-124.ngrok-free.app/voice/analysis";  // 음성 분석 모델 API URL
-
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
@@ -154,7 +148,7 @@ public class VoiceServiceImpl implements VoiceService {
 		HttpEntity<FlaskSendRequest> entity = new HttpEntity<>(flaskSendRequest, headers);
 
 		// Flask 서버로 POST 요청 보내기
-		ResponseEntity<STTResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
+		ResponseEntity<STTResponse> response = restTemplate.exchange(analysisServerUrl, HttpMethod.POST, entity,
 			STTResponse.class);
 		
 		// 응답 처리 (필요에 따라)
