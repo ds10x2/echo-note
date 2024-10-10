@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { useEffect, useState, useRef } from "react";
 import {
   STTContainer,
@@ -11,6 +10,8 @@ import { useAudioStore } from "@stores/recordStore";
 import { getSTTResult } from "@services/sttApi";
 import { useSearchStore } from "@stores/sideBarStore";
 import { useNoteStore } from "@stores/noteStore";
+import LoadingIcon from "@components/common/LoadingIcon";
+import swal from "sweetalert";
 
 // 시간 포맷팅 함수 (초를 분:초로 변환)
 const formatTime = (seconds) => {
@@ -24,6 +25,7 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
   const [modifiedTexts, setModifiedTexts] = useState([]);
   const { setStartTime } = useAudioStore();
   const { note_id, record_path, stt_status, setSTTStatus } = useNoteStore();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     currentIndex,
@@ -31,6 +33,7 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
     currentKeyword,
     searchResults,
     isKeyword,
+    keywordColor,
   } = useSearchStore();
   const resultRefs = useRef([]);
   const resultListRef = useRef(null);
@@ -48,11 +51,12 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
       return;
     }
 
-    if (stt_status === "processing") {
+    if (stt_status === "done") {
       console.log("stt 불러옴");
       fetchData();
     } else if (stt_status === "processing") {
       console.log("stt 분석중");
+      setIsLoading(true);
       const eventSource = new EventSource(
         `${import.meta.env.VITE_API_URL}voice/sse?note_id=${note_id}`
       ); // notd_id를 키값으로 들고다님 반드시 필요!
@@ -69,7 +73,9 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
         console.log("STT 완료: ", event.data);
 
         eventSource.close();
-        alert("STT 완료!");
+        swal("STT 성공!", "STT분석이 완료되었어요", "success", {
+          button: "확인",
+        });
 
         setSTTStatus("done");
         fetchData();
@@ -89,6 +95,7 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
 
       // 컴포넌트 언마운트 시 SSE 연결 닫기
       return () => {
+        setIsLoading(false);
         eventSource.close();
         console.log("SSE 연결 종료");
       };
@@ -133,7 +140,7 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
                       part.toLowerCase() === keyword.toLowerCase()
                   )
                 ? {
-                    color: "lightgreen",
+                    color: keywordColor,
                     backgroundColor: "black",
                   }
                 : {}
@@ -156,7 +163,7 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
         start: segment.start,
         end: segment.end,
         text: newText,
-        anomaly: false,
+        anomaly: segment.anomaly,
       };
 
       const exists = modifiedTexts.find((item) => item.id === segmentId);
@@ -209,32 +216,51 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
 
   return (
     <STTContainer>
-      {sttData && sttData.length > 0 ? (
-        <STTResultList ref={resultListRef}>
-          {sttData.map((segment, index) => (
-            <STTResultItem
-              key={segment.id}
-              ref={(el) => (resultRefs.current[index] = el)} // 각 세그먼트 참조 저장
-            >
-              <ResultLink
-                onClick={() => setStartTime(Number(segment.start).toFixed(6))}
-              >
-                {formatTime(parseFloat(segment.start))} ~{" "}
-                {formatTime(parseFloat(segment.end))}
-              </ResultLink>
-              <ResultText
-                contentEditable={isEditMode}
-                onBlur={(e) => handleTextChange(segment.id, e.target.innerText)}
-                suppressContentEditableWarning={true} // Prevent warning
-                $isEditMode={isEditMode}
-              >
-                {highlightText(segment.text, index)} {/* 검색어 하이라이트 */}
-              </ResultText>
-            </STTResultItem>
-          ))}
-        </STTResultList>
+      {isLoading ? (
+        <LoadingIcon
+          text="STT분석이 진행중입니다"
+          style={{ paddingBottom: "10px" }}
+        />
       ) : (
-        <p>이곳에 텍스트가 들어갑니다. STT 관련 내용을 추가할 수 있습니다.</p>
+        <>
+          {sttData && sttData.length > 0 ? (
+            <STTResultList ref={resultListRef}>
+              {sttData.map((segment, index) => (
+                <STTResultItem
+                  key={segment.id}
+                  ref={(el) => (resultRefs.current[index] = el)} // 각 세그먼트 참조 저장
+                >
+                  <ResultLink
+                    onClick={() =>
+                      setStartTime(Number(segment.start).toFixed(6))
+                    }
+                  >
+                    {formatTime(parseFloat(segment.start))} ~{" "}
+                    {formatTime(parseFloat(segment.end))}
+                  </ResultLink>
+                  <ResultText
+                    contentEditable={isEditMode}
+                    onBlur={(e) =>
+                      handleTextChange(segment.id, e.target.innerText)
+                    }
+                    suppressContentEditableWarning={true} // Prevent warning
+                    $isEditMode={isEditMode}
+                    style={{
+                      fontWeight: segment.anomaly ? "bold" : "normal", // anomaly일 경우 bold 처리
+                    }}
+                  >
+                    {highlightText(segment.text, index)}{" "}
+                    {/* 검색어 하이라이트 */}
+                  </ResultText>
+                </STTResultItem>
+              ))}
+            </STTResultList>
+          ) : (
+            <p>
+              이곳에 텍스트가 들어갑니다. STT 관련 내용을 추가할 수 있습니다.
+            </p>
+          )}
+        </>
       )}
     </STTContainer>
   );
