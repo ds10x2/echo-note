@@ -8,6 +8,7 @@ import {
 } from "@components/styles/PdfSettingModal.style";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
+import { exportPdfWithTextAndShapes } from "@services/PDFSave/PdfSave";
 
 const PdfSettingModal = ({ isOpen, onClose, position, toggleAnalyzeModal }) => {
   const [animate, setAnimate] = useState(false);
@@ -28,6 +29,16 @@ const PdfSettingModal = ({ isOpen, onClose, position, toggleAnalyzeModal }) => {
 
   if (!animate && !visible) return null;
 
+  const handleExportPdf = async () => {
+    try {
+      await exportPdfWithTextAndShapes(); // PDF 내보내기 함수 호출
+      alert("PDF가 성공적으로 내보내졌습니다.");
+    } catch (error) {
+      console.error("PDF 내보내기 실패:", error);
+      alert("PDF 내보내기에 실패했습니다.");
+    }
+  };
+
   return (
     <ModalBackdrop
       className={isOpen ? "modal open" : "modal"}
@@ -47,7 +58,7 @@ const PdfSettingModal = ({ isOpen, onClose, position, toggleAnalyzeModal }) => {
         </ModalHeader>
         <ModalList>
           <ModalItem>태그</ModalItem>
-          <ModalItem>파일로 저장</ModalItem>
+          <ModalItem onClick={handleExportPdf}>파일로 저장</ModalItem>
           <ModalItem>손가락으로 그리기 켜기</ModalItem>
         </ModalList>
       </ModalContainer>
