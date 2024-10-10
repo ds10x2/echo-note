@@ -82,7 +82,7 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
   const settingButtonRef = useRef(null);
   const [isPenActive, setIsPenActive] = useState(false);
   const navigate = useNavigate();
-  const { note_name } = useNoteStore();
+  const { note_name, resetNoteStore } = useNoteStore();
   const [isFontSizeOpen, setIsFontSizeOpen] = useState(false);
   const fontSizeRef = useRef(null);
 
@@ -129,6 +129,7 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
   const moveNoteList = () => {
     navigate(-1);
     resetSidebarStore();
+    resetNoteStore();
   };
 
   const toggleAnalyzeModal = () => {
