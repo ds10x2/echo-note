@@ -31,67 +31,73 @@ public class MemoServiceImpl implements MemoService {
 
     // MongoDB에 메모 추가
     @Override
-    public void insertMemo(Memo list) {
-        memoRepository.insert(list);
+    public Memo saveMemo(Memo list) {
+        Memo result = memoRepository.save(list);
+
+        return result;
+
     }
+
 
     // 메모 업데이트
     @Override
-    public void updateMemo(Memo list) {
-        long memoId = list.getId();
+    public Memo updateMemo(Memo list) {
+            Memo result = memoRepository.save(list);
+            return result;
 
-        Map<String, Map<String, List<MemoRequest.MemoText>>> fieldsToUpdate = new HashMap<>();
-        fieldsToUpdate.put("text", list.getText());
-        fieldsToUpdate.put("rectangle", list.getRectangle());
-        fieldsToUpdate.put("circle", list.getCircle());
-        fieldsToUpdate.put("drawing", list.getCircle());
-        
-        for (Map.Entry<String, Map<String, List<MemoRequest.MemoText>>> entry : fieldsToUpdate.entrySet()) {
-            String fieldName = entry.getKey();
-            Map<String, List<MemoRequest.MemoText>> fieldValue = entry.getValue();
-
-            if (fieldValue != null) {
-                for (Map.Entry<String, List<MemoRequest.MemoText>> groupEntry : fieldValue.entrySet()) {
-                    String groupKey = groupEntry.getKey();
-                    List<MemoRequest.MemoText> memoTexts = groupEntry.getValue();
-
-                    for (MemoRequest.MemoText memoText : memoTexts) {
-                        String updatePath = fieldName + "." + groupKey;
-                        Query query = new Query(Criteria.where("_id").is(memoId)
-                                .and(updatePath).elemMatch(Criteria.where("id").is(memoText.getId())));
-
-                        String updateDetail = memoText.getDetail();
-
-                        Update update;
-                        if (updateDetail.isEmpty()) {
-                            // Delete the item if detail is empty
-                            update = new Update().pull(updatePath,
-                                    Query.query(Criteria.where("id").is(memoText.getId())));
-                        } else {
-                            // Update the item if detail is not empty
-                            update = new Update().set(updatePath + ".$.detail", updateDetail);
-                        }
-
-                        try {
-                            UpdateResult result = mongoTemplate.updateFirst(query, update, Memo.class);
-                            if (result.getMatchedCount() == 0 && !updateDetail.isEmpty()) {
-                                // If no matching document found and detail is not empty, add a new item
-                                Query addQuery = new Query(Criteria.where("_id").is(memoId));
-                                Update addUpdate = new Update().push(updatePath, memoText);
-                                mongoTemplate.updateFirst(addQuery, addUpdate, Memo.class);
-                                log.info("Added new item to " + fieldName + "." + groupKey + ": " + memoText);
-                            } else if (updateDetail.isEmpty()) {
-                                log.info("Deleted item from " + fieldName + "." + groupKey + ": " + memoText.getId());
-                            } else {
-                                log.info("Updated existing item in " + fieldName + "." + groupKey + ": " + memoText);
-                            }
-                        } catch (DataIntegrityViolationException e) {
-                            log.error("Memo data integrity violation for " + fieldName + ": " + e.getMessage());
-                        }
-                    }
-                }
-            }
-        }
+//        long memoId = list.getId();
+//
+//        Map<String, Map<String, List<MemoRequest.MemoText>>> fieldsToUpdate = new HashMap<>();
+//        fieldsToUpdate.put("text", list.getText());
+//        fieldsToUpdate.put("rectangle", list.getRectangle());
+//        fieldsToUpdate.put("circle", list.getCircle());
+//        fieldsToUpdate.put("drawing", list.getDrawing());
+//
+//        for (Map.Entry<String, Map<String, List<MemoRequest.MemoText>>> entry : fieldsToUpdate.entrySet()) {
+//            String fieldName = entry.getKey();
+//            Map<String, List<MemoRequest.MemoText>> fieldValue = entry.getValue();
+//
+//            if (fieldValue != null) {
+//                for (Map.Entry<String, List<MemoRequest.MemoText>> groupEntry : fieldValue.entrySet()) {
+//                    String groupKey = groupEntry.getKey();
+//                    List<MemoRequest.MemoText> memoTexts = groupEntry.getValue();
+//
+//                    for (MemoRequest.MemoText memoText : memoTexts) {
+//                        String updatePath = fieldName + "." + groupKey;
+//                        Query query = new Query(Criteria.where("_id").is(memoId)
+//                                .and(updatePath).elemMatch(Criteria.where("id").is(memoText.getId())));
+//                        String updateDetail = memoText.getDetail();
+//
+//                        Update update;
+//                        if (updateDetail.isEmpty()) {
+//                            // Delete the item if detail is empty
+//                            update = new Update().pull(updatePath,
+//                                    Query.query(Criteria.where("id").is(memoText.getId())));
+//                        } else {
+//                            // Update the item if detail is not empty
+//                            update = new Update().set(updatePath + ".$.detail", updateDetail);
+//                        }
+//
+//                        try {
+//                            UpdateResult result = mongoTemplate.updateFirst(query, update, Memo.class);
+//                            if (result.getMatchedCount() == 0 && !updateDetail.isEmpty()) {
+//                                // If no matching document found and detail is not empty, add a new item
+//                                Query addQuery = new Query(Criteria.where("_id").is(memoId));
+//                                Update addUpdate = new Update().push(updatePath, memoText);
+//                                mongoTemplate.updateFirst(addQuery, addUpdate, Memo.class);
+//                                log.info("Added new item to " + fieldName + "." + groupKey + ": " + memoText);
+//                            } else if (updateDetail.isEmpty()) {
+//                                log.info("Deleted item from " + fieldName + "." + groupKey + ": " + memoText.getId());
+//                            } else {
+//                                log.info("Updated existing item in " + fieldName + "." + groupKey + ": " + memoText);
+//                            }
+//                        } catch (DataIntegrityViolationException e) {
+//                            log.error("Memo data integrity violation for " + fieldName + ": " + e.getMessage());
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     // 메모 삭제하기(전체 삭제가 아니라 특정 메모만 삭제합니다.)
