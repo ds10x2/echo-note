@@ -1,9 +1,9 @@
 import { PDFDocument, rgb } from "pdf-lib";
 import * as fontkit from "fontkit";
-import textStore from "@stores/textStore";
-import shapeStore from "@stores/shapeStore";
-import pageStore from "@stores/pageStore";
-import canvasStore from "@stores/canvasStore";
+import textStore from "@stores/textStore"; // zustand store
+import shapeStore from "@stores/shapeStore"; // zustand store
+import pageStore from "@stores/pageStore"; // zustand store
+import canvasStore from "@stores/canvasStore"; // zustand store
 import fontUrl from "@fonts/SUIT-Medium.ttf"; // 한글 TTF 폰트 경로
 
 // 헥사코드를 RGB로 변환하는 함수
@@ -15,6 +15,26 @@ const hexToRGB = (hex) => {
   return rgb(r / 255, g / 255, b / 255);
 };
 
+// 가장 가까운 originSize를 찾는 함수
+const findClosestOriginSize = (pdfWidth, pdfHeight, originSizes) => {
+  let closestPage = null;
+  let closestDiff = Infinity;
+
+  for (const [pageNum, size] of Object.entries(originSizes)) {
+    const widthDiff = Math.abs(size.width - pdfWidth);
+    const heightDiff = Math.abs(size.height - pdfHeight);
+    const totalDiff = widthDiff + heightDiff;
+
+    if (totalDiff < closestDiff) {
+      closestDiff = totalDiff;
+      closestPage = size;
+    }
+  }
+
+  return closestPage;
+};
+
+// 텍스트, 도형, 그린 경로를 저장하는 서비스 함수
 export const exportPdfWithTextAndShapes = async () => {
   try {
     const pdfUrl = pageStore.getState().url;
@@ -28,99 +48,102 @@ export const exportPdfWithTextAndShapes = async () => {
     const customFont = await pdfDoc.embedFont(fontBytes);
 
     const pages = pdfDoc.getPages();
-    const currentPage = pageStore.getState().currentPage - 1;
-    const page = pages[currentPage];
-
     const totalPages = pages.length; // 전체 페이지 수 가져오기
-
-    const textItems = textStore.getState().getCurrentPageItems();
-    const rectangles = shapeStore.getState().getRectangles();
-    const circles = shapeStore.getState().getCircles();
-
     const scale = pageStore.getState().scale;
-    const originSize = pageStore.getState().originSize; // 원본 크기 가져오기
+    const originSizes = pageStore.getState().originSizes; // 각 페이지별 originSize 가져오기
 
-    const pdfWidth = page.getWidth(); // PDF 페이지의 실제 너비
-    const pdfHeight = page.getHeight(); // PDF 페이지의 실제 높이
-
-    // 원본 크기와 PDF 크기 비교
-    const widthRatio = pdfWidth / originSize.width;
-    const heightRatio = pdfHeight / originSize.height;
-
-    // 텍스트 아이템을 PDF 페이지에 추가
-    textItems.forEach((item) => {
-      const { x, y, text } = item.detail;
-      page.drawText(text, {
-        x: (x / scale) * widthRatio, // 비율에 맞게 위치 조정
-        y: ((originSize.height - y) / scale) * heightRatio, // y좌표 변환 (PDF 좌표계 고려)
-        size: (12 / scale) * Math.min(widthRatio, heightRatio), // 텍스트 크기 조정
-        font: customFont,
-        color: rgb(0, 0, 0),
-      });
-    });
-
-    // 사각형을 PDF 페이지에 추가
-    rectangles.forEach((rect) => {
-      const { x, y, width, height, property } = rect.detail;
-      const strokeColor = hexToRGB(property.strokeColor);
-      const fillColor = property.fill
-        ? hexToRGB(property.fillColor)
-        : undefined;
-
-      const borderWidth = property.stroke
-        ? (Number(property.strokeWidth) / scale) *
-          Math.min(widthRatio, heightRatio)
-        : 0;
-
-      page.drawRectangle({
-        x: (x / scale) * widthRatio,
-        y: ((originSize.height - y - height) / scale) * heightRatio, // y좌표 변환
-        width: (width / scale) * widthRatio, // width 보정
-        height: (height / scale) * heightRatio, // height 보정
-        borderWidth: borderWidth,
-        borderColor: strokeColor,
-        color: fillColor,
-      });
-    });
-
-    // 원을 PDF 페이지에 추가
-    circles.forEach((circle) => {
-      const { cx, cy, r, property } = circle.detail;
-      const strokeColor = hexToRGB(property.strokeColor);
-      const fillColor = property.fill
-        ? hexToRGB(property.fillColor)
-        : undefined;
-
-      const borderWidth = property.stroke
-        ? (Number(property.strokeWidth) / scale) *
-          Math.min(widthRatio, heightRatio)
-        : 0;
-
-      page.drawCircle({
-        x: (cx / scale) * widthRatio,
-        y: ((originSize.height - cy) / scale) * heightRatio, // y좌표 변환
-        size: (r / scale) * Math.min(widthRatio, heightRatio), // 원 크기 보정
-        borderWidth: borderWidth,
-        borderColor: strokeColor,
-        color: fillColor,
-      });
-    });
-
+    // 모든 페이지에 대해 텍스트, 도형, 필기 데이터를 추가
     for (let i = 0; i < totalPages; i++) {
       const page = pages[i];
-      const drawings = canvasStore.getState().getCanvasPath(i + 1); // i번째 페이지의 그린 경로 가져오기
-
       const pdfWidth = page.getWidth(); // PDF 페이지의 실제 너비
       const pdfHeight = page.getHeight(); // PDF 페이지의 실제 높이
+      let originSize = originSizes[i + 1]; // 현재 페이지의 originSize 가져오기
+
+      // originSize가 없는 경우 가장 가까운 사이즈로 추정
+      if (!originSize) {
+        originSize = findClosestOriginSize(pdfWidth, pdfHeight, originSizes);
+        if (!originSize) {
+          console.warn(`Cannot find suitable originSize for page ${i + 1}`);
+          continue;
+        }
+      }
 
       // 원본 크기와 PDF 크기 비교
       const widthRatio = pdfWidth / originSize.width;
       const heightRatio = pdfHeight / originSize.height;
 
-      // 그린 경로를 PDF에 추가
+      // 텍스트 아이템 가져오기 및 PDF에 추가
+      const textItems = textStore.getState().getCurrentPageItems(i + 1);
+      if (textItems && textItems.length > 0) {
+        textItems.forEach((item) => {
+          const { x, y, text } = item.detail;
+          page.drawText(text, {
+            x: (x / scale) * widthRatio, // 비율에 맞게 위치 조정
+            y: ((originSize.height - y) / scale) * heightRatio, // y좌표 변환 (PDF 좌표계 고려)
+            size: (12 / scale) * Math.min(widthRatio, heightRatio), // 텍스트 크기 조정
+            font: customFont,
+            color: rgb(0, 0, 0),
+          });
+        });
+      }
+
+      // 도형 아이템 가져오기 및 PDF에 추가
+      const rectangles = shapeStore.getState().getRectangles(i + 1);
+      const circles = shapeStore.getState().getCircles(i + 1);
+
+      if (rectangles && rectangles.length > 0) {
+        rectangles.forEach((rect) => {
+          const { x, y, width, height, property } = rect.detail;
+          const strokeColor = hexToRGB(property.strokeColor);
+          const fillColor = property.fill
+            ? hexToRGB(property.fillColor)
+            : undefined;
+
+          const borderWidth = property.stroke
+            ? (Number(property.strokeWidth) / scale) *
+              Math.min(widthRatio, heightRatio)
+            : 0;
+
+          page.drawRectangle({
+            x: (x / scale) * widthRatio,
+            y: ((originSize.height - y - height) / scale) * heightRatio, // y좌표 변환
+            width: (width / scale) * widthRatio, // width 보정
+            height: (height / scale) * heightRatio, // height 보정
+            borderWidth: borderWidth,
+            borderColor: strokeColor,
+            color: fillColor,
+          });
+        });
+      }
+
+      if (circles && circles.length > 0) {
+        circles.forEach((circle) => {
+          const { cx, cy, r, property } = circle.detail;
+          const strokeColor = hexToRGB(property.strokeColor);
+          const fillColor = property.fill
+            ? hexToRGB(property.fillColor)
+            : undefined;
+
+          const borderWidth = property.stroke
+            ? (Number(property.strokeWidth) / scale) *
+              Math.min(widthRatio, heightRatio)
+            : 0;
+
+          page.drawCircle({
+            x: (cx / scale) * widthRatio,
+            y: ((originSize.height - cy) / scale) * heightRatio, // y좌표 변환
+            size: (r / scale) * Math.min(widthRatio, heightRatio), // 원 크기 보정
+            borderWidth: borderWidth,
+            borderColor: strokeColor,
+            color: fillColor,
+          });
+        });
+      }
+
+      // 그린 경로 추가
+      const drawings = canvasStore.getState().getCanvasPath(i + 1);
       if (drawings && drawings.length > 0) {
         drawings.forEach((path) => {
-          // 각 점을 선으로 연결하여 경로 그리기
           for (let j = 0; j < path.paths.length - 1; j++) {
             const startX = (path.paths[j].x / scale) * widthRatio;
             const startY =
@@ -129,7 +152,6 @@ export const exportPdfWithTextAndShapes = async () => {
             const endY =
               ((originSize.height - path.paths[j + 1].y) / scale) * heightRatio;
 
-            // PDF에 선을 그리기
             page.drawLine({
               start: { x: startX, y: startY },
               end: { x: endX, y: endY },

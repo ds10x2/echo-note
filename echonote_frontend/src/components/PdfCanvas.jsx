@@ -124,9 +124,12 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
     onResize(canvasSize.width, canvasSize.height);
   }, [canvasSize]);
 
+  // 각 페이지의 originSize 저장
   useEffect(() => {
-    setOriginSize(originalSize.width, originalSize.height);
-  }, [originalSize]);
+    if (originalSize.width && originalSize.height) {
+      setOriginSize(currentPage, originalSize.width, originalSize.height);
+    }
+  }, [originalSize, currentPage, setOriginSize]);
 
   return (
     <St.PdfCanvasContainer width={canvasSize.width} height={canvasSize.height}>
