@@ -77,8 +77,6 @@ public class NoteServiceImpl implements NoteService {
 			.id(noteId)
 			.keywords(noteCreateRequest.getKeywords()).build();
 
-		System.out.println("Add Note에서 키워드 출력 : " + keyword.toString());
-
 		keywordRepository.save(keyword);
 
 		return res;
