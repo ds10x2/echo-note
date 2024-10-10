@@ -5,7 +5,7 @@ import * as St from "@components/common/LoadingIcon.style";
 const LoadingIcon = () => {
   return (
     <St.LoadingIconContainer>
-      <h3>PDF를 가져오고 있어요</h3>
+      <St.LoadingText>PDF를 가져오고 있어요</St.LoadingText>
       <MoonLoader color="#FF900D" />
     </St.LoadingIconContainer>
   );

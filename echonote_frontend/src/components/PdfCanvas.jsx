@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import * as St from "./styles/PdfCanvas.style";
 import * as pdfjsLib from "pdfjs-dist";
 import PdfEditor from "@components/PdfEditor";
-import pageStore from "@/stores/pageStore"; // zustand 스토어 가져오기
+import pageStore from "@/stores/pageStore"; // zustand의 상태와 액션 가져오기
 import DrawingEditor from "@components/DrawingEditor";
 import drawingTypeStore from "@/stores/drawingTypeStore";
+import LoadingIcon from "@components/common/LoadingIcon"; // 로딩 아이콘
 
 const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
   const canvasRef = useRef();
@@ -15,11 +16,13 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
+  const [isRendering, setIsRendering] = useState(true); // 렌더링 상태 추가
   const { mode } = drawingTypeStore();
 
   const renderPage = useCallback(
     (pageNum, pdf = pdfRef) => {
-      if (pdf && containerRef.current) {
+      if (pdf && containerRef.current && canvasRef.current) {
+        setIsRendering(true); // 렌더링 시작 시 true로 설정
         pdf.getPage(pageNum).then((page) => {
           const containerWidth = containerRef.current.clientWidth;
           const containerHeight = containerRef.current.clientHeight;
@@ -34,39 +37,44 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
           });
 
           const canvas = canvasRef.current;
-          canvas.height = scaledViewport.height;
-          canvas.width = scaledViewport.width;
 
-          setCanvasSize({
-            width: scaledViewport.width,
-            height: scaledViewport.height,
-          });
+          if (canvas) {
+            canvas.height = scaledViewport.height;
+            canvas.width = scaledViewport.width;
 
-          setOriginalSize({
-            width: scaledViewport.width / scale,
-            height: scaledViewport.height / scale,
-          });
-
-          const renderContext = {
-            canvasContext: canvas.getContext("2d"),
-            viewport: scaledViewport,
-          };
-
-          if (renderTaskRef.current) {
-            renderTaskRef.current.cancel();
-          }
-
-          renderTaskRef.current = page.render(renderContext);
-
-          renderTaskRef.current.promise
-            .then(() => {
-              renderTaskRef.current = null;
-            })
-            .catch((err) => {
-              if (err.name !== "RenderingCancelledException") {
-                console.error(err);
-              }
+            setCanvasSize({
+              width: scaledViewport.width,
+              height: scaledViewport.height,
             });
+
+            setOriginalSize({
+              width: scaledViewport.width / scale,
+              height: scaledViewport.height / scale,
+            });
+
+            const renderContext = {
+              canvasContext: canvas.getContext("2d"),
+              viewport: scaledViewport,
+            };
+
+            if (renderTaskRef.current) {
+              renderTaskRef.current.cancel();
+            }
+
+            renderTaskRef.current = page.render(renderContext);
+
+            renderTaskRef.current.promise
+              .then(() => {
+                setIsRendering(false); // 렌더링 완료 후 false로 설정
+                renderTaskRef.current = null;
+              })
+              .catch((err) => {
+                setIsRendering(false); // 오류 발생 시에도 false로 설정
+                if (err.name !== "RenderingCancelledException") {
+                  console.error(err);
+                }
+              });
+          }
         });
       }
     },
@@ -75,7 +83,9 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
 
   // currentPage, scale이 바뀔 때마다 페이지 렌더링
   useEffect(() => {
-    renderPage(currentPage, pdfRef);
+    if (pdfRef) {
+      renderPage(currentPage, pdfRef);
+    }
   }, [currentPage, pdfRef, scale, renderPage]);
 
   // PDF 로드 후 페이지 설정
@@ -85,12 +95,14 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
 
   // PDF 문서를 로드
   useEffect(() => {
+    setIsRendering(true); // PDF 로드 시작 시 렌더링 true로 설정
     const loadingTask = pdfjsLib.getDocument(url);
     loadingTask.promise.then(
       (loadedPdf) => {
         setPdfRef(loadedPdf);
       },
       (err) => {
+        setIsRendering(false); // 오류 발생 시 렌더링 false로 설정
         console.error(err);
       }
     );
@@ -103,17 +115,28 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
   return (
     <St.PdfCanvasContainer width={canvasSize.width} height={canvasSize.height}>
       <div style={{ margin: "10px" }}>
+        {/* canvas는 항상 DOM에 렌더링되며, isRendering에 따라 로딩 아이콘을 표시 */}
         <canvas ref={canvasRef}></canvas>
-        <PdfEditor
-          scale={scale}
-          originalSize={originalSize}
-          currentPage={currentPage}
-          containerRef={containerRef}
-        />
-        {mode.pen ? (
-          <DrawingEditor scale={scale} page={currentPage} readOnly={false} />
+        {isRendering ? (
+          <LoadingIcon /> // 로딩 중일 때 로딩 아이콘 표시
         ) : (
-          <DrawingEditor scale={scale} page={currentPage} readOnly={true} />
+          <>
+            <PdfEditor
+              scale={scale}
+              originalSize={originalSize}
+              currentPage={currentPage}
+              containerRef={containerRef}
+            />
+            {mode.pen ? (
+              <DrawingEditor
+                scale={scale}
+                page={currentPage}
+                readOnly={false}
+              />
+            ) : (
+              <DrawingEditor scale={scale} page={currentPage} readOnly={true} />
+            )}
+          </>
         )}
       </div>
     </St.PdfCanvasContainer>
