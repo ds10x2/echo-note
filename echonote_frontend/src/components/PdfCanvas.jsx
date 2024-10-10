@@ -7,6 +7,7 @@ import DrawingEditor from "@components/DrawingEditor";
 import { DrawingEditorContainer } from "@components/styles/DrawingEditor.style";
 import canvasStore from "@stores/canvasStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
+import { useNoteStore } from "@stores/noteStore";
 
 const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened, onResize }) => {
   const canvasRef = useRef();
@@ -18,9 +19,10 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened, onResize }) => {
   const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
   const { mode } = drawingTypeStore();
+  const { pdf_path } = useNoteStore();
 
-  const sampleUrl =
-    "https://timeisnullnull.s3.ap-northeast-2.amazonaws.com/le_Petit_Prince_%EB%B3%B8%EB%AC%B8.pdf";
+  // const pdf_path =
+  //   "https://timeisnullnull.s3.ap-northeast-2.amazonaws.com/le_Petit_Prince_%EB%B3%B8%EB%AC%B8.pdf";
 
   const renderPage = useCallback(
     (pageNum, pdf = pdfRef) => {
@@ -90,16 +92,23 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened, onResize }) => {
 
   // PDF 문서를 로드
   useEffect(() => {
-    const loadingTask = pdfjsLib.getDocument(sampleUrl);
-    loadingTask.promise.then(
-      (loadedPdf) => {
-        setPdfRef(loadedPdf);
-      },
-      (err) => {
-        console.error(err);
-      }
-    );
-  }, [url]);
+    if (pdf_path) {
+      const loadingTask = pdfjsLib.getDocument(pdf_path);
+      loadingTask.promise.then(
+        (loadedPdf) => {
+          setPdfRef(loadedPdf);
+        },
+        (err) => {
+          if (err.name === "InvalidPDFException") {
+            console.error("유효하지 않은 PDF 파일입니다:" + pdf_path);
+            alert("유효하지 않은 PDF 파일입니다. 다른 파일을 시도해 주세요.");
+          } else {
+            console.error("PDF 로드 중 오류 발생:", err);
+          }
+        }
+      );
+    }
+  }, [pdf_path]);
 
   useEffect(() => {
     onResize(canvasSize.width, canvasSize.height);
