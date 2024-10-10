@@ -13,6 +13,7 @@ export const STTBarContainer = styled.div.withConfig({
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
   overflow: hidden; // 부모 너비가 줄어들 때 내부 콘텐츠가 잘리도록
   transition: width 0.3s ease; // 부드럽게 너비가 변화
+  z-index: 10;
 `;
 
 // 헤더 스타일
