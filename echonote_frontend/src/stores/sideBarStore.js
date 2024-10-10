@@ -31,8 +31,9 @@ const useSearchStore = create((set) => ({
   isKeyword: false,
   toggleKeyword: () => set((state) => ({ isKeyword: !state.isKeyword })),
 
-  sttKeyword: ["비극", "영하", "음질"],
-  setSTTKeywords: (keywords) => set({ sttKeyword: keywords }),
+  keywordColor: "#B80000",
+  setKeywordColor: (color) => set({ keywordColor: color }),
+
   currentKeyword: [],
   setCurrentKeyword: (keywords) => set({ currentKeyword: keywords }),
 }));

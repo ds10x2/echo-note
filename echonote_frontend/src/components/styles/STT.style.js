@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const STTContainer = styled.div`
   margin: 0;
   padding: 0;
-  height: 550px;
+  height: 570px;
   overflow-y: scroll;
   -ms-overflow-style: none;
   scrollbar-width: none;

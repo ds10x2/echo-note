@@ -16,4 +16,5 @@ export const LoadingIconContainer = styled.div`
 export const LoadingText = styled.h3`
   width: 300px;
   text-align: center;
+  color: #424242;
 `;

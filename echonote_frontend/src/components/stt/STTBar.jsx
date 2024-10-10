@@ -19,7 +19,7 @@ const STTBar = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [modifiedTexts, setModifiedTexts] = useState([]);
 
-  const { currentIndex, setCurrentIndex, searchResults } = useSearchStore();
+  const { setCurrentIndex } = useSearchStore();
   const { note_id } = useNoteStore();
 
   const handleSearch = (term) => {

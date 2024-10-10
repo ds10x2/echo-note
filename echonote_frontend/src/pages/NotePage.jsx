@@ -18,7 +18,7 @@ const NotePage = () => {
   const { id } = useParams();
   const [isDrawingEditorOpened, setIsDrawingEditorOpened] = useState(false);
   const [isToolBarCollapsed, setIsToolBarCollapsed] = useState(false); // ToolBar 접힘 상태 관리
-  const { setNoteDetail } = useNoteStore();
+  const { setNoteDetail, keywords } = useNoteStore();
   const { loadTextItems } = textStore();
   const { loadRectangles, loadCircles } = shapeStore();
   const { loadDrawings } = canvasStore();

@@ -137,7 +137,7 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
         {/* canvas는 항상 DOM에 렌더링되며, isRendering에 따라 로딩 아이콘을 표시 */}
         <canvas ref={canvasRef}></canvas>
         {isRendering ? (
-          <LoadingIcon /> // 로딩 중일 때 로딩 아이콘 표시
+          <LoadingIcon text="PDF를 가져오고 있어요" /> // 로딩 중일 때 로딩 아이콘 표시
         ) : (
           <>
             <PdfEditor
