@@ -22,10 +22,14 @@ const canvasStore = create((set, get) => ({
   },
 
   // 저장된 경로 데이터를 불러오는 함수
-  getCanvasPath: (page) => get().savedCanvasPaths[page] || null,
+  getCanvasPath: (page) => {
+    return get().savedCanvasPaths?.[page] || [];
+  },
 
   // 저장된 녹음 시간을 불러오는 함수
-  getCanvasRecords: (page) => get().savedCanvasRecords[page] || [],
+  getCanvasRecords: (page) => {
+    return get().savedCanvasRecords?.[page] || [];
+  },
 
   // 선택된 시간 중 가장 빠른 값을 반환하는 함수
   getMinRecordingTime: (page, indices) => {
@@ -48,7 +52,10 @@ const canvasStore = create((set, get) => ({
           savedCanvasPaths[page],
         ];
         const newUndoStack = pageUndoStack.slice(0, -1);
-        const previousPath = newUndoStack[newUndoStack.length - 1] || null;
+        const previousPath =
+          newUndoStack.length > 0
+            ? newUndoStack[newUndoStack.length - 1]
+            : null;
 
         return {
           savedCanvasPaths: { ...savedCanvasPaths, [page]: previousPath },
@@ -122,16 +129,38 @@ const canvasStore = create((set, get) => ({
 
     if (data) {
       Object.keys(data).forEach((page) => {
-        newCanvasPaths[page] = data[page].map((item) => item.detail.paths);
-        newCanvasRecords[page] = data[page].map(
-          (item) => item.detail.timestamp
-        );
+        if (data[page]) {
+          newCanvasPaths[page] = data[page].map((item) => item.detail.paths);
+          newCanvasRecords[page] = data[page].map(
+            (item) => item.detail.timestamp
+          );
+        }
       });
     }
 
     set(() => ({
       savedCanvasPaths: newCanvasPaths,
       savedCanvasRecords: newCanvasRecords,
+    }));
+  },
+
+  resetAllTimestamps: () => {
+    const { savedCanvasRecords } = get();
+    const newRecords = {};
+
+    Object.keys(savedCanvasRecords).forEach((page) => {
+      newRecords[page] = savedCanvasRecords[page].map(() => 0);
+    });
+
+    set(() => ({
+      savedCanvasRecords: newRecords,
+    }));
+  },
+
+  resetAllDrawings: () => {
+    set(() => ({
+      savedCanvasPaths: null,
+      savedCanvasRecords: null,
     }));
   },
 }));

@@ -61,7 +61,7 @@ public class VoiceServiceImpl implements VoiceService {
 	String analysisServerUrl;  // 음성 분석 모델 API URL
 
 //	@Value("${STT_flask_Url}")
-	String STTflaskUrl= "https://d3b9-34-125-118-154.ngrok-free.app/voice_stt/stt";
+	String STTflaskUrl= "https://c0f5-34-87-129-244.ngrok-free.app/voice_stt/stt";
 
 	private final Map<String, TwoFlaskResult> resultStore = new ConcurrentHashMap<>();
 
@@ -224,11 +224,19 @@ public class VoiceServiceImpl implements VoiceService {
 					aIdx++;
 					sttIdx++;
 				}
-				
+
+				if(sttIdx >= sttRequest.size() || aIdx >= anomalyTimes.size())
+					break;
+
+
 				// 현재 문장이 이상 지점보다 이전에 있다면 다음 문장을 탐색
-				if( Float.parseFloat(sttRequest.get(sttIdx).getEnd()) <
+				if(  Float.parseFloat(sttRequest.get(sttIdx).getEnd()) <
 					Float.parseFloat(anomalyTimes.get(aIdx)) )
 					sttIdx++;
+
+				if(sttIdx >= sttRequest.size())
+					break;
+
 				
 				// 이상 지점이 현재 문장보다 이전에 있다면 다음 이상 지점을 탐색
 				if( Float.parseFloat(anomalyTimes.get(aIdx)) <

@@ -54,17 +54,17 @@ const NotePage = () => {
         if (!memoData) return;
 
         // 각 메모 요소로 전달
-        if (memoData.text || memoData.text.length > 0) {
-          loadTextItems(parseDetail(memoData.text));
+        if (memoData.text) {
+          loadTextItems(parseDetail(memoData.text) || {});
         }
-        if (memoData.rectangle || memoData.rectangle.length > 0) {
-          loadRectangles(parseDetail(memoData.rectangle));
+        if (memoData.rectangle) {
+          loadRectangles(parseDetail(memoData.rectangle) || {});
         }
-        if (memoData.circle || memoData.circle.length > 0) {
-          loadCircles(parseDetail(memoData.circle));
+        if (memoData.circle) {
+          loadCircles(parseDetail(memoData.circle) || {});
         }
-        if (memoData.drawing || memoData.drawing.length > 0) {
-          loadDrawings(parseDetail(memoData.drawing));
+        if (memoData.drawing) {
+          loadDrawings(parseDetail(memoData.drawing) || {});
         }
       } catch (error) {
         console.error("Error fetching memo:", error);
@@ -90,6 +90,7 @@ const NotePage = () => {
           newObj.detail = JSON.parse(newObj.detail);
         } catch (error) {
           console.error("Invalid JSON string in 'detail':", newObj.detail);
+          newObj.detail = {}; // 기본값 설정
         }
       }
 
