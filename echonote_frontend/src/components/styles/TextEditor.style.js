@@ -49,20 +49,20 @@ export const TextBox = styled.div
     isSelected &&
     `
       border: 1px solid ${theme.colors.textSelectedStrokeColor};
-      border-radius: 4px;
-      box-shadow: 0 0 5px ${theme.colors.textSelectedStrokeColor};
+      border-radius: 2px;
+      box-shadow: 0 0 3px ${theme.colors.textSelectedStrokeColor};
       animation: subtlePulse 1.5s infinite;
     `}
 
   @keyframes subtlePulse {
     0% {
-      box-shadow: 0 0 5px ${theme.colors.textSelectedStrokeColor};
+      box-shadow: 0 0 2px ${theme.colors.textSelectedStrokeColor};
     }
     50% {
-      box-shadow: 0 0 8px ${theme.colors.textSelectedStrokeColor};
+      box-shadow: 0 0 4px ${theme.colors.textSelectedStrokeColor};
     }
     100% {
-      box-shadow: 0 0 5px ${theme.colors.textSelectedStrokeColor};
+      box-shadow: 0 0 6px ${theme.colors.textSelectedStrokeColor};
     }
   }
 `;
@@ -71,13 +71,15 @@ export const TextArea = styled.textarea`
   font-size: ${({ fontSize }) => fontSize || 16}px;
   padding: 4px;
   background-color: transparent;
-  outline: none;
   resize: none;
   user-select: none;
-  border: none;
+  border: 1px dotted #000; /* 점선 외곽선 */
+  outline: none; /* 기본 외곽선 제거 */
   border-radius: 4px;
   line-height: 1.5;
   transition: all 0.2s ease-in-out;
+  min-width: 200px;
+  min-height: ${({ fontSize }) => fontSize || 16}px;
 `;
 
 export const TextDetail = styled.div`
