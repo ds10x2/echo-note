@@ -11,6 +11,7 @@ export const ToolBarContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 10px 0px;
+  z-index: 15;
 `;
 
 // 상단 제목과 접기 버튼을 담은 헤더 영역

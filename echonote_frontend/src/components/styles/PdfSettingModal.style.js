@@ -9,7 +9,7 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1;
+  z-index: 15;
   animation: fadeOut 0.2s ease-out forwards; // 닫기 애니메이션
 
   &.open {
