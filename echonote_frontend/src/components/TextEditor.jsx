@@ -94,16 +94,18 @@ const TextEditor = ({
     (e) => {
       if (isDraggingRef.current || hasDraggedRef.current) return;
 
-      const clientX = e.touches[0].clientX;
-      const clientY = e.touches[0].clientY;
+      // 터치 좌표를 pageX, pageY로 변경
+      const clientX = e.touches[0].pageX;
+      const clientY = e.touches[0].pageY;
 
       const containerRect = containerRef.current.getBoundingClientRect();
-      const parentScrollLeft = parentContainerRef.current.scrollLeft;
-      const parentScrollTop = parentContainerRef.current.scrollTop;
 
-      const x = (clientX + parentScrollLeft - containerRect.left) / scale;
-      const y = (clientY + parentScrollTop - containerRect.top) / scale;
+      // pageX, pageY는 전체 문서 기준 좌표이므로 스크롤 값은 따로 고려할 필요 없음
+      // 확대/축소만 적용
+      const x = (clientX - containerRect.left) / scale;
+      const y = (clientY - containerRect.top) / scale;
 
+      // 새로운 텍스트 박스를 추가
       addTextItem({
         id: Date.now(),
         detail: {
@@ -119,6 +121,7 @@ const TextEditor = ({
         },
       });
 
+      // 새 텍스트 박스를 추가한 후 선택된 텍스트 해제
       setSelectedText(null);
     },
     [
@@ -145,8 +148,10 @@ const TextEditor = ({
           ) {
             return;
           }
+          // 텍스트 박스를 선택하는 로직
           setSelectedText(clickedItemId);
         } else {
+          // 텍스트 박스가 아닌 곳을 터치하면 새 텍스트 박스를 추가
           handleAddTextBox(e);
         }
       }
