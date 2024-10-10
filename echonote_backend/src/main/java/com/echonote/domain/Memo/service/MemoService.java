@@ -6,10 +6,10 @@ import java.util.List;
 
 public interface MemoService {
     // MongoDB에 메모 추가
-    void insertMemo(Memo list);
+    Memo saveMemo(Memo list);
 
     // 메모 업데이트
-    void updateMemo(Memo list);
+    Memo updateMemo(Memo list);
 
     // 메모 삭제하기
     void deleteMemo(long id, List<Long> memoId);
