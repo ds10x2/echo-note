@@ -175,36 +175,36 @@ const TextEditor = ({
       return;
     }
 
-    isDraggingRef.current = true;
-    hasDraggedRef.current = false;
+    // isDraggingRef.current = true;
+    // hasDraggedRef.current = false;
     setSelectedText(id);
 
-    const clientX = e.touches[0].clientX;
-    const clientY = e.touches[0].clientY;
+    // const clientX = e.touches[0].clientX;
+    // const clientY = e.touches[0].clientY;
 
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const parentScrollLeft = parentContainerRef.current.scrollLeft;
-    const parentScrollTop = parentContainerRef.current.scrollTop;
+    // const containerRect = containerRef.current.getBoundingClientRect();
+    // const parentScrollLeft = parentContainerRef.current.scrollLeft;
+    // const parentScrollTop = parentContainerRef.current.scrollTop;
 
-    // Scale 적용: 좌표 계산 시 스케일을 명확히 반영
-    const x = (clientX + parentScrollLeft - containerRect.left) / scale;
-    const y = (clientY + parentScrollTop - containerRect.top) / scale;
+    // // Scale 적용: 좌표 계산 시 스케일을 명확히 반영
+    // const x = (clientX + parentScrollLeft - containerRect.left) / scale;
+    // const y = (clientY + parentScrollTop - containerRect.top) / scale;
 
-    const offsetX = x - nowItem.detail.x;
-    const offsetY = y - nowItem.detail.y;
+    // const offsetX = x - nowItem.detail.x;
+    // const offsetY = y - nowItem.detail.y;
 
-    setCurItems((items) =>
-      items.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              detail: { ...item.detail, isDragging: true, offsetX, offsetY },
-            }
-          : item
-      )
-    );
+    // setCurItems((items) =>
+    //   items.map((item) =>
+    //     item.id === id
+    //       ? {
+    //           ...item,
+    //           detail: { ...item.detail, isDragging: true, offsetX, offsetY },
+    //         }
+    //       : item
+    //   )
+    // );
 
-    document.body.style.userSelect = "none";
+    // document.body.style.userSelect = "none";
   };
 
   const handleTouchMove = (e) => {
@@ -293,16 +293,16 @@ const TextEditor = ({
     }
   }, [updatedItems]);
 
-  useEffect(() => {
-    const container = containerRef.current;
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
-    window.addEventListener("touchend", handleTouchEnd);
+  // useEffect(() => {
+  //   const container = containerRef.current;
+  //   window.addEventListener("touchmove", handleTouchMove, { passive: false });
+  //   window.addEventListener("touchend", handleTouchEnd);
 
-    return () => {
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener("touchmove", handleTouchMove);
+  //     window.removeEventListener("touchend", handleTouchEnd);
+  //   };
+  // }, []);
 
   const handleKeyDown = (e, id) => {
     if (e.key === "Enter") {
