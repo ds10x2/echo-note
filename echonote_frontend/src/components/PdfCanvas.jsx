@@ -124,12 +124,9 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
     onResize(canvasSize.width, canvasSize.height);
   }, [canvasSize]);
 
-  // 각 페이지의 originSize 저장
   useEffect(() => {
-    if (originalSize.width && originalSize.height) {
-      setOriginSize(currentPage, originalSize.width, originalSize.height);
-    }
-  }, [originalSize, currentPage, setOriginSize]);
+    setOriginSize(originalSize.width, originalSize.height);
+  }, [originalSize]);
 
   return (
     <St.PdfCanvasContainer width={canvasSize.width} height={canvasSize.height}>
@@ -137,7 +134,7 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
         {/* canvas는 항상 DOM에 렌더링되며, isRendering에 따라 로딩 아이콘을 표시 */}
         <canvas ref={canvasRef}></canvas>
         {isRendering ? (
-          <LoadingIcon text="PDF를 가져오고 있어요" /> // 로딩 중일 때 로딩 아이콘 표시
+          <LoadingIcon /> // 로딩 중일 때 로딩 아이콘 표시
         ) : (
           <>
             <PdfEditor

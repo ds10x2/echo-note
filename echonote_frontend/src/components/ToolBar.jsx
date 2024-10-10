@@ -72,7 +72,7 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
     setPenMode,
   } = drawingTypeStore();
 
-  const { nextPage, prevPage, zoomIn, zoomOut, currentPage } = pageStore();
+  const { nextPage, prevPage, zoomIn, zoomOut, setCurrentPage } = pageStore();
   const { fontProperty, setFontSize, resetTextItems, textItems } = textStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPdfSettingModalOpen, setIsPdfSettingModalOpen] = useState(false);
@@ -98,6 +98,7 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
   const resetItems = () => {
     resetTextItems();
     resetAllShapes();
+    setCurrentPage(1);
     //드로잉
   };
 
