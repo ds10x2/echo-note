@@ -25,6 +25,7 @@ const DrawingCanvas = forwardRef(
     ref
   ) => {
     const containerRef = useRef();
+    const overlayCanvasRef = useRef();
     const [selectionPath, setSelectionPath] = useState([]);
     const { getCanvasPath, setCanvasPath, getMinRecordingTime } =
       canvasStore.getState();
@@ -54,7 +55,42 @@ const DrawingCanvas = forwardRef(
     useEffect(() => {
       loadCanvasPath();
       ref.current.eraseMode(eraseMode);
+
+      if (overlayCanvasRef.current) {
+        const overlayCanvas = overlayCanvasRef.current;
+        const container = containerRef.current;
+        const devicePixelRatio = window.devicePixelRatio || 1;
+
+        overlayCanvas.width = container.clientWidth * devicePixelRatio;
+        overlayCanvas.height = container.clientHeight * devicePixelRatio;
+        overlayCanvas.style.width = `${container.clientWidth}px`;
+        overlayCanvas.style.height = `${container.clientHeight}px`;
+
+        const context = overlayCanvas.getContext("2d");
+        context.scale(devicePixelRatio, devicePixelRatio);
+      }
     }, [eraseMode, scale, page]);
+
+    // lassoMode가 변경될 때마다 overlayCanvas를 초기화하거나 지우는 효과 추가
+    useEffect(() => {
+      if (overlayCanvasRef.current) {
+        const overlayCanvas = overlayCanvasRef.current;
+        const context = overlayCanvas.getContext("2d");
+
+        context.globalAlpha = 0.2; // 배경의 투명도 설정
+        context.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+        context.globalAlpha = 1.0; // 경로는 기본 불투명도로 설정
+        context.setLineDash([10, 10]); // 점선 설정
+        context.strokeStyle = "#ffffff"; // 점선 색상
+        context.lineWidth = 4;
+
+        if (!lassoMode) {
+          // lassoMode가 해제되면 캔버스를 초기화
+          context.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        }
+      }
+    }, [lassoMode]);
 
     const getRelativePosition = useCallback(
       (e) => {
@@ -74,6 +110,31 @@ const DrawingCanvas = forwardRef(
       [scale]
     );
 
+    const drawLassoPath = (path) => {
+      const overlayCanvas = overlayCanvasRef.current;
+      if (!overlayCanvas) return;
+
+      const context = overlayCanvas.getContext("2d");
+      context.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+      context.globalAlpha = 0.2; // 배경의 투명도 설정
+      context.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+      context.globalAlpha = 1.0; // 경로는 기본 불투명도로 설정
+      context.setLineDash([10, 10]); // 점선 설정
+      context.strokeStyle = "#ffffff"; // 점선 색상
+      context.lineWidth = 4;
+
+      if (path.length > 0) {
+        context.beginPath();
+        context.moveTo(path[0].x * scale, path[0].y * scale);
+        for (let i = 1; i < path.length; i++) {
+          context.lineTo(path[i].x * scale, path[i].y * scale);
+        }
+        context.stroke();
+      }
+    };
+
     const handleTouchStart = (event) => {
       if (lassoMode) {
         const pos = getRelativePosition(event);
@@ -86,7 +147,11 @@ const DrawingCanvas = forwardRef(
     const handleTouchMove = (event) => {
       if (lassoMode && selectionPath.length > 0) {
         const pos = getRelativePosition(event);
-        setSelectionPath((prevPath) => [...prevPath, pos]);
+        setSelectionPath((prevPath) => {
+          const newPath = [...prevPath, pos];
+          drawLassoPath(newPath);
+          return newPath;
+        });
       }
     };
 
@@ -94,6 +159,7 @@ const DrawingCanvas = forwardRef(
       if (lassoMode && selectionPath.length > 0) {
         checkIntersections(selectionPath);
         setSelectionPath([]);
+        drawLassoPath([]);
         loadCanvasPath();
       } else {
         saveCanvasPath();
@@ -101,12 +167,11 @@ const DrawingCanvas = forwardRef(
       }
     };
 
-    // 다각형 내부에 점이 포함되는지 확인하는 함수
     const pointInPolygon = (point, polygon) => {
       let isInside = false;
       const { x, y } = point;
 
-      const closedPolygon = [...polygon, polygon[0]]; // 다각형을 닫음
+      const closedPolygon = [...polygon, polygon[0]];
 
       for (
         let i = 0, j = closedPolygon.length - 1;
@@ -133,13 +198,12 @@ const DrawingCanvas = forwardRef(
       if (savedPaths && savedPaths.length > 0) {
         const selectedIndices = savedPaths
           .map((stroke, index) => {
-            // stroke가 다각형과 겹치는지 확인하고, 겹치는 경우 인덱스를 반환
             if (stroke.paths.some((point) => pointInPolygon(point, polygon))) {
               return index;
             }
             return null;
           })
-          .filter((index) => index !== null); // 겹치는 인덱스만 필터링
+          .filter((index) => index !== null);
 
         if (selectedIndices && selectedIndices.length > 0) {
           const minTime = getMinRecordingTime(page, selectedIndices);
@@ -150,7 +214,6 @@ const DrawingCanvas = forwardRef(
 
     const saveCanvasPath = () => {
       if (ref.current) {
-        // Path 저장
         ref.current
           .exportPaths()
           .then((data) => {
@@ -176,7 +239,21 @@ const DrawingCanvas = forwardRef(
     };
 
     return (
-      <St.DrawingCanvasContainer ref={containerRef}>
+      <St.DrawingCanvasContainer
+        ref={containerRef}
+        style={{ position: "relative" }}
+      >
+        <canvas
+          ref={overlayCanvasRef}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            pointerEvents: "none",
+          }}
+        />
         <div
           style={{
             width: "100%",
@@ -189,14 +266,17 @@ const DrawingCanvas = forwardRef(
         >
           <ReactSketchCanvas
             ref={ref}
-            strokeColor={lassoMode ? "#e0e0e04e" : strokeColor || "#000"}
-            strokeWidth={lassoMode ? 3 : strokeWidth || 5}
+            strokeColor={lassoMode ? "#0000000" : strokeColor || "#000"}
+            strokeWidth={strokeWidth || 5}
             eraserWidth={eraserWidth || 5}
             width="100%"
             height="100%"
             canvasColor="transparent"
             readOnly={readOnly}
-            style={{ border: 0, borderRadius: 0 }}
+            style={{
+              border: 0,
+              borderRadius: 0,
+            }}
           />
         </div>
       </St.DrawingCanvasContainer>
