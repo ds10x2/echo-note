@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, require } from "react";
 import {
   STTContainer,
   STTResultList,
@@ -11,7 +11,7 @@ import { getSTTResult } from "@services/sttApi";
 import { useSearchStore } from "@stores/sideBarStore";
 import { useNoteStore } from "@stores/noteStore";
 import LoadingIcon from "@components/common/LoadingIcon";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 
 // 시간 포맷팅 함수 (초를 분:초로 변환)
 const formatTime = (seconds) => {
@@ -26,6 +26,18 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
   const { setStartTime } = useAudioStore();
   const { note_id, record_path, stt_status, setSTTStatus } = useNoteStore();
   const [isLoading, setIsLoading] = useState(false);
+
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "bottom-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
 
   const {
     currentIndex,
@@ -73,8 +85,9 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
         console.log("STT 완료: ", event.data);
 
         eventSource.close();
-        swal("STT 성공!", "STT분석이 완료되었어요", "success", {
-          button: "확인",
+        Toast.fire({
+          icon: "success",
+          title: "STT분석이 완료되었어요",
         });
 
         setSTTStatus("done");
@@ -90,6 +103,10 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
       eventSource.onerror = (event) => {
         console.error("SSE 오류 발생:", event);
         console.error("readyState:", eventSource.readyState); // 상태 로그
+        Toast.fire({
+          icon: "error",
+          title: "STT분석에 실패했어요",
+        });
         eventSource.close(); // 연결 종료
       };
 
