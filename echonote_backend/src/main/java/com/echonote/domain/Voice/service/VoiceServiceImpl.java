@@ -60,6 +60,10 @@ public class VoiceServiceImpl implements VoiceService {
 	@Value("${voice_analysis_server}")
 	String analysisServerUrl;  // 음성 분석 모델 API URL
 
+	@Value("${STT_flask_Url}")
+	String STTflaskUrl;
+			//= "https://d3b9-34-125-118-154.ngrok-free.app/voice_stt/stt";
+
 	private final Map<String, TwoFlaskResult> resultStore = new ConcurrentHashMap<>();
 
 	@Override
@@ -109,7 +113,7 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 	private STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
-		String flaskUrl = "https://f1f9-34-83-36-185.ngrok-free.app/voice_stt/stt";
+
 //		String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
 //		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
 
@@ -117,14 +121,14 @@ public class VoiceServiceImpl implements VoiceService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
 
-		log.info("flaskUrl: " + flaskUrl);
+		log.info("flaskUrl: " + STTflaskUrl);
 		log.info("flask로 보내는 정보: "+ flaskSendRequest.toString());
 
 		// 요청에 데이터 추가
 		HttpEntity<FlaskSendRequest> entity = new HttpEntity<>(flaskSendRequest, headers);
 
 		// Flask 서버로 POST 요청 보내기
-		ResponseEntity<STTResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
+		ResponseEntity<STTResponse> response = restTemplate.exchange(STTflaskUrl, HttpMethod.POST, entity,
 			STTResponse.class);
 
 		log.info(response.toString());
