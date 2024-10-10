@@ -5,9 +5,18 @@ const pageStore = create((set, get) => ({
   currentPage: 1, // 현재 페이지 상태 추가
   pages: 1, // 최대 페이지 수 상태 추가
   scale: 1, // 줌 스케일 초기 상태
+  originSize: { width: 0, height: 0 }, // 초기값 설정
 
-  //PDF URL 업데이트
-  setUrl: (url) => set({ url: url }),
+  // PDF URL 업데이트
+  setUrl: (url) => set({ url }),
+
+  // originSize 설정 메서드
+  setOriginSize: (width, height) => {
+    const currentSize = get().originSize;
+    if (currentSize.width !== width || currentSize.height !== height) {
+      set({ originSize: { width, height } });
+    }
+  },
 
   // 페이지 상태 업데이트
   setCurrentPage: (page) => set({ currentPage: page }),

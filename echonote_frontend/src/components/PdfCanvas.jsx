@@ -13,7 +13,7 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
   const [pdfRef, setPdfRef] = useState(null);
-  const { currentPage, setPages, scale, url } = pageStore(); // zustand의 상태와 액션 가져오기
+  const { currentPage, setPages, scale, url, setOriginSize } = pageStore(); // zustand의 상태와 액션 가져오기
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
   const renderTaskRef = useRef(null);
@@ -123,6 +123,10 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
   useEffect(() => {
     onResize(canvasSize.width, canvasSize.height);
   }, [canvasSize]);
+
+  useEffect(() => {
+    setOriginSize(originalSize.width, originalSize.height);
+  }, [originalSize]);
 
   return (
     <St.PdfCanvasContainer width={canvasSize.width} height={canvasSize.height}>
