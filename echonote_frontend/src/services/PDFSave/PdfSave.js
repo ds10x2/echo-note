@@ -5,6 +5,7 @@ import shapeStore from "@stores/shapeStore";
 import pageStore from "@stores/pageStore";
 import canvasStore from "@stores/canvasStore";
 import fontUrl from "@fonts/SUIT-Medium.ttf"; // 한글 TTF 폰트 경로
+import { useNoteStore } from "@/stores/noteStore";
 
 // 헥사코드를 RGB로 변환하는 함수
 const hexToRGB = (hex) => {
@@ -35,10 +36,9 @@ const findClosestOriginSize = (pdfWidth, pdfHeight, originSizes) => {
 };
 
 // 텍스트, 도형, 그린 경로를 저장하는 서비스 함수
-export const exportPdfWithTextAndShapes = async () => {
+export const exportPdfWithTextAndShapes = async (pdf_path) => {
   try {
-    const pdfUrl = pageStore.getState().url;
-    const existingPdfBytes = await fetch(pdfUrl).then((res) =>
+    const existingPdfBytes = await fetch(pdf_path).then((res) =>
       res.arrayBuffer()
     );
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
@@ -118,7 +118,14 @@ export const exportPdfWithTextAndShapes = async () => {
 
       if (circles && circles.length > 0) {
         circles.forEach((circle) => {
-          const { cx, cy, r, property } = circle.detail;
+          const { cx, cy, rx, ry, property } = circle.detail;
+
+          // cx, cy, rx, ry 값이 유효한지 확인
+          const centerX = !isNaN(cx) ? cx : 0;
+          const centerY = !isNaN(cy) ? cy : 0;
+          const radiusX = !isNaN(rx) ? rx : 1; // rx가 없거나 NaN이면 기본값 1
+          const radiusY = !isNaN(ry) ? ry : 1; // ry가 없거나 NaN이면 기본값 1
+
           const strokeColor = hexToRGB(property.strokeColor);
           const fillColor = property.fill
             ? hexToRGB(property.fillColor)
@@ -129,10 +136,11 @@ export const exportPdfWithTextAndShapes = async () => {
               Math.min(widthRatio, heightRatio)
             : 0;
 
-          page.drawCircle({
-            x: (cx / scale) * widthRatio,
-            y: ((originSize.height - cy) / scale) * heightRatio, // y좌표 변환
-            size: (r / scale) * Math.min(widthRatio, heightRatio), // 원 크기 보정
+          page.drawEllipse({
+            x: (centerX / scale) * widthRatio,
+            y: ((originSize.height - centerY) / scale) * heightRatio,
+            xScale: (radiusX / scale) * Math.min(widthRatio, heightRatio),
+            yScale: (radiusY / scale) * Math.min(widthRatio, heightRatio),
             borderWidth: borderWidth,
             borderColor: strokeColor,
             color: fillColor,

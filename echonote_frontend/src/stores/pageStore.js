@@ -1,14 +1,10 @@
 import { create } from "zustand";
 
 const pageStore = create((set, get) => ({
-  url: "https://timeisnullnull.s3.ap-northeast-2.amazonaws.com/le_Petit_Prince_%EB%B3%B8%EB%AC%B8.pdf",
   currentPage: 1, // 현재 페이지 상태 추가
   pages: 1, // 최대 페이지 수 상태 추가
   scale: 1, // 줌 스케일 초기 상태
   originSizes: {}, // 각 페이지의 originSize 저장
-
-  // PDF URL 업데이트
-  setUrl: (url) => set({ url }),
 
   // 각 페이지의 originSize 설정 메서드
   setOriginSize: (page, width, height) => {

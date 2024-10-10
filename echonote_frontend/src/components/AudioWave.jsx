@@ -23,6 +23,8 @@ import {
 } from "@services/recordApi";
 import { useAudioStore } from "@stores/recordStore";
 import { useNoteStore } from "@stores/noteStore";
+import textStore from "@/stores/textStore";
+import shapeStore from "@/stores/shapeStore";
 
 const AudioWave = () => {
   const containerRef = useRef(null);
@@ -38,6 +40,14 @@ const AudioWave = () => {
     useAudioStore();
   const { note_id, record_path, setRecordPath, stt_status, setSTTStatus } =
     useNoteStore();
+  const { resetAllTimestamps: resetTextAllTimestamps } = textStore();
+  const { resetAllTimestamps: resetShapeAllTimestamps } = shapeStore();
+
+  const resetTimestamp = () => {
+    resetTextAllTimestamps();
+    resetShapeAllTimestamps();
+    //드로잉
+  };
 
   const { wavesurfer, currentTime } = useWavesurfer({
     container: containerRef,
@@ -72,6 +82,7 @@ const AudioWave = () => {
       recPlugin.on("record-end", async (blob) => {
         if (blob.size === 0) {
           alert("녹음이 너무 짧습니다! 새로운 녹음이 진행됩니다.");
+          resetTimestamp();
           record.startRecording();
           return;
         }
@@ -147,6 +158,7 @@ const AudioWave = () => {
       } else {
         setRecordPath(null);
         setRecordTime(0);
+        resetTimestamp();
         record.startRecording({ deviceId });
       }
     } catch (error) {

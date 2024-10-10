@@ -199,6 +199,25 @@ const textStore = create((set, get) => ({
     );
     return selectedItem?.detail?.timestamp || null; // timestamp가 있으면 반환, 없으면 null
   },
+
+  resetAllTimestamps: () => {
+    set((state) => {
+      const updatedTextItems = {};
+
+      // 모든 페이지의 텍스트 아이템 순회
+      Object.keys(state.textItems).forEach((page) => {
+        updatedTextItems[page] = state.textItems[page].map((item) => ({
+          ...item,
+          detail: {
+            ...item.detail,
+            timestamp: null, // 각 아이템의 timestamp를 null로 초기화
+          },
+        }));
+      });
+
+      return { textItems: updatedTextItems };
+    });
+  },
 }));
 
 export default textStore;

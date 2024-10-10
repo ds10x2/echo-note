@@ -240,6 +240,43 @@ const shapeStore = create((set, get) => ({
     // 해당 도형의 타임스탬프 반환
     return selectedItem?.detail?.timestamp || null; // timestamp가 있으면 반환, 없으면 null
   },
+
+  resetAllTimestamps: () => {
+    const { rectangles, circles } = get();
+
+    const updatedRectangles = Object.keys(rectangles).reduce((acc, page) => {
+      acc[page] = rectangles[page].map((rect) => ({
+        ...rect,
+        detail: {
+          ...rect.detail,
+          timestamp: null, // 타임스탬프를 null로 초기화
+        },
+      }));
+      return acc;
+    }, {});
+
+    const updatedCircles = Object.keys(circles).reduce((acc, page) => {
+      acc[page] = circles[page].map((circle) => ({
+        ...circle,
+        detail: {
+          ...circle.detail,
+          timestamp: null, // 타임스탬프를 null로 초기화
+        },
+      }));
+      return acc;
+    }, {});
+
+    set(() => ({
+      rectangles: updatedRectangles,
+      circles: updatedCircles,
+    }));
+  },
+  resetAllShapes: () => {
+    set(() => ({
+      rectangles: null, // rectangles 객체를 null로 설정
+      circles: null, // circles 객체를 null로 설정
+    }));
+  },
 }));
 
 export default shapeStore;

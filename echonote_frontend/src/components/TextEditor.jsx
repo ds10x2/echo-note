@@ -94,18 +94,16 @@ const TextEditor = ({
     (e) => {
       if (isDraggingRef.current || hasDraggedRef.current) return;
 
-      // 터치 좌표를 pageX, pageY로 변경
-      const clientX = e.touches[0].pageX;
-      const clientY = e.touches[0].pageY;
+      const clientX = e.touches[0].clientX;
+      const clientY = e.touches[0].clientY;
 
       const containerRect = containerRef.current.getBoundingClientRect();
+      const parentScrollLeft = parentContainerRef.current.scrollLeft;
+      const parentScrollTop = parentContainerRef.current.scrollTop;
 
-      // pageX, pageY는 전체 문서 기준 좌표이므로 스크롤 값은 따로 고려할 필요 없음
-      // 확대/축소만 적용
-      const x = (clientX - containerRect.left) / scale;
-      const y = (clientY - containerRect.top) / scale;
+      const x = (clientX + parentScrollLeft - containerRect.left) / scale;
+      const y = (clientY + parentScrollTop - containerRect.top) / scale;
 
-      // 새로운 텍스트 박스를 추가
       addTextItem({
         id: Date.now(),
         detail: {
@@ -121,7 +119,6 @@ const TextEditor = ({
         },
       });
 
-      // 새 텍스트 박스를 추가한 후 선택된 텍스트 해제
       setSelectedText(null);
     },
     [
@@ -148,10 +145,8 @@ const TextEditor = ({
           ) {
             return;
           }
-          // 텍스트 박스를 선택하는 로직
           setSelectedText(clickedItemId);
         } else {
-          // 텍스트 박스가 아닌 곳을 터치하면 새 텍스트 박스를 추가
           handleAddTextBox(e);
         }
       }
@@ -187,16 +182,16 @@ const TextEditor = ({
     const clientX = e.touches[0].clientX;
     const clientY = e.touches[0].clientY;
 
+    const containerRect = containerRef.current.getBoundingClientRect();
     const parentScrollLeft = parentContainerRef.current.scrollLeft;
     const parentScrollTop = parentContainerRef.current.scrollTop;
 
-    // Scale을 반영해서 좌표 계산, 스크롤 고려
-    const offsetX =
-      (clientX + parentScrollLeft - containerRef.current.offsetLeft) / scale -
-      nowItem.detail.x;
-    const offsetY =
-      (clientY + parentScrollTop - containerRef.current.offsetTop) / scale -
-      nowItem.detail.y;
+    // Scale 적용: 좌표 계산 시 스케일을 명확히 반영
+    const x = (clientX + parentScrollLeft - containerRect.left) / scale;
+    const y = (clientY + parentScrollTop - containerRect.top) / scale;
+
+    const offsetX = x - nowItem.detail.x;
+    const offsetY = y - nowItem.detail.y;
 
     setCurItems((items) =>
       items.map((item) =>
@@ -219,20 +214,19 @@ const TextEditor = ({
       const clientX = e.touches[0].clientX;
       const clientY = e.touches[0].clientY;
 
+      const containerRect = containerRef.current.getBoundingClientRect();
       const parentScrollLeft = parentContainerRef.current.scrollLeft;
       const parentScrollTop = parentContainerRef.current.scrollTop;
+
+      const x = (clientX + parentScrollLeft - containerRect.left) / scale;
+      const y = (clientY + parentScrollTop - containerRect.top) / scale;
 
       setCurItems((items) =>
         items.map((item) => {
           if (item.detail.isDragging) {
-            // Scale 값을 반영해 이동 거리 계산, 스크롤 고려
-            let newX =
-              (clientX + parentScrollLeft - item.detail.offsetX * scale) /
-              scale;
-            let newY =
-              (clientY + parentScrollTop - item.detail.offsetY * scale) / scale;
+            const newX = x - item.detail.offsetX;
+            const newY = y - item.detail.offsetY;
 
-            const containerRect = containerRef.current.getBoundingClientRect();
             const containerWidth = containerRect.width / scale;
             const containerHeight = containerRect.height / scale;
 
