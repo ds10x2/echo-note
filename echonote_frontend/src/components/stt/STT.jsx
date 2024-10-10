@@ -202,7 +202,7 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
     if (currentIndex !== null && searchResults[currentIndex]?.ref) {
       searchResults[currentIndex].ref.scrollIntoView({
         behavior: "smooth",
-        block: "center", // 선택된 요소가 리스트 중앙에 위치하도록 조정
+        block: "nearest",
       });
     }
   }, [currentIndex, searchResults]);
