@@ -3,13 +3,22 @@ package com.echonote.domain.note.controller;
 import java.util.List;
 import java.util.UUID;
 
-import com.echonote.domain.note.dto.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.echonote.domain.Voice.dto.VoiceSendRequest;
+import com.echonote.domain.note.dto.GetNoteResponse;
+import com.echonote.domain.note.dto.NoteCreateRequest;
+import com.echonote.domain.note.dto.NoteCreateResponse;
+import com.echonote.domain.note.dto.NoteListResponse;
+import com.echonote.domain.note.dto.UrlResponse;
 import com.echonote.domain.note.service.NoteServiceImpl;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,7 +68,7 @@ public class NoteController {
 
 	@GetMapping
 	@Operation(summary = "노트 상세조회", description = "noteId에 해당하는 노트의 정보를 불러옵니다.")
-	public ResponseEntity<GetNoteResponse> getNote(@RequestParam Long noteId) {
+	public ResponseEntity<GetNoteResponse> getNote(@RequestParam("noteId") Long noteId) {
 		GetNoteResponse response = noteService.getNote(noteId);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
