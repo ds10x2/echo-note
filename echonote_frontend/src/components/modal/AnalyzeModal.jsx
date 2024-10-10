@@ -14,7 +14,7 @@ import { useSearchStore } from "@stores/sideBarStore";
 import { useNoteStore } from "@stores/noteStore";
 
 const CORLER_HEX = [
-  "#B80000",
+  "#d30000",
   "#DB3E00",
   "#FCCB00",
   "#008B02",

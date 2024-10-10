@@ -224,8 +224,8 @@ const TextEditor = ({
       setCurItems((items) =>
         items.map((item) => {
           if (item.detail.isDragging) {
-            const newX = x - item.detail.offsetX;
-            const newY = y - item.detail.offsetY;
+            let newX = x - item.detail.offsetX;
+            let newY = y - item.detail.offsetY;
 
             const containerWidth = containerRect.width / scale;
             const containerHeight = containerRect.height / scale;

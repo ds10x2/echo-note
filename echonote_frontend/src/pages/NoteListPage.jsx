@@ -43,7 +43,7 @@ const NoteListPage = () => {
 
   return (
     <NoteListContainer>
-      <h1>모든 노트</h1>
+      <h1>Echo Note</h1>
       <NoteGrid>
         {notes.map((note) => (
           <NoteItem key={note.id}>

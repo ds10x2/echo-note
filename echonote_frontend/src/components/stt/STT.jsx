@@ -1,17 +1,19 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, require } from "react";
 import {
   STTContainer,
   STTResultList,
   STTResultItem,
   ResultLink,
   ResultText,
+  Highlight,
+  TextUnder,
 } from "@/components/styles/STT.style";
 import { useAudioStore } from "@stores/recordStore";
 import { getSTTResult } from "@services/sttApi";
 import { useSearchStore } from "@stores/sideBarStore";
 import { useNoteStore } from "@stores/noteStore";
 import LoadingIcon from "@components/common/LoadingIcon";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 
 // 시간 포맷팅 함수 (초를 분:초로 변환)
 const formatTime = (seconds) => {
@@ -26,6 +28,18 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
   const { setStartTime } = useAudioStore();
   const { note_id, record_path, stt_status, setSTTStatus } = useNoteStore();
   const [isLoading, setIsLoading] = useState(false);
+
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "bottom-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
 
   const {
     currentIndex,
@@ -52,10 +66,8 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
     }
 
     if (stt_status === "done") {
-      console.log("stt 불러옴");
       fetchData();
     } else if (stt_status === "processing") {
-      console.log("stt 분석중");
       setIsLoading(true);
       const eventSource = new EventSource(
         `${import.meta.env.VITE_API_URL}voice/sse?note_id=${note_id}`
@@ -63,18 +75,12 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
 
       console.log("SSE 연결 시도 중...");
 
-      // 연결 시 초기 메시지 처리
-      eventSource.onopen = (event) => {
-        console.log("연결 완료: ", event);
-      };
-
       // STT 완료 이벤트 처리
       eventSource.addEventListener("stt_complete", (event) => {
-        console.log("STT 완료: ", event.data);
-
         eventSource.close();
-        swal("STT 성공!", "STT분석이 완료되었어요", "success", {
-          button: "확인",
+        Toast.fire({
+          icon: "success",
+          title: "STT분석이 완료되었어요",
         });
 
         setSTTStatus("done");
@@ -90,6 +96,10 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
       eventSource.onerror = (event) => {
         console.error("SSE 오류 발생:", event);
         console.error("readyState:", eventSource.readyState); // 상태 로그
+        Toast.fire({
+          icon: "error",
+          title: "STT분석에 실패했어요",
+        });
         eventSource.close(); // 연결 종료
       };
 
@@ -124,31 +134,31 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
 
     return (
       <span>
-        {parts.map((part, i) => (
-          <span
-            key={i}
-            style={
-              typeof part === "string" &&
-              part.toLowerCase() === searchTerm?.toLowerCase()
-                ? {
-                    backgroundColor: "yellow", // 검색어 하이라이트 색상
-                  }
-                : isKeyword &&
-                  currentKeyword.some(
-                    (keyword) =>
-                      typeof part === "string" &&
-                      part.toLowerCase() === keyword.toLowerCase()
-                  )
-                ? {
-                    color: keywordColor,
-                    backgroundColor: "black",
-                  }
-                : {}
-            }
-          >
-            {part}
-          </span>
-        ))}
+        {parts.map((part, i) => {
+          if (
+            typeof part === "string" &&
+            part.toLowerCase() === searchTerm?.toLowerCase()
+          ) {
+            return <Highlight key={i}>{part}</Highlight>;
+          }
+
+          if (
+            isKeyword &&
+            currentKeyword.some(
+              (keyword) =>
+                typeof part === "string" &&
+                part.toLowerCase() === keyword.toLowerCase()
+            )
+          ) {
+            return (
+              <TextUnder key={i} keywordColor={keywordColor}>
+                {part}
+              </TextUnder>
+            );
+          }
+
+          return <span key={i}>{part}</span>;
+        })}
       </span>
     );
   };

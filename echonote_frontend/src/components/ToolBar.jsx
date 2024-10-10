@@ -12,7 +12,6 @@ import {
   FaRegCircle,
   FaRegSquare,
   FaCaretDown,
-  FaPalette,
 } from "react-icons/fa";
 import { BiWindowAlt, BiChevronsDown, BiChevronsUp } from "react-icons/bi";
 import {
@@ -25,27 +24,9 @@ import { useSidebarStore } from "@stores/sideBarStore";
 import drawingTypeStore from "@stores/drawingTypeStore";
 import pageStore from "@stores/pageStore";
 import { useNoteStore } from "@stores/noteStore";
-import {
-  AnimatedToolBarContent,
-  Divider,
-  IconButton,
-  SettingButton,
-  SideBarButton,
-  Title,
-  ToolBarButton,
-  ToolBarContainer,
-  ToolBarContent,
-  ToolBarHeader,
-  ToolBarIcon,
-  ToolBarIconDetail,
-  FontSizeText,
-  FontSizeButton,
-  ToolBarIconContainer,
-  ListButton,
-  SaveButton,
-} from "@components/styles/ToolBar.style";
+import * as St from "@components/styles/ToolBar.style";
 import { VscSettings, VscArrowLeft } from "react-icons/vsc";
-import textStore from "@/stores/textStore";
+import textStore from "@stores/textStore";
 import Dropdown from "@components/common/Dropdown";
 import canvasStore from "@stores/canvasStore";
 import shapeStore from "@stores/shapeStore";
@@ -225,45 +206,49 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
   };
 
   return (
-    <ToolBarContainer>
-      <AnimatedToolBarContent collapsed={isCollapsed}>
-        <ToolBarHeader>
-          <ListButton onClick={moveNoteList}>
+    <St.ToolBarContainer>
+      <St.AnimatedToolBarContent collapsed={isCollapsed}>
+        <St.ToolBarHeader>
+          <St.ListButton onClick={moveNoteList}>
             <VscArrowLeft style={{ marginLeft: "10px", fontSize: "20px" }} />
-          </ListButton>
-          <Title>
+          </St.ListButton>
+          <St.Title>
             {note_name}
             <FaStar style={{ marginLeft: "10px", color: "gold" }} />
-          </Title>
-          <SaveButton onClick={() => handleFileStore()}>Save</SaveButton>
-          <SettingButton ref={settingButtonRef} onClick={togglePdfModal}>
+          </St.Title>
+          <St.SaveButton onClick={() => handleFileStore()}>Save</St.SaveButton>
+          <St.SettingButton ref={settingButtonRef} onClick={togglePdfModal}>
             <VscSettings style={{ marginRight: "10px", fontSize: "20px" }} />
-          </SettingButton>
-        </ToolBarHeader>
-      </AnimatedToolBarContent>
+          </St.SettingButton>
+        </St.ToolBarHeader>
+      </St.AnimatedToolBarContent>
 
-      <ToolBarContent>
-        <ToolBarButton>
-          <IconButton
+      <St.ToolBarContent>
+        <St.ToolBarButton>
+          <St.IconButton
             as={IoMicSharp}
             onClick={toggleRecordingBar}
             isActive={isRecordingBarOpened}
           />
-          <Divider />
-          <IconButton as={FaPen} onClick={handlePenClick} isActive={mode.pen} />
-          <ToolBarIconContainer>
-            <ToolBarIcon
+          <St.Divider />
+          <St.IconButton
+            as={FaPen}
+            onClick={handlePenClick}
+            isActive={mode.pen}
+          />
+          <St.ToolBarIconContainer>
+            <St.ToolBarIcon
               as={FaTextHeight}
               onClick={setTextMode}
               isActive={mode.text}
             />
-            <ToolBarIconDetail
+            <St.ToolBarIconDetail
               ref={fontSizeRef}
               isOpen={mode.text}
               onClick={handleFontDropDown}
             >
-              <FontSizeText>{fontProperty.fontSize}</FontSizeText>
-              <FontSizeButton as={FaCaretDown} />
+              <St.FontSizeText>{fontProperty.fontSize}</St.FontSizeText>
+              <St.FontSizeButton as={FaCaretDown} />
               <Dropdown
                 isOpen={isFontSizeOpen}
                 setIsOpen={setIsFontSizeOpen}
@@ -272,10 +257,10 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
                 onSelect={setFontSize}
                 selectedOption={fontProperty.fontSize}
               />
-            </ToolBarIconDetail>
-          </ToolBarIconContainer>
-          <ToolBarIcon as={FaImage} />
-          <ToolBarIcon
+            </St.ToolBarIconDetail>
+          </St.ToolBarIconContainer>
+          <St.ToolBarIcon as={FaImage} />
+          <St.ToolBarIcon
             as={
               !mode.shape
                 ? FaShapes
@@ -286,39 +271,39 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
             onClick={handleShapeMode}
             isActive={mode.shape}
           />
-          <Divider />
-          <IconButton as={LuZoomOut} onClick={zoomOut} />
-          <IconButton as={LuZoomIn} onClick={zoomIn} />
-          <Divider />
-          <IconButton as={IoChevronBackOutline} onClick={prevPage} />
-          <IconButton as={IoChevronForwardOutline} onClick={nextPage} />
-        </ToolBarButton>
-        <SideBarButton>
-          <IconButton
+          <St.Divider />
+          <St.IconButton as={LuZoomOut} onClick={zoomOut} />
+          <St.IconButton as={LuZoomIn} onClick={zoomIn} />
+          <St.Divider />
+          <St.IconButton as={IoChevronBackOutline} onClick={prevPage} />
+          <St.IconButton as={IoChevronForwardOutline} onClick={nextPage} />
+        </St.ToolBarButton>
+        <St.SideBarButton>
+          <St.IconButton
             as={BiWindowAlt}
             onClick={togglePdfBar}
             isActive={isPdfBarOpened}
           />
-          <IconButton
+          <St.IconButton
             as={RiSpeakLine}
             onClick={toggleSTTBar}
             isActive={isSTTBarOpened}
           />
           {isCollapsed ? (
-            <IconButton
+            <St.IconButton
               as={BiChevronsUp}
               onClick={toggleCollapse}
               isActive={!isCollapsed}
             />
           ) : (
-            <IconButton
+            <St.IconButton
               as={BiChevronsDown}
               onClick={toggleCollapse}
               isActive={!isCollapsed}
             />
           )}
-        </SideBarButton>
-      </ToolBarContent>
+        </St.SideBarButton>
+      </St.ToolBarContent>
 
       <PdfSettingModal
         isOpen={isPdfSettingModalOpen}
@@ -333,7 +318,7 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
         position={buttonPosition}
         modalType={modalType}
       />
-    </ToolBarContainer>
+    </St.ToolBarContainer>
   );
 };
 
