@@ -1,9 +1,9 @@
 import { PDFDocument, rgb } from "pdf-lib";
 import * as fontkit from "fontkit";
-import textStore from "@stores/textStore"; // zustand store
-import shapeStore from "@stores/shapeStore"; // zustand store
-import pageStore from "@stores/pageStore"; // zustand store
-import canvasStore from "@stores/canvasStore"; // zustand store
+import textStore from "@stores/textStore";
+import shapeStore from "@stores/shapeStore";
+import pageStore from "@stores/pageStore";
+import canvasStore from "@stores/canvasStore";
 import fontUrl from "@fonts/SUIT-Medium.ttf"; // 한글 TTF 폰트 경로
 
 // 헥사코드를 RGB로 변환하는 함수
