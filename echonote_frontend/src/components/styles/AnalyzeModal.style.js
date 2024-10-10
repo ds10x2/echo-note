@@ -143,22 +143,17 @@ export const ToggleContainer = styled.div`
 `;
 
 export const TagButton = styled.button.withConfig({
-  shouldForwardProp: shouldNotForwardPropsWithKeys(["isSelected"]),
+  shouldForwardProp: (prop) => prop !== "isSelected",
 })`
   border: 2px solid ${(props) => props.theme.colors.recordInActive};
   background-color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.recordActive : "transparent"};
   color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.white : theme.colors.recordInActive};
+    isSelected ? theme.colors.textLightColor : theme.colors.recordInActive};
   border-radius: 20px;
   padding: 5px 10px;
   font-size: 14px;
   margin: 3px;
   cursor: pointer;
   transition: all 0.3s ease;
-
-  &:hover {
-    background-color: ${(props) => props.theme.colors.recordActive};
-    color: white;
-  }
 `;

@@ -62,6 +62,10 @@ const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
   };
 
   useEffect(() => {
+    console.log("useEffect keyword : ", currentKeyword);
+  }, [currentKeyword]);
+
+  useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
     } else {
