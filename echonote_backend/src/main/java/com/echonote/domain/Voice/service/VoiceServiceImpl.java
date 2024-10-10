@@ -127,13 +127,15 @@ public class VoiceServiceImpl implements VoiceService {
 		ResponseEntity<STTResponse> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity,
 			STTResponse.class);
 
+		log.info(response.toString());
+
 		// 응답 처리 (필요에 따라)
 		if (response.getStatusCode().is2xxSuccessful()) {
 			System.out.println("성공적으로 Flask 서버에 전송되었습니다: " + response.getBody());
 		} else {
 			System.err.println("Flask 서버 요청 실패: " + response.getStatusCode());
 		}
-
+		
 		return response.getBody();
 
 	}
