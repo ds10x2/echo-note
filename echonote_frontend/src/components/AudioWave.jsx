@@ -25,6 +25,7 @@ import { useAudioStore } from "@stores/recordStore";
 import { useNoteStore } from "@stores/noteStore";
 import textStore from "@/stores/textStore";
 import shapeStore from "@/stores/shapeStore";
+import Swal from "sweetalert2";
 
 const AudioWave = () => {
   const containerRef = useRef(null);
@@ -42,6 +43,13 @@ const AudioWave = () => {
     useNoteStore();
   const { resetAllTimestamps: resetTextAllTimestamps } = textStore();
   const { resetAllTimestamps: resetShapeAllTimestamps } = shapeStore();
+
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top",
+    showConfirmButton: true,
+    timerProgressBar: true,
+  });
 
   const resetTimestamp = () => {
     resetTextAllTimestamps();
@@ -97,7 +105,6 @@ const AudioWave = () => {
         try {
           const data = await getPresignedUrl();
           const objectUrl = data.object_url;
-          console.log("object URL: " + objectUrl);
 
           // Blob을 File 객체로 변환
           const wavFile = new File([blob], "record.wav", {
@@ -149,6 +156,14 @@ const AudioWave = () => {
   };
 
   const handleStartStopRecording = async () => {
+    if (stt_status === "processing") {
+      Toast.fire({
+        icon: "warning",
+        title: "현재 STT분석이 진행중이에요",
+        text: "분석이 끝난 후에 다시 시도해주세요",
+      });
+      return;
+    }
     const devices = await RecordPlugin.getAvailableAudioDevices();
     const deviceId = devices[0]?.deviceId;
 
@@ -194,15 +209,27 @@ const AudioWave = () => {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController(); // AbortController 생성
+
     if (wavesurfer) {
       wavesurfer.on("finish", () => {
         setIsPlaying(false);
       });
     }
+
     return () => {
+      // 컴포넌트 언마운트 시 wavesurfer를 안전하게 해제
       if (wavesurfer) {
-        wavesurfer.destroy();
+        try {
+          wavesurfer.destroy(); // wavesurfer가 존재할 때만 destroy 호출
+        } catch (error) {
+          if (error.name !== "AbortError") {
+            console.error("Error during wavesurfer destruction:", error);
+          }
+        }
       }
+      // 비동기 작업을 안전하게 취소
+      controller.abort();
     };
   }, [wavesurfer]);
 

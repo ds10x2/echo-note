@@ -26,7 +26,6 @@ export const saveRecordedFile = async (noteId, objectUrl) => {
 
     const response = await apiClient.post("/voice", payload);
     if (response.status === 200) {
-      console.log("File saved successfully");
       return response.data;
     } else {
       console.error("Failed to save the file");
