@@ -111,8 +111,8 @@ public class VoiceController {
 		System.out.println("=============");
 		System.out.println(analysisResultRequest);
 		System.out.println("=============");
-		System.out.println(analysisResultRequest.getAnomalyTime().get(0));
-		System.out.println(analysisResultRequest.getAnomalyTime().get(0).getClass().getName());
+		// System.out.println(analysisResultRequest.getAnomalyTime().get(0));
+		// System.out.println(analysisResultRequest.getAnomalyTime().get(0).getClass().getName());
 
 		// 결과가 들어오면 map에 임시로 저장한다.
 		voiceService.saveAnalysisResult(analysisResultRequest);
