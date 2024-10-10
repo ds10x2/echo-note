@@ -12,6 +12,7 @@ import { getMemo } from "@services/memoApi";
 import canvasStore from "@stores/canvasStore";
 import shapeStore from "@stores/shapeStore";
 import textStore from "@stores/textStore";
+import { useSidebarStore } from "@stores/sideBarStore";
 
 const NotePage = () => {
   const { id } = useParams();
@@ -21,6 +22,7 @@ const NotePage = () => {
   const { loadTextItems } = textStore();
   const { loadRectangles, loadCircles } = shapeStore();
   const { loadDrawings } = canvasStore();
+  const { isRecordingBarOpened } = useSidebarStore();
 
   const toggleDrawingEditor = () => {
     setIsDrawingEditorOpened(!isDrawingEditorOpened);
@@ -101,7 +103,7 @@ const NotePage = () => {
         onToggleToolBar={handleToggleToolBar}
       />
       <Layout>
-        <RecordingBar />
+        {isRecordingBarOpened && <RecordingBar />}
         <PdfBar />
         <MainContent isCollapsed={isToolBarCollapsed}>
           <PdfViewer isDrawingEditorOpened={isDrawingEditorOpened} />

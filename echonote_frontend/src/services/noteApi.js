@@ -51,14 +51,16 @@ export const getPdfPresignedUrl = async () => {
 };
 
 // POST 요청: object_url을 통해 파일을 서버에 저장
-export const savePdfFile = async (objectUrl) => {
+export const savePdfFile = async (objectUrl, noteName, keywords) => {
   try {
     const payload = {
       object_url: objectUrl,
+      note_name: noteName,
+      keywords: keywords,
     };
 
     const response = await apiClient.post("/note", payload);
-    if (response.status === 200) {
+    if (response.status === 201) {
       console.log("File saved successfully");
       return response.data;
     } else {

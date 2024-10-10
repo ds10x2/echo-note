@@ -1,5 +1,6 @@
 import styled, { keyframes } from "styled-components";
 
+// 모달이 나타날 때 애니메이션
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -11,7 +12,7 @@ const fadeIn = keyframes`
   }
 `;
 
-// 모달이 사라질 때의 애니메이션
+// 모달이 사라질 때 애니메이션
 const fadeOut = keyframes`
   from {
     opacity: 1;
@@ -23,7 +24,7 @@ const fadeOut = keyframes`
   }
 `;
 
-// 배경이 불투명하게 처리된 모달 뒷배경 스타일
+// 모달의 배경 스타일 (화면 전체를 덮는 배경)
 export const ModalBackdrop = styled.div`
   position: fixed;
   top: 0;
@@ -104,6 +105,7 @@ export const ModalOption = styled.div`
   }
 `;
 
+// 선택 버튼 스타일
 export const OptionButton = styled.div`
   width: 24px;
   height: 24px;
@@ -116,6 +118,29 @@ export const OptionButton = styled.div`
   &:hover {
     background-color: ${(props) => (props.selected ? "#ff6347" : "#f5f5f5")};
   }
+`;
+
+// 태그 UI 영역 스타일
+export const TagContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+`;
+
+export const Tag = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border-radius: 20px;
+`;
+
+export const TagRemoveButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
 `;
 
 // 모달 푸터 스타일
@@ -136,5 +161,21 @@ export const ModalFooter = styled.div`
     &:hover {
       background-color: #0056b3;
     }
+  }
+`;
+
+export const TitleBox = styled.input`
+  width: 85%;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 16px;
+  border: 2px solid #cde3fd; /* 연한 파란색 테두리 */
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(66, 153, 225, 0.5); /* 그림자 추가 */
+  outline: none;
+
+  &:focus {
+    border-color: #3182ce; /* 포커스 시 진한 파란색 테두리 */
+    box-shadow: 0 0 8px rgba(49, 130, 206, 0.6); /* 포커스 시 그림자 강화 */
   }
 `;
