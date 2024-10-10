@@ -7,6 +7,7 @@ export const useNoteStore = create((set) => ({
   record_path: null,
   stt_status: "processing",
   update_at: null,
+  keywords: [],
 
   // 상태 업데이트 함수
   setNoteDetail: (note) =>
@@ -17,6 +18,7 @@ export const useNoteStore = create((set) => ({
       record_path: note.record_path,
       stt_status: note.stt_status,
       update_at: note.update_at,
+      keywords: note.keywords,
     }),
 
   setRecordPath: (url) => set({ record_path: url }),
@@ -29,5 +31,6 @@ export const useNoteStore = create((set) => ({
       pdf_path: null,
       record_path: null,
       stt_status: "processing",
+      keywords: [],
     }),
 }));

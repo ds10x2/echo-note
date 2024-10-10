@@ -11,6 +11,7 @@ import Github, { GithubPlacement } from "@uiw/react-color-github";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useSearchStore } from "@stores/sideBarStore";
+import { useNoteStore } from "@stores/noteStore";
 
 const CORLER_HEX = [
   "#B80000",
@@ -33,10 +34,15 @@ const CORLER_HEX = [
 
 const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
   const [isVisible, setIsVisible] = useState(isOpen);
-  const [hex, setHex] = useState("#fff");
   const [isOn, setisOn] = useState(false);
-  const { sttKeyword, currentKeyword, setCurrentKeyword, toggleKeyword } =
-    useSearchStore();
+  const {
+    currentKeyword,
+    setCurrentKeyword,
+    toggleKeyword,
+    keywordColor,
+    setKeywordColor,
+  } = useSearchStore();
+  const { keywords } = useNoteStore();
 
   const toggleHandler = () => {
     setisOn(!isOn);
@@ -108,7 +114,7 @@ const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
               </ToggleContainer>
             </ModalHeader>
             <AnalyzedSection>
-              {sttKeyword.map((keyword) => (
+              {keywords.map((keyword) => (
                 <TagButton
                   key={keyword}
                   onClick={() => toggleTag(keyword)}
@@ -123,7 +129,7 @@ const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
         <ModalHeader>텍스트 설정</ModalHeader>
         <BackgroundColorSection>
           <Github
-            color={hex}
+            color={keywordColor}
             colors={CORLER_HEX}
             placement={GithubPlacement.TopLeft}
             style={{
@@ -133,7 +139,7 @@ const AnalyzeModal = ({ isOpen, onClose, position, modalType }) => {
               "--github-arrow-border-color": "rgba(0, 0, 0, 0)",
             }}
             onChange={(color) => {
-              setHex(color.hex);
+              setKeywordColor(color.hex);
             }}
           />
         </BackgroundColorSection>
