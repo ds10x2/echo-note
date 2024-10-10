@@ -219,12 +219,18 @@ public class VoiceServiceImpl implements VoiceService {
 					System.out.println("changed");
 					sttRequest.get(sttIdx).changeAnomaly(true);
 					aIdx++;
+					sttIdx++;
 				}
 				
 				// 현재 문장이 이상 지점보다 이전에 있다면 다음 문장을 탐색
 				if( Float.parseFloat(sttRequest.get(sttIdx).getEnd()) <
 					Float.parseFloat(anomalyTimes.get(aIdx)) )
 					sttIdx++;
+				
+				// 이상 지점이 현재 문장보다 이전에 있다면 다음 이상 지점을 탐색
+				if( Float.parseFloat(anomalyTimes.get(aIdx)) <
+					Float.parseFloat(sttRequest.get(sttIdx).getStart())  )
+					aIdx++;
 			}
 
 			// MongoDB에 조합한 결과 저장
