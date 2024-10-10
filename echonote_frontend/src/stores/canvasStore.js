@@ -97,18 +97,21 @@ const canvasStore = create((set, get) => ({
   drawings: () => {
     const paths = get().savedCanvasPaths;
     const records = get().savedCanvasRecords;
-
     const result = {};
 
-    Object.keys(paths).forEach((page) => {
-      result[page] = paths[page].map((path, index) => ({
-        id: index,
-        detail: {
-          paths: path,
-          records: records[page] ? records[page][index] : null,
-        },
-      }));
-    });
+    if (paths) {
+      Object.keys(paths).forEach((page) => {
+        if (paths[page]) {
+          result[page] = paths[page].map((path, index) => ({
+            id: index,
+            detail: {
+              paths: path,
+              timestamp: records[page] ? records[page][index] : null,
+            },
+          }));
+        }
+      });
+    }
 
     return result;
   },
@@ -117,10 +120,14 @@ const canvasStore = create((set, get) => ({
     const newCanvasPaths = {};
     const newCanvasRecords = {};
 
-    Object.keys(data).forEach((page) => {
-      newCanvasPaths[page] = data[page].map((item) => item.detail.paths);
-      newCanvasRecords[page] = data[page].map((item) => item.detail.records);
-    });
+    if (data) {
+      Object.keys(data).forEach((page) => {
+        newCanvasPaths[page] = data[page].map((item) => item.detail.paths);
+        newCanvasRecords[page] = data[page].map(
+          (item) => item.detail.timestamp
+        );
+      });
+    }
 
     set(() => ({
       savedCanvasPaths: newCanvasPaths,
