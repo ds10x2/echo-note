@@ -7,6 +7,7 @@ import DrawingEditor from "@components/DrawingEditor";
 import { DrawingEditorContainer } from "@components/styles/DrawingEditor.style";
 import canvasStore from "@stores/canvasStore";
 import drawingTypeStore from "@/stores/drawingTypeStore";
+import LoadingIcon from "@components/common/LoadingIcon"; // LoadingIcon 추가
 
 const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened, onResize }) => {
   const canvasRef = useRef();
@@ -16,6 +17,7 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened, onResize }) => {
   const { currentPage, setPages, scale } = pageStore(); // zustand의 상태와 액션 가져오기
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
   const renderTaskRef = useRef(null);
   const { mode } = drawingTypeStore();
 
@@ -25,6 +27,7 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened, onResize }) => {
   const renderPage = useCallback(
     (pageNum, pdf = pdfRef) => {
       if (pdf && containerRef.current) {
+        setIsLoading(true); // 페이지 렌더링 시작 시 로딩 상태 활성화
         pdf.getPage(pageNum).then((page) => {
           const containerWidth = containerRef.current.clientWidth;
           const containerHeight = containerRef.current.clientHeight;
@@ -65,9 +68,11 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened, onResize }) => {
 
           renderTaskRef.current.promise
             .then(() => {
+              setIsLoading(false); // 렌더링 완료 시 로딩 상태 비활성화
               renderTaskRef.current = null;
             })
             .catch((err) => {
+              setIsLoading(false); // 오류 발생 시에도 로딩 상태 비활성화
               if (err.name !== "RenderingCancelledException") {
                 console.error(err);
               }
@@ -94,9 +99,11 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened, onResize }) => {
     loadingTask.promise.then(
       (loadedPdf) => {
         setPdfRef(loadedPdf);
+        setIsLoading(false); // PDF 로드 완료 후 로딩 상태 비활성화
       },
       (err) => {
         console.error(err);
+        setIsLoading(false); // 오류 발생 시에도 로딩 상태 비활성화
       }
     );
   }, [url]);
@@ -106,22 +113,36 @@ const PdfCanvas = ({ url, containerRef, isDrawingEditorOpened, onResize }) => {
   }, [canvasSize]);
 
   return (
-    <St.PdfCanvasContainer width={canvasSize.width} height={canvasSize.height}>
-      <div style={{ margin: "10px" }}>
-        <canvas ref={canvasRef}></canvas>
-        <PdfEditor
-          scale={scale}
-          originalSize={originalSize}
-          currentPage={currentPage}
-          containerRef={containerRef}
-        />
-        {mode.pen ? (
-          <DrawingEditor scale={scale} page={currentPage} readOnly={false} />
-        ) : (
-          <DrawingEditor scale={scale} page={currentPage} readOnly={true} />
-        )}
-      </div>
-    </St.PdfCanvasContainer>
+    <>
+      {isLoading ? ( // 로딩 중일 때 LoadingIcon 표시
+        <LoadingIcon /> // 로딩 컴포넌트
+      ) : (
+        // 로딩 완료 시 PdfCanvasContainer 표시
+        <St.PdfCanvasContainer
+          width={canvasSize.width}
+          height={canvasSize.height}
+        >
+          <div style={{ margin: "10px" }}>
+            <canvas ref={canvasRef}></canvas>
+            <PdfEditor
+              scale={scale}
+              originalSize={originalSize}
+              currentPage={currentPage}
+              containerRef={containerRef}
+            />
+            {mode.pen ? (
+              <DrawingEditor
+                scale={scale}
+                page={currentPage}
+                readOnly={false}
+              />
+            ) : (
+              <DrawingEditor scale={scale} page={currentPage} readOnly={true} />
+            )}
+          </div>
+        </St.PdfCanvasContainer>
+      )}
+    </>
   );
 };
 
