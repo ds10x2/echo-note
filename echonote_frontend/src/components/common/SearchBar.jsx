@@ -90,7 +90,8 @@ const SearchBar = ({ onSearch }) => {
         </SearchButton>
       ) : (
         <SearchResultCount>
-          {currentIndex}/{searchResults.length}
+          {searchResults.length == 0 ? 0 : currentIndex + 1}/
+          {searchResults.length}
           <SearchControlIcons>
             <SearchArrowIcon onClick={() => handleArrowNavigation("up")}>
               <IoIosArrowUp />

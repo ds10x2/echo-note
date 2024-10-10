@@ -51,6 +51,7 @@ public class NoteController {
 	@Operation(summary = "노트 생성", description = "업로드한 pdf에 대한 노트 생성")
 	public ResponseEntity<NoteCreateResponse> createNote(@RequestBody NoteCreateRequest noteCreateRequest) {
 
+		System.out.println(noteService.toString());
 		Long userId = 1L;
 		NoteCreateResponse response = noteService.addNote(userId, noteCreateRequest);
 
