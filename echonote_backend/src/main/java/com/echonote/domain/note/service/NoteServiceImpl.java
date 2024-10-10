@@ -100,7 +100,7 @@ public class NoteServiceImpl implements NoteService {
 		Note note = noteRepository.findById(noteId)
 			.orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
 		String stt_status = note.is_processing() ? "processing" : "done";
-		
+
 		// keyword select
 		Keywords keywords = keywordRepository.findById(noteId)
 			.orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
@@ -108,6 +108,14 @@ public class NoteServiceImpl implements NoteService {
 		GetNoteResponse res = GetNoteResponse.fromEntity(note, stt_status, keywords.getKeywords());
 
 		return res;
+	}
+
+	@Override
+	public void updateDate(Long noteId) {
+		Note note = noteRepository.findById(noteId)
+			.orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
+		note.setUpdate_at(LocalDateTime.now());
+		noteRepository.save(note);
 	}
 
 	@Override
