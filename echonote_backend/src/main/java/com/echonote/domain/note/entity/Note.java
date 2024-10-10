@@ -44,4 +44,6 @@ public class Note {
 
 	private LocalDateTime update_at;
 
+	private boolean is_processing;
+
 }
