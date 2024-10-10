@@ -207,7 +207,11 @@ const DrawingCanvas = forwardRef(
 
         if (selectedIndices && selectedIndices.length > 0) {
           const minTime = getMinRecordingTime(page, selectedIndices);
-          setStartTime(minTime);
+
+          // 녹음과 매핑된 경우에만 이동
+          if (minTime !== 0) {
+            setStartTime(minTime);
+          }
         }
       }
     };
