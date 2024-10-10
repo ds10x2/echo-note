@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { shouldNotForwardPropsWithKeys } from "@shared/utils/shouldForwardProp";
 
 export const STTContainer = styled.div`
   margin: 0;
@@ -55,4 +56,26 @@ export const ResultText = styled.p`
   padding: 0;
   background-color: ${(props) =>
     props.$isEditMode ? "lightyellow" : "transparent"};
+`;
+
+export const Highlight = styled.span`
+  background-color: yellow;
+`;
+
+export const TextUnder = styled.span.withConfig({
+  shouldForwardProp: shouldNotForwardPropsWithKeys(["keywordColor"]),
+})`
+  position: relative;
+
+  &::after {
+    content: "";
+    width: 100%;
+    height: 10px;
+    background: ${(props) => props.keywordColor || "#99fee7"};
+    position: absolute;
+    display: inline-block;
+    left: 0;
+    bottom: 1px;
+    z-index: -1;
+  }
 `;

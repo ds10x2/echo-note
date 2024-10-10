@@ -5,6 +5,8 @@ import {
   STTResultItem,
   ResultLink,
   ResultText,
+  Highlight,
+  TextUnder,
 } from "@/components/styles/STT.style";
 import { useAudioStore } from "@stores/recordStore";
 import { getSTTResult } from "@services/sttApi";
@@ -64,10 +66,8 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
     }
 
     if (stt_status === "done") {
-      console.log("stt 불러옴");
       fetchData();
     } else if (stt_status === "processing") {
-      console.log("stt 분석중");
       setIsLoading(true);
       const eventSource = new EventSource(
         `${import.meta.env.VITE_API_URL}voice/sse?note_id=${note_id}`
@@ -75,15 +75,8 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
 
       console.log("SSE 연결 시도 중...");
 
-      // 연결 시 초기 메시지 처리
-      eventSource.onopen = (event) => {
-        console.log("연결 완료: ", event);
-      };
-
       // STT 완료 이벤트 처리
       eventSource.addEventListener("stt_complete", (event) => {
-        console.log("STT 완료: ", event.data);
-
         eventSource.close();
         Toast.fire({
           icon: "success",
@@ -141,31 +134,31 @@ const STTComponent = ({ searchTerm, isEditMode, onSubmit }) => {
 
     return (
       <span>
-        {parts.map((part, i) => (
-          <span
-            key={i}
-            style={
-              typeof part === "string" &&
-              part.toLowerCase() === searchTerm?.toLowerCase()
-                ? {
-                    backgroundColor: "yellow", // 검색어 하이라이트 색상
-                  }
-                : isKeyword &&
-                  currentKeyword.some(
-                    (keyword) =>
-                      typeof part === "string" &&
-                      part.toLowerCase() === keyword.toLowerCase()
-                  )
-                ? {
-                    color: keywordColor,
-                    backgroundColor: "black",
-                  }
-                : {}
-            }
-          >
-            {part}
-          </span>
-        ))}
+        {parts.map((part, i) => {
+          if (
+            typeof part === "string" &&
+            part.toLowerCase() === searchTerm?.toLowerCase()
+          ) {
+            return <Highlight key={i}>{part}</Highlight>;
+          }
+
+          if (
+            isKeyword &&
+            currentKeyword.some(
+              (keyword) =>
+                typeof part === "string" &&
+                part.toLowerCase() === keyword.toLowerCase()
+            )
+          ) {
+            return (
+              <TextUnder key={i} keywordColor={keywordColor}>
+                {part}
+              </TextUnder>
+            );
+          }
+
+          return <span key={i}>{part}</span>;
+        })}
       </span>
     );
   };
