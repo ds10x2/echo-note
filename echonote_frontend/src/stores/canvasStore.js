@@ -58,7 +58,10 @@ const canvasStore = create((set, get) => ({
           savedCanvasPaths[page],
         ];
         const newUndoStack = pageUndoStack.slice(0, -1);
-        const previousPath = newUndoStack[newUndoStack.length - 1] || null;
+        const previousPath =
+          newUndoStack.length > 0
+            ? newUndoStack[newUndoStack.length - 1]
+            : null;
 
         return {
           savedCanvasPaths: { ...savedCanvasPaths, [page]: previousPath },
