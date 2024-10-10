@@ -117,6 +117,9 @@ public class VoiceServiceImpl implements VoiceService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
 
+		log.info("flaskUrl: " + flaskUrl);
+		log.info("flask로 보내는 정보: "+ flaskSendRequest.toString());
+
 		// 요청에 데이터 추가
 		HttpEntity<FlaskSendRequest> entity = new HttpEntity<>(flaskSendRequest, headers);
 
