@@ -9,10 +9,12 @@ import {
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { exportPdfWithTextAndShapes } from "@services/PDFSave/PdfSave";
+import { useNoteStore } from "@/stores/noteStore";
 
 const PdfSettingModal = ({ isOpen, onClose, position, toggleAnalyzeModal }) => {
   const [animate, setAnimate] = useState(false);
   const [visible, setVisible] = useState(isOpen);
+  const { pdf_path } = useNoteStore();
 
   useEffect(() => {
     if (isOpen) {
@@ -31,7 +33,7 @@ const PdfSettingModal = ({ isOpen, onClose, position, toggleAnalyzeModal }) => {
 
   const handleExportPdf = async () => {
     try {
-      await exportPdfWithTextAndShapes(); // PDF 내보내기 함수 호출
+      await exportPdfWithTextAndShapes(pdf_path); // PDF 내보내기 함수 호출
       alert("PDF가 성공적으로 내보내졌습니다.");
     } catch (error) {
       console.error("PDF 내보내기 실패:", error);
