@@ -1,13 +1,12 @@
-import React from "react";
 import { MoonLoader } from "react-spinners";
 import * as St from "@components/common/LoadingIcon.style";
 import { theme } from "@/shared/styles/theme";
 
-const LoadingIcon = () => {
+const LoadingIcon = ({ text }) => {
   return (
     <St.LoadingIconContainer>
-      <St.LoadingText>PDF를 가져오고 있어요</St.LoadingText>
-      <MoonLoader color={theme.colors.main} />
+      <MoonLoader color={theme.colors.main} speedMultiplier={0.8} />
+      <St.LoadingText>{text}</St.LoadingText>
     </St.LoadingIconContainer>
   );
 };
