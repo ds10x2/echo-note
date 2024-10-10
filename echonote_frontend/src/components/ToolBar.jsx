@@ -73,7 +73,7 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
   } = drawingTypeStore();
 
   const { nextPage, prevPage, zoomIn, zoomOut, currentPage } = pageStore();
-  const { fontProperty, setFontSize } = textStore();
+  const { fontProperty, setFontSize, resetTextItems, textItems } = textStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPdfSettingModalOpen, setIsPdfSettingModalOpen] = useState(false);
   const [isAnalyzeModalOpen, setIsAnalyzeModalOpen] = useState(false);
@@ -93,8 +93,13 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
   // 1부터 64까지의 숫자 배열(폰트사이즈)
   const fontSizeOptions = Array.from({ length: 64 }, (_, index) => index + 1);
   const { drawings } = canvasStore();
-  const { rectangles, circles } = shapeStore();
-  const { textItems } = textStore();
+  const { rectangles, circles, resetAllShapes } = shapeStore();
+
+  const resetItems = () => {
+    resetTextItems();
+    resetAllShapes();
+    //드로잉
+  };
 
   //도형모드 off -> 사각형 모드 -> 원 모드 -> 도형모드 off
   const handleShapeMode = () => {
@@ -130,6 +135,7 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
     navigate(-1);
     resetSidebarStore();
     resetNoteStore();
+    resetItems();
   };
 
   const toggleAnalyzeModal = () => {
@@ -213,7 +219,7 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
       // console.log("save memo");
       saveMemo(data);
     }
-
+    resetItems();
     navigate("/");
   };
 
