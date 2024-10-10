@@ -205,8 +205,8 @@ public class VoiceServiceImpl implements VoiceService {
 
 			for (int sttIdx = 0, aIdx = 0; sttIdx < sttRequest.size() && aIdx < anomalyTimes.size(); ) {
 
-				if( Float.parseFloat(sttRequest.get(sttIdx).getStart()) <= Float.parseFloat(anomalyTimes.get(aIdx)) &&
-					Float.parseFloat(sttRequest.get(sttIdx).getEnd()) >= Float.parseFloat(anomalyTimes.get(aIdx)) ) {
+				if( (Float.parseFloat(sttRequest.get(sttIdx).getStart()) - 1.0f) <= Float.parseFloat(anomalyTimes.get(aIdx)) &&
+					(Float.parseFloat(sttRequest.get(sttIdx).getEnd()) + 1.0f) >= Float.parseFloat(anomalyTimes.get(aIdx)) ) {
 					// 속성 변경
 					System.out.println("changed");
 					sttRequest.get(sttIdx).changeAnomaly(true);
