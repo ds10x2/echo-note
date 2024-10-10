@@ -61,7 +61,7 @@ public class VoiceServiceImpl implements VoiceService {
 	String analysisServerUrl;  // 음성 분석 모델 API URL
 
 //	@Value("${STT_flask_Url}")
-	String STTflaskUrl= "https://d3b9-34-125-118-154.ngrok-free.app/voice_stt/stt";
+	String STTflaskUrl= "https://c0f5-34-87-129-244.ngrok-free.app/voice_stt/stt";
 
 	private final Map<String, TwoFlaskResult> resultStore = new ConcurrentHashMap<>();
 
