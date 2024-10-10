@@ -200,7 +200,7 @@ public class VoiceServiceImpl implements VoiceService {
 				.orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
 			note.set_processing(false);
 
-			// 결과 조합하기
+			// 결과 조합하기. anomalyTimes를 중심으로 탐색한다.
 			List<STTRequest> sttRequest = twoFlaskResult.getSttResultRequest().getResult();
 			List<String> anomalyTimes = twoFlaskResult.getAnalysisResultRequest().getAnomalyTime();
 
@@ -213,8 +213,11 @@ public class VoiceServiceImpl implements VoiceService {
 					sttRequest.get(sttIdx).changeAnomaly(true);
 					aIdx++;
 				}
-
-				sttIdx++;
+				
+				// 현재 문장이 이상 지점보다 이전에 있다면 다음 문장을 탐색
+				if( Float.parseFloat(sttRequest.get(sttIdx).getEnd()) <
+					Float.parseFloat(anomalyTimes.get(aIdx)) )
+					sttIdx++;
 			}
 
 			// MongoDB에 조합한 결과 저장
