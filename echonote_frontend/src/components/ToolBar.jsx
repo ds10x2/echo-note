@@ -166,6 +166,8 @@ const ToolBar = ({ onToggleDrawingEditor, onToggleToolBar, noteId }) => {
   };
 
   const stringifyDetail = (obj) => {
+    if (!obj || obj.length === 0) return;
+
     // 배열일 때, 각 요소에 대해 재귀 호출
     if (Array.isArray(obj)) {
       return obj.map((item) => stringifyDetail(item));

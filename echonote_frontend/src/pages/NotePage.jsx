@@ -51,17 +51,18 @@ const NotePage = () => {
       try {
         const memoData = await getMemo(id);
         // console.log(memoData);
+
         // 각 메모 요소로 전달
-        if (memoData.text && memoData.text.length > 0) {
+        if (memoData.text || memoData.text.length > 0) {
           loadTextItems(parseDetail(memoData.text));
         }
-        if (memoData.rectangle && memoData.rectangle.length > 0) {
+        if (memoData.rectangle || memoData.rectangle.length > 0) {
           loadRectangles(parseDetail(memoData.rectangle));
         }
-        if (memoData.circle && memoData.circle.length > 0) {
+        if (memoData.circle || memoData.circle.length > 0) {
           loadCircles(parseDetail(memoData.circle));
         }
-        if (memoData.drawing && memoData.drawing.length > 0) {
+        if (memoData.drawing || memoData.drawing.length > 0) {
           loadDrawings(parseDetail(memoData.drawing));
         }
       } catch (error) {
@@ -73,8 +74,6 @@ const NotePage = () => {
   }, [id, loadTextItems, loadRectangles, loadCircles, loadDrawings]);
 
   const parseDetail = (obj) => {
-    if (!obj || obj.length === 0) return;
-
     // 배열일 때, 각 요소에 대해 재귀 호출
     if (Array.isArray(obj)) {
       return obj.map((item) => parseDetail(item));
