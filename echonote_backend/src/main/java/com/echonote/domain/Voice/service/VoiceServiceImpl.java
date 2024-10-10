@@ -109,11 +109,8 @@ public class VoiceServiceImpl implements VoiceService {
 	}
 
 	private STTResponse sendSTTFlask(FlaskSendRequest flaskSendRequest) {
-//		 String flaskUrl = "https://timeisnullnull.duckdns.org:8090/voice_stt/stt";  // STT 모델 API URL
-//		String flaskUrl = "http://localhost:5000/stt";
-//		String flaskUrl = "http://70.12.130.111:4999/voice_stt/stt";
 		String flaskUrl = "https://f1f9-34-83-36-185.ngrok-free.app/voice_stt/stt";
-		
+
 		// HTTP 헤더 설정
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);  // JSON으로 전송
@@ -148,7 +145,7 @@ public class VoiceServiceImpl implements VoiceService {
 		// Flask 서버로 POST 요청 보내기
 		ResponseEntity<STTResponse> response = restTemplate.exchange(analysisServerUrl, HttpMethod.POST, entity,
 			STTResponse.class);
-		
+
 		// 응답 처리 (필요에 따라)
 		if (response.getStatusCode().is2xxSuccessful()) {
 			System.out.println("성공적으로 Flask 서버에 전송되었습니다: " + response.getBody());
@@ -199,6 +196,7 @@ public class VoiceServiceImpl implements VoiceService {
 			Note note = noteRepository.findById(twoFlaskResult.getSttResultRequest().getId())
 				.orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
 			note.set_processing(false);
+			noteRepository.save(note);
 
 			// 결과 조합하기. anomalyTimes를 중심으로 탐색한다.
 			List<STTRequest> sttRequest = twoFlaskResult.getSttResultRequest().getResult();
@@ -206,8 +204,10 @@ public class VoiceServiceImpl implements VoiceService {
 
 			for (int sttIdx = 0, aIdx = 0; sttIdx < sttRequest.size() && aIdx < anomalyTimes.size(); ) {
 
-				if( (Float.parseFloat(sttRequest.get(sttIdx).getStart()) - 1.0f) <= Float.parseFloat(anomalyTimes.get(aIdx)) &&
-					(Float.parseFloat(sttRequest.get(sttIdx).getEnd()) + 1.0f) >= Float.parseFloat(anomalyTimes.get(aIdx)) ) {
+				if ((Float.parseFloat(sttRequest.get(sttIdx).getStart()) - 1.0f) <= Float.parseFloat(
+					anomalyTimes.get(aIdx)) &&
+					(Float.parseFloat(sttRequest.get(sttIdx).getEnd()) + 1.0f) >= Float.parseFloat(
+						anomalyTimes.get(aIdx))) {
 					// 속성 변경
 					System.out.println("changed");
 					sttRequest.get(sttIdx).changeAnomaly(true);
@@ -233,7 +233,6 @@ public class VoiceServiceImpl implements VoiceService {
 		}
 	}
 
-	// STT Service
 	private final MongoTemplate mongoTemplate;
 
 	@Override

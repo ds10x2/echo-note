@@ -5,14 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,9 +19,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.echonote.domain.Voice.dto.AnalysisResultRequest;
 import com.echonote.domain.Voice.dto.STTResultRequest;
@@ -37,8 +32,6 @@ import com.echonote.domain.note.dto.NoteCreateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,7 +44,6 @@ public class VoiceController {
 	private String bucketName;
 
 	private final Map<Long, SseEmitter> emitters = new HashMap<>();
-
 
 	// 확장자명에 따라 presigned url 반환
 	@GetMapping("/url")
@@ -82,27 +74,27 @@ public class VoiceController {
 		voiceService.saveSTTResult(sttResultRequest);
 
 		STT stt = new STT().builder()
-				.id(sttResultRequest.getId())
-				.result(sttResultRequest.getResult())
-				.processId(sttResultRequest.getProcessId())
-				.build();
+			.id(sttResultRequest.getId())
+			.result(sttResultRequest.getResult())
+			.processId(sttResultRequest.getProcessId())
+			.build();
 
 		voiceService.insertSTT(stt);
 
-		if(emitters.get(sttResultRequest.getId()) != null){
+		if (emitters.get(sttResultRequest.getId()) != null) {
 			SseEmitter emitter = emitters.get(sttResultRequest.getId());
 			try {
 				emitter.send(
-						SseEmitter
-								.event()
-								.name("stt_complete")
-								.data("STT 정보 수신 완료"));
+					SseEmitter
+						.event()
+						.name("stt_complete")
+						.data("STT 정보 수신 완료"));
 
 				emitter.complete(); // 이미터 kill
 
 			} catch (IOException e) {
 				emitter.completeWithError(e);
-			}finally {
+			} finally {
 				// 이미터를 null로 설정 (선택 사항)
 				emitters.remove(sttResultRequest.getId());
 				emitter = null;  // 참조를 제거
@@ -135,20 +127,12 @@ public class VoiceController {
 		return new ResponseEntity<>(stt, HttpStatus.OK);
 	}
 
-//	@PostMapping("/stt")
-//	@Operation(summary = "stt 저장", description = "stt를 저장하는 API. flask 서버와 연동된다.")
-//	public ResponseEntity<STT> saveSTT(@RequestBody STT result) {
-//		voiceService.insertSTT(result);
-//
-//		return new ResponseEntity<>(HttpStatus.OK);
-//	}
-
-//	@CrossOrigin(origins = "*", allowedHeaders = "*") // 특정 출처 허용
+	//	@CrossOrigin(origins = "*", allowedHeaders = "*") // 특정 출처 허용
 	@GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public SseEmitter streamSTT(@RequestParam("note_id") long noteId) {
 
-		if(emitters.get(noteId) == null){
-			SseEmitter emitter = new SseEmitter(30*60000L);
+		if (emitters.get(noteId) == null) {
+			SseEmitter emitter = new SseEmitter(30 * 60000L);
 			emitters.put(noteId, emitter);
 
 			emitter.onCompletion(() -> emitters.remove(emitter));
@@ -161,14 +145,12 @@ public class VoiceController {
 				emitter.completeWithError(e);
 			}
 
-
 			return emitter;
-		}else{
+		} else {
 			SseEmitter emitter = emitters.get(noteId);
 			return emitter;
 		}
 	}
-
 
 	@PutMapping("/stt")
 	@Operation(summary = "stt 업데이트", description = "note_id와 stt 정보를 보내주면 mongoDB에서 업데이트 할 수 있다.")
