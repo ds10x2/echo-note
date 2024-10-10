@@ -4,19 +4,13 @@ const pageStore = create((set, get) => ({
   currentPage: 1, // 현재 페이지 상태 추가
   pages: 1, // 최대 페이지 수 상태 추가
   scale: 1, // 줌 스케일 초기 상태
-  originSizes: {}, // 각 페이지의 originSize 저장
+  originSize: { width: 0, height: 0 }, // 초기값 설정
 
-  // 각 페이지의 originSize 설정 메서드
-  setOriginSize: (page, width, height) => {
-    const originSizes = get().originSizes;
-    const currentSize = originSizes[page] || { width: 0, height: 0 };
+  // originSize 설정 메서드
+  setOriginSize: (width, height) => {
+    const currentSize = get().originSize;
     if (currentSize.width !== width || currentSize.height !== height) {
-      set({
-        originSizes: {
-          ...originSizes,
-          [page]: { width, height },
-        },
-      });
+      set({ originSize: { width, height } });
     }
   },
 
