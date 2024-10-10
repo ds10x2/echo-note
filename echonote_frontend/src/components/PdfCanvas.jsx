@@ -5,6 +5,7 @@ import PdfEditor from "@components/PdfEditor";
 import pageStore from "@/stores/pageStore"; // zustand의 상태와 액션 가져오기
 import DrawingEditor from "@components/DrawingEditor";
 import drawingTypeStore from "@/stores/drawingTypeStore";
+import { useNoteStore } from "@stores/noteStore";
 import LoadingIcon from "@components/common/LoadingIcon"; // 로딩 아이콘
 
 const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
@@ -18,6 +19,10 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
   const renderTaskRef = useRef(null);
   const [isRendering, setIsRendering] = useState(true); // 렌더링 상태 추가
   const { mode } = drawingTypeStore();
+  const { pdf_path } = useNoteStore();
+
+  // const pdf_path =
+  //   "https://timeisnullnull.s3.ap-northeast-2.amazonaws.com/le_Petit_Prince_%EB%B3%B8%EB%AC%B8.pdf";
 
   const renderPage = useCallback(
     (pageNum, pdf = pdfRef) => {
@@ -95,18 +100,25 @@ const PdfCanvas = ({ containerRef, isDrawingEditorOpened, onResize }) => {
 
   // PDF 문서를 로드
   useEffect(() => {
-    setIsRendering(true); // PDF 로드 시작 시 렌더링 true로 설정
-    const loadingTask = pdfjsLib.getDocument(url);
-    loadingTask.promise.then(
-      (loadedPdf) => {
-        setPdfRef(loadedPdf);
-      },
-      (err) => {
-        setIsRendering(false); // 오류 발생 시 렌더링 false로 설정
-        console.error(err);
-      }
-    );
-  }, [url]);
+    if (pdf_path) {
+      setIsRendering(true);
+      const loadingTask = pdfjsLib.getDocument(pdf_path);
+      loadingTask.promise.then(
+        (loadedPdf) => {
+          setPdfRef(loadedPdf);
+        },
+        (err) => {
+          setIsRendering(false);
+          if (err.name === "InvalidPDFException") {
+            console.error("유효하지 않은 PDF 파일입니다:" + pdf_path);
+            alert("유효하지 않은 PDF 파일입니다. 다른 파일을 시도해 주세요.");
+          } else {
+            console.error("PDF 로드 중 오류 발생:", err);
+          }
+        }
+      );
+    }
+  }, [pdf_path]);
 
   useEffect(() => {
     onResize(canvasSize.width, canvasSize.height);
