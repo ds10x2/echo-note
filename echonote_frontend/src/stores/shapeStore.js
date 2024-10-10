@@ -100,12 +100,20 @@ const shapeStore = create((set, get) => ({
 
   getRectangles: () => {
     const currentPage = get().currentPage;
-    return get().rectangles[currentPage] || [];
+    const rectangles = get().rectangles;
+    if (!rectangles || !rectangles[currentPage]) {
+      return [];
+    }
+    return rectangles[currentPage];
   },
 
   getCircles: () => {
     const currentPage = get().currentPage;
-    return get().circles[currentPage] || [];
+    const circles = get().circles;
+    if (!circles || !circles[currentPage]) {
+      return [];
+    }
+    return circles[currentPage];
   },
 
   getProperty: () => {
