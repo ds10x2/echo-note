@@ -14,7 +14,7 @@ const drawingTypeStore = create((set, get) => ({
   resetType: () =>
     set((state) => ({
       mode: {
-        text: !state.mode.text, // text의 값을 토글
+        text: false, // text의 값을 토글
         shape: false,
         pen: false,
       },
