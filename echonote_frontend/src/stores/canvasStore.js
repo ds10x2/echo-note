@@ -6,6 +6,19 @@ const canvasStore = create((set, get) => ({
   savedCanvasRecords: {}, // 페이지별 저장된 녹음 시간
   undoStacks: {}, // 페이지별 undo 스택
   redoStacks: {}, // 페이지별 redo 스택
+  strokeColor: "#000",
+
+  setStrokeColor: (color) => {
+    set(() => ({
+      strokeColor: color,
+    }));
+  },
+
+  resetStrockColor: () => {
+    set(() => ({
+      strokeColor: "#000",
+    }));
+  },
 
   // 경로 데이터를 저장하는 함수
   setCanvasPath: (page, data, time) => {
