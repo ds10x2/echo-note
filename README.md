@@ -1,7 +1,5 @@
 <img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=200&section=header&text=Echo%20Note&fontSize=70&animation=fadeIn" />
 
-### 🏆 **삼성 청년 SW 아카데미(SSAFY) 11기 - 특화 우수 프로젝트**
-
 # 📝Echo Note
 
 **Echo Note**는 AI를 통한 녹음 분석과 필기를 합쳐 사용자의 효율적인 학습을 돕는 노트 서비스입니다.
