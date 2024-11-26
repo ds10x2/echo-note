@@ -23,7 +23,6 @@ export default defineConfig({
       },
       { find: "@shared", replacement: path.resolve(__dirname, "src/shared") },
       { find: "@stores", replacement: path.resolve(__dirname, "src/stores") },
-      { find: "@shared", replacement: path.resolve(__dirname, "src/shared") },
       {
         find: "@icons",
         replacement: path.resolve(__dirname, "src/assets/icons"),
@@ -31,6 +30,10 @@ export default defineConfig({
       {
         find: "@images",
         replacement: path.resolve(__dirname, "src/assets/images"),
+      },
+      {
+        find: "@fonts",
+        replacement: path.resolve(__dirname, "src/assets/fonts"),
       },
     ],
   },
